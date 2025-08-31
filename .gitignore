@@ -58,3 +58,5 @@ compile_commands.json
 *.user
 /win/vc/.vs/QToml
 /win/vc/build/QToml/Debug
+/win/vc/build/QToml/Release
+/win/vc/deploy/bin
