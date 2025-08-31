@@ -29,33 +29,33 @@
  * - Qt framework integration and wrapper implementation
  */
 
-/**
- * @file qtomldatetime_p.h
- * @brief Private implementation details for QTomlDateTime class.
- * 
- * This header contains the private implementation class for QTomlDateTime,
- * following Qt's PIMPL (Private Implementation) pattern. The private class
- * encapsulates all internal data structures and implementation details,
- * providing binary compatibility and compilation hiding for the public API.
- * 
- * Design principles:
- * - Follows Qt naming conventions for private classes (ClassNamePrivate)
- * - Uses snake_case for internal member variables per project standards
- * - Minimizes memory footprint through efficient data layout
- * - Provides type-safe representation of TOML temporal format variants
- * - Enables zero-overhead abstraction over Qt's date-time classes
- * 
- * The implementation supports all TOML v1.0.0 temporal formats:
- * - Local dates without time information
- * - Local times without date information  
- * - Complete date-time values with timezone support
- * - Null state for uninitialized or missing temporal data
- * 
- * @note This file is part of the private API and should not be included directly
- * @note Implementation details may change between versions without notice
- * @note Only the QTomlDateTime class and internal converters should access this
- * @see qtomldatetime.h for the public interface
- */
+ /**
+  * @file qtomldatetime_p.h
+  * @brief Private implementation details for QTomlDateTime class.
+  *
+  * This header contains the private implementation class for QTomlDateTime,
+  * following Qt's PIMPL (Private Implementation) pattern. The private class
+  * encapsulates all internal data structures and implementation details,
+  * providing binary compatibility and compilation hiding for the public API.
+  *
+  * Design principles:
+  * - Follows Qt naming conventions for private classes (ClassNamePrivate)
+  * - Uses snake_case for internal member variables per project standards
+  * - Minimizes memory footprint through efficient data layout
+  * - Provides type-safe representation of TOML temporal format variants
+  * - Enables zero-overhead abstraction over Qt's date-time classes
+  *
+  * The implementation supports all TOML v1.0.0 temporal formats:
+  * - Local dates without time information
+  * - Local times without date information
+  * - Complete date-time values with timezone support
+  * - Null state for uninitialized or missing temporal data
+  *
+  * @note This file is part of the private API and should not be included directly
+  * @note Implementation details may change between versions without notice
+  * @note Only the QTomlDateTime class and internal converters should access this
+  * @see qtomldatetime.h for the public interface
+  */
 
 #pragma once
 #pragma execution_character_set("utf-8")
@@ -64,60 +64,60 @@
 #include <QTime>
 #include <QTimeZone>
 
-/**
- * @class QTomlDateTimePrivate
- * @brief Private implementation class for QTomlDateTime using PIMPL pattern.
- * 
- * This class contains the actual data storage and implementation details for
- * QTomlDateTime objects. It uses a discriminated union approach where the
- * type enumeration determines which temporal components are valid and meaningful.
- * 
- * The class is designed for:
- * - **Memory efficiency**: Compact representation with no virtual overhead
- * - **Type safety**: Strong typing through enumerated temporal formats
- * - **Performance**: Zero-overhead abstraction over Qt date-time classes
- * - **Simplicity**: Straightforward data layout for easy copying and assignment
- * 
- * Data layout strategy:
- * The class stores all possible temporal components (date, time, timezone) but
- * only interprets them according to the type indicator. This approach avoids
- * complex inheritance hierarchies while maintaining type safety through the
- * public interface.
- * 
- * Naming conventions:
- * - Class name follows Qt convention: QTomlDateTimePrivate
- * - Member variables use snake_case per project coding standards
- * - Enumeration values use lowercase for consistency
- * 
- * @note This class is not thread-safe; synchronization must be handled externally
- * @note Direct manipulation of member variables can lead to inconsistent state
- * @note Only the QTomlDateTime public interface should be used for modifications
- * 
- * @see QTomlDateTime for the public interface
- * @see PIMPL pattern documentation for design rationale
- */
+  /**
+   * @class QTomlDateTimePrivate
+   * @brief Private implementation class for QTomlDateTime using PIMPL pattern.
+   *
+   * This class contains the actual data storage and implementation details for
+   * QTomlDateTime objects. It uses a discriminated union approach where the
+   * type enumeration determines which temporal components are valid and meaningful.
+   *
+   * The class is designed for:
+   * - **Memory efficiency**: Compact representation with no virtual overhead
+   * - **Type safety**: Strong typing through enumerated temporal formats
+   * - **Performance**: Zero-overhead abstraction over Qt date-time classes
+   * - **Simplicity**: Straightforward data layout for easy copying and assignment
+   *
+   * Data layout strategy:
+   * The class stores all possible temporal components (date, time, timezone) but
+   * only interprets them according to the type indicator. This approach avoids
+   * complex inheritance hierarchies while maintaining type safety through the
+   * public interface.
+   *
+   * Naming conventions:
+   * - Class name follows Qt convention: QTomlDateTimePrivate
+   * - Member variables use snake_case per project coding standards
+   * - Enumeration values use lowercase for consistency
+   *
+   * @note This class is not thread-safe; synchronization must be handled externally
+   * @note Direct manipulation of member variables can lead to inconsistent state
+   * @note Only the QTomlDateTime public interface should be used for modifications
+   *
+   * @see QTomlDateTime for the public interface
+   * @see PIMPL pattern documentation for design rationale
+   */
 class QTomlDateTimePrivate
 {
 public:
 	/**
 	 * @enum type
 	 * @brief Enumeration defining the temporal format type stored in this object.
-	 * 
+	 *
 	 * This enumeration provides type safety by explicitly identifying which
 	 * temporal format this object represents. It determines the interpretation
 	 * of the stored date, time, and timezone components.
-	 * 
+	 *
 	 * The enumeration values correspond directly to TOML v1.0.0 temporal formats:
 	 * - **null**: No temporal data (default/uninitialized state)
 	 * - **date**: Local date only (YYYY-MM-DD format)
 	 * - **time**: Local time only (HH:MM:SS[.ffffff] format)
 	 * - **date_time**: Complete date-time with timezone (RFC 3339 format)
-	 * 
+	 *
 	 * Type interpretation rules:
 	 * - Only components relevant to the type should be considered valid
 	 * - Invalid components for a given type should return default-constructed values
 	 * - Type transitions should only occur through public QTomlDateTime methods
-	 * 
+	 *
 	 * @note Enumeration uses lowercase names per project coding standards
 	 * @note Values are ordered by complexity: null < date < time < date_time
 	 * @note Additional temporal formats can be added in future versions
@@ -126,26 +126,26 @@ public:
 	{
 		/**
 		 * @brief Null state indicating no temporal data.
-		 * 
+		 *
 		 * Represents the absence of temporal information, typically from
 		 * default construction or error conditions. All temporal components
 		 * should be considered invalid when type is null.
-		 * 
+		 *
 		 * Valid components: None
 		 * TOML representation: Not applicable (internal state only)
 		 */
 		null,
-		
+
 		/**
 		 * @brief Date-only temporal format without time or timezone.
-		 * 
+		 *
 		 * Represents a calendar date without time information, corresponding
 		 * to TOML's local date format. Only the date component is meaningful;
 		 * time and timezone components should be ignored.
-		 * 
+		 *
 		 * Valid components: date_ only
 		 * TOML representation: "1979-05-27"
-		 * 
+		 *
 		 * @example
 		 * @code
 		 * // date_ = QDate(1979, 5, 27)
@@ -154,17 +154,17 @@ public:
 		 * @endcode
 		 */
 		date,
-		
+
 		/**
 		 * @brief Time-only temporal format without date or timezone.
-		 * 
+		 *
 		 * Represents a time of day without date context, corresponding
 		 * to TOML's local time format. Only the time component is meaningful;
 		 * date and timezone components should be ignored.
-		 * 
+		 *
 		 * Valid components: time_ only
 		 * TOML representation: "07:32:00" or "07:32:00.999999"
-		 * 
+		 *
 		 * @example
 		 * @code
 		 * // date_ = ignored (may contain any value)
@@ -173,17 +173,17 @@ public:
 		 * @endcode
 		 */
 		time,
-		
+
 		/**
 		 * @brief Complete date-time format with optional timezone.
-		 * 
+		 *
 		 * Represents a full temporal value with date, time, and timezone
 		 * components, corresponding to TOML's offset date-time format.
 		 * All temporal components are meaningful and should be preserved.
-		 * 
+		 *
 		 * Valid components: date_, time_, time_zone_
 		 * TOML representation: "1979-05-27T07:32:00Z" or "1979-05-27T07:32:00-08:00"
-		 * 
+		 *
 		 * @example
 		 * @code
 		 * // date_ = QDate(1979, 5, 27)
@@ -196,20 +196,20 @@ public:
 
 	/**
 	 * @brief Default constructor initializing to null state.
-	 * 
+	 *
 	 * Creates a QTomlDateTimePrivate object in the null state, representing
 	 * the absence of temporal data. All temporal components are left in their
 	 * default-constructed states, which should be ignored when type is null.
-	 * 
+	 *
 	 * Initial state:
 	 * - type_ = type::null
 	 * - date_ = default QDate() (invalid)
 	 * - time_ = default QTime() (invalid)
 	 * - time_zone_ = default QTimeZone() (invalid)
-	 * 
+	 *
 	 * @complexity O(1) - Simple member initialization
 	 * @exception Strong exception safety through default constructors
-	 * 
+	 *
 	 * @note All temporal components are invalid in null state
 	 * @note Type should be changed through QTomlDateTime public methods
 	 * @note Null state is the safe default for uninitialized objects
@@ -221,22 +221,22 @@ public:
 
 	/**
 	 * @brief Copy constructor using compiler-generated implementation.
-	 * 
+	 *
 	 * Creates a deep copy of another QTomlDateTimePrivate object, copying
 	 * all temporal data and type information. The compiler-generated version
 	 * is sufficient as all member types have proper copy semantics.
-	 * 
+	 *
 	 * Copied components:
 	 * - type_ is copied exactly
 	 * - date_ is copied (QDate has value semantics)
 	 * - time_ is copied (QTime has value semantics)
 	 * - time_zone_ is copied (QTimeZone has value semantics)
-	 * 
+	 *
 	 * @param other The QTomlDateTimePrivate object to copy from
-	 * 
+	 *
 	 * @complexity O(1) - Simple member copying with small overhead
 	 * @exception Strong exception safety through member copy constructors
-	 * 
+	 *
 	 * @note Compiler-generated version is explicitly declared for clarity
 	 * @note All Qt temporal classes have efficient copy constructors
 	 * @note The copy is completely independent of the source object
@@ -247,92 +247,92 @@ public:
 
 	/**
 	 * @brief Type indicator determining which temporal components are valid.
-	 * 
+	 *
 	 * This member determines the interpretation of all other temporal
 	 * components in this object. Only components relevant to the specified
 	 * type should be considered meaningful; others should be ignored even
 	 * if they contain valid-looking data.
-	 * 
+	 *
 	 * Type determines component validity:
 	 * - type::null: No components are valid
 	 * - type::date: Only date_ is valid
-	 * - type::time: Only time_ is valid  
+	 * - type::time: Only time_ is valid
 	 * - type::date_time: All components (date_, time_, time_zone_) are valid
-	 * 
+	 *
 	 * @note Should only be modified through controlled public interface
 	 * @note Changing type without updating components can cause inconsistent state
 	 * @note Used for branch prediction optimization in accessor methods
 	 */
 	type type_;
-	
+
 	/**
 	 * @brief Date component for date-only and date-time temporal formats.
-	 * 
+	 *
 	 * Stores the calendar date portion of the temporal value. This component
 	 * is meaningful when type_ is date or date_time, and should be ignored
 	 * for other types.
-	 * 
+	 *
 	 * Component validity by type:
 	 * - type::null: Ignored (may be invalid)
 	 * - type::date: Valid and meaningful
 	 * - type::time: Ignored (may be invalid)
 	 * - type::date_time: Valid and meaningful
-	 * 
+	 *
 	 * Data characteristics:
 	 * - Can represent any valid Gregorian calendar date
 	 * - Supports QDate's full range (approximately 4800 BCE to 1.4 million CE)
 	 * - Invalid dates are preserved as-is for error handling
-	 * 
+	 *
 	 * @note QDate has value semantics and efficient copy operations
 	 * @note Validity should be checked through QDate::isValid() when applicable
 	 * @note Component is ignored for time-only temporal values
 	 */
 	QDate date_;
-	
+
 	/**
 	 * @brief Time component for time-only and date-time temporal formats.
-	 * 
+	 *
 	 * Stores the time-of-day portion of the temporal value with microsecond
 	 * precision. This component is meaningful when type_ is time or date_time,
 	 * and should be ignored for other types.
-	 * 
+	 *
 	 * Component validity by type:
 	 * - type::null: Ignored (may be invalid)
 	 * - type::date: Ignored (may be invalid)
 	 * - type::time: Valid and meaningful
 	 * - type::date_time: Valid and meaningful
-	 * 
+	 *
 	 * Precision characteristics:
 	 * - Supports full 24-hour time range (00:00:00 to 23:59:59)
 	 * - Microsecond precision (0-999999 microseconds)
 	 * - Millisecond precision accessible through QTime::msec()
 	 * - Invalid times are preserved for error handling
-	 * 
+	 *
 	 * @note QTime has value semantics and efficient copy operations
 	 * @note Precision is limited by QTime's internal representation
 	 * @note Component is ignored for date-only temporal values
 	 */
 	QTime time_;
-	
+
 	/**
 	 * @brief Timezone component for complete date-time temporal formats.
-	 * 
+	 *
 	 * Stores timezone information for complete date-time values, including
 	 * UTC designation, fixed offsets, and named timezones. This component
 	 * is only meaningful when type_ is date_time.
-	 * 
+	 *
 	 * Component validity by type:
 	 * - type::null: Ignored (may be invalid)
 	 * - type::date: Ignored (may be invalid)
 	 * - type::time: Ignored (may be invalid)
 	 * - type::date_time: Valid and meaningful
-	 * 
+	 *
 	 * Supported timezone types:
 	 * - UTC timezone (QTimeZone::utc()) for "Z" suffix
 	 * - Fixed offset timezones for "+05:00" style offsets
 	 * - Named timezones where supported by the system
 	 * - Invalid timezones preserved for error conditions
-	 * 
+	 *
 	 * @note QTimeZone has value semantics but may have larger copy overhead
 	 * @note Timezone validity depends on system timezone database
 	 * @note Component is ignored for date-only and time-only values

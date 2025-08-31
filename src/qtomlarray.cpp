@@ -43,11 +43,11 @@ namespace
 {
 	/**
 	 * @brief Global registration of QTomlArray as a Qt meta type.
-	 * 
+	 *
 	 * This ensures that QTomlArray can be used in Qt's signal-slot system,
 	 * QVariant containers, and other Qt meta object features. The registration
 	 * occurs at program startup during static initialization.
-	 * 
+	 *
 	 * @note This follows Qt's recommended pattern for custom type registration.
 	 * @see Q_DECLARE_METATYPE, qRegisterMetaType
 	 */
@@ -56,18 +56,18 @@ namespace
 
 /**
  * @brief Default constructor creating an empty TOML array.
- * 
+ *
  * Creates a QTomlArray instance with no elements. The array is ready for
  * use immediately and can have elements added via append(), prepend(), or
  * insert() methods.
- * 
+ *
  * This constructor is marked noexcept to guarantee no exceptions will be
  * thrown during construction, making it safe for use in exception-sensitive
  * contexts.
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for construction only; concurrent access requires external synchronization
- * 
+ *
  * @example
  * @code
  * QTomlArray array;
@@ -82,19 +82,19 @@ QTomlArray::QTomlArray() noexcept
 
 /**
  * @brief Initializer list constructor for convenient array creation.
- * 
+ *
  * Creates a QTomlArray instance initialized with the provided values.
  * This constructor enables brace-initialization syntax for creating
  * arrays with known values at compile time.
- * 
+ *
  * The implementation pre-allocates memory for optimal performance,
  * avoiding multiple reallocations during construction.
- * 
+ *
  * @param args Initializer list of QTomlValue objects to populate the array
- * 
+ *
  * @complexity O(n) where n is the number of elements in the initializer list
  * @threadsafety Thread-safe for construction only
- * 
+ *
  * @example
  * @code
  * QTomlArray array{
@@ -105,7 +105,7 @@ QTomlArray::QTomlArray() noexcept
  * Q_ASSERT(array.size() == 3);
  * Q_ASSERT(array.at(0).toInteger() == 42);
  * @endcode
- * 
+ *
  * @note Values are copied into the array; the original values remain unchanged
  */
 QTomlArray::QTomlArray(std::initializer_list<QTomlValue> args)
@@ -121,24 +121,24 @@ QTomlArray::QTomlArray(std::initializer_list<QTomlValue> args)
 
 /**
  * @brief Copy constructor creating a deep copy of another array.
- * 
+ *
  * Creates a new QTomlArray instance that is an independent copy of the
  * provided array. All elements are deep-copied, ensuring modifications
  * to either array do not affect the other.
- * 
+ *
  * Uses the PIMPL pattern's copy semantics to ensure proper resource
  * management and deep copying of all contained values.
- * 
+ *
  * @param other The QTomlArray instance to copy
- * 
+ *
  * @complexity O(n) where n is the number of elements in the source array
  * @threadsafety Thread-safe for construction; the source array should not be modified during copying
- * 
+ *
  * @example
  * @code
  * QTomlArray original{QTomlValue(42), QTomlValue("hello")};
  * QTomlArray copy(original);
- * 
+ *
  * copy.append(QTomlValue(true));
  * Q_ASSERT(original.size() == 2);  // Original unchanged
  * Q_ASSERT(copy.size() == 3);      // Copy has new element
@@ -151,43 +151,43 @@ QTomlArray::QTomlArray(const QTomlArray& other)
 
 /**
  * @brief Move constructor for efficient resource transfer.
- * 
+ *
  * Creates a new QTomlArray instance by transferring ownership of resources
  * from the source array. The source array becomes empty but remains in a
  * valid state after the move.
- * 
+ *
  * This constructor provides optimal performance for temporary arrays and
  * return value optimization scenarios.
- * 
+ *
  * @param other Rvalue reference to the QTomlArray instance to move from
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for construction only
- * 
+ *
  * @example
  * @code
  * QTomlArray createArray() {
  *     QTomlArray temp{QTomlValue(42), QTomlValue("hello")};
  *     return temp;  // Move constructor called automatically
  * }
- * 
+ *
  * QTomlArray array = createArray();  // Efficient transfer
  * @endcode
- * 
+ *
  * @note Marked noexcept for optimal move semantics and exception safety
  */
 QTomlArray::QTomlArray(QTomlArray&& other) noexcept = default;
 
 /**
  * @brief Destructor ensuring proper cleanup of resources.
- * 
+ *
  * Automatically releases all resources associated with the array,
  * including all contained QTomlValue instances. The PIMPL pattern
  * ensures proper cleanup order and exception safety.
- * 
+ *
  * @complexity O(n) where n is the number of elements requiring cleanup
  * @threadsafety Thread-safe for destruction only
- * 
+ *
  * @note Marked noexcept to guarantee no exceptions during destruction
  * @note Uses RAII principles for automatic resource management
  */
@@ -195,29 +195,29 @@ QTomlArray::~QTomlArray() noexcept = default;
 
 /**
  * @brief Copy assignment operator for array replacement.
- * 
+ *
  * Replaces the contents of this array with a deep copy of another array.
  * Includes self-assignment protection to handle cases where an array
  * is assigned to itself.
- * 
+ *
  * All existing elements in this array are replaced with copies of elements
  * from the source array. The operation is exception-safe.
- * 
+ *
  * @param other The QTomlArray instance to copy from
  * @return Reference to this array for chaining operations
- * 
+ *
  * @complexity O(n + m) where n is current size and m is source size
  * @threadsafety Not thread-safe; external synchronization required for concurrent access
- * 
+ *
  * @example
  * @code
  * QTomlArray array1{QTomlValue(42)};
  * QTomlArray array2{QTomlValue(13), QTomlValue(7)};
- * 
+ *
  * array1 = array2;  // array1 now contains [13, 7]
  * Q_ASSERT(array1.size() == 2);
  * @endcode
- * 
+ *
  * @note Self-assignment (array = array) is handled safely
  */
 QTomlArray& QTomlArray::operator=(const QTomlArray& other)
@@ -231,60 +231,60 @@ QTomlArray& QTomlArray::operator=(const QTomlArray& other)
 
 /**
  * @brief Move assignment operator for efficient resource transfer.
- * 
+ *
  * Replaces the contents of this array by transferring ownership from
  * another array. The source array becomes empty but remains valid.
- * 
+ *
  * This operation is highly efficient as it transfers resources rather
  * than copying data, making it ideal for performance-critical scenarios.
- * 
+ *
  * @param other Rvalue reference to the QTomlArray instance to move from
  * @return Reference to this array for chaining operations
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Not thread-safe; external synchronization required
- * 
+ *
  * @example
  * @code
  * QTomlArray array1{QTomlValue(42)};
  * QTomlArray array2{QTomlValue(13), QTomlValue(7)};
- * 
+ *
  * array1 = std::move(array2);  // Efficient transfer
  * Q_ASSERT(array1.size() == 2);
  * // array2 is now in valid but unspecified state
  * @endcode
- * 
+ *
  * @note Marked noexcept for optimal performance and exception safety
  */
 QTomlArray& QTomlArray::operator=(QTomlArray&& other) noexcept = default;
 
 /**
  * @brief Reserves memory capacity for future elements.
- * 
+ *
  * Pre-allocates memory to hold at least the specified number of elements
  * without triggering reallocations. This is a performance optimization
  * for scenarios where the approximate final size is known.
- * 
+ *
  * If the current capacity is already greater than or equal to the requested
  * size, this function has no effect. The reserve operation never reduces
  * capacity.
- * 
+ *
  * @param size The minimum number of elements to reserve space for
- * 
+ *
  * @complexity O(n) if reallocation occurs, O(1) otherwise
  * @threadsafety Not thread-safe; external synchronization required
- * 
+ *
  * @example
  * @code
  * QTomlArray array;
  * array.reserve(1000);  // Pre-allocate for 1000 elements
- * 
+ *
  * // Now adding elements will be efficient
  * for (int i = 0; i < 1000; ++i) {
  *     array.append(QTomlValue(i));  // No reallocations
  * }
  * @endcode
- * 
+ *
  * @note This function does not change the array size, only its capacity
  * @see capacity(), size()
  */
@@ -295,29 +295,29 @@ void QTomlArray::reserve(qsizetype size)
 
 /**
  * @brief Returns the current memory capacity of the array.
- * 
+ *
  * Returns the number of elements that can be stored in the currently
  * allocated memory before a reallocation is required. This value is
  * always greater than or equal to size().
- * 
+ *
  * Understanding capacity is useful for performance optimization and
  * memory usage analysis.
- * 
+ *
  * @return The current capacity of the array
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @example
  * @code
  * QTomlArray array;
  * qDebug() << "Initial capacity:" << array.capacity();
- * 
+ *
  * array.reserve(100);
  * Q_ASSERT(array.capacity() >= 100);
  * Q_ASSERT(array.size() == 0);  // Size unchanged
  * @endcode
- * 
+ *
  * @note Marked noexcept as it never throws exceptions
  * @see reserve(), size()
  */
@@ -328,29 +328,29 @@ qsizetype QTomlArray::capacity() const noexcept
 
 /**
  * @brief Appends a value to the end of the array.
- * 
+ *
  * Adds a new element at the end of the array, increasing the array size
  * by one. If the current capacity is insufficient, the array will be
  * reallocated to accommodate the new element.
- * 
+ *
  * The value is copied into the array, so the original value remains
  * unchanged and can be safely modified after this operation.
- * 
+ *
  * @param value The QTomlValue to add to the array
- * 
+ *
  * @complexity Amortized O(1), worst case O(n) if reallocation occurs
  * @threadsafety Not thread-safe; external synchronization required
- * 
+ *
  * @example
  * @code
  * QTomlArray array;
  * array.append(QTomlValue(42));
  * array.append(QTomlValue("hello"));
- * 
+ *
  * Q_ASSERT(array.size() == 2);
  * Q_ASSERT(array.at(0).toInteger() == 42);
  * @endcode
- * 
+ *
  * @see prepend(), insert(), append(QTomlValue&&)
  */
 void QTomlArray::append(const QTomlValue& value)
@@ -360,28 +360,28 @@ void QTomlArray::append(const QTomlValue& value)
 
 /**
  * @brief Appends a value to the end of the array using move semantics.
- * 
+ *
  * Adds a new element at the end of the array by moving the provided value.
  * This is more efficient than the copy version when the source value is
  * a temporary or can be moved from.
- * 
+ *
  * After this operation, the source value is in a valid but unspecified state.
- * 
+ *
  * @param value Rvalue reference to the QTomlValue to move into the array
- * 
+ *
  * @complexity Amortized O(1), worst case O(n) if reallocation occurs
  * @threadsafety Not thread-safe; external synchronization required
- * 
+ *
  * @example
  * @code
  * QTomlArray array;
  * QTomlValue temp(42);
  * array.append(std::move(temp));  // Efficient move
- * 
+ *
  * // temp is now in unspecified state
  * Q_ASSERT(array.size() == 1);
  * @endcode
- * 
+ *
  * @note This is an optimization for performance-critical code
  * @see append(const QTomlValue&), prepend(QTomlValue&&)
  */
@@ -392,28 +392,28 @@ void QTomlArray::append(QTomlValue&& value)
 
 /**
  * @brief Prepends a value to the beginning of the array.
- * 
+ *
  * Inserts a new element at the beginning of the array, shifting all
  * existing elements to higher indices. This operation increases the
  * array size by one.
- * 
+ *
  * The value is copied into the array, preserving the original value.
- * 
+ *
  * @param value The QTomlValue to add to the beginning of the array
- * 
+ *
  * @complexity O(n) where n is the current array size due to element shifting
  * @threadsafety Not thread-safe; external synchronization required
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(2), QTomlValue(3)};
  * array.prepend(QTomlValue(1));
- * 
+ *
  * Q_ASSERT(array.size() == 3);
  * Q_ASSERT(array.at(0).toInteger() == 1);  // New first element
  * Q_ASSERT(array.at(1).toInteger() == 2);  // Shifted
  * @endcode
- * 
+ *
  * @note Consider using append() for better performance when order doesn't matter
  * @see append(), insert(), prepend(QTomlValue&&)
  */
@@ -424,26 +424,26 @@ void QTomlArray::prepend(const QTomlValue& value)
 
 /**
  * @brief Prepends a value to the beginning using move semantics.
- * 
+ *
  * Inserts a new element at the beginning of the array by moving the
  * provided value. This is more efficient than the copy version when
  * the source value can be moved from.
- * 
+ *
  * All existing elements are shifted to higher indices.
- * 
+ *
  * @param value Rvalue reference to the QTomlValue to move to the beginning
- * 
+ *
  * @complexity O(n) where n is the current array size due to element shifting
  * @threadsafety Not thread-safe; external synchronization required
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(2)};
  * array.prepend(QTomlValue(1));  // Move from temporary
- * 
+ *
  * Q_ASSERT(array.at(0).toInteger() == 1);
  * @endcode
- * 
+ *
  * @see prepend(const QTomlValue&), append(QTomlValue&&)
  */
 void QTomlArray::prepend(QTomlValue&& value)
@@ -453,30 +453,30 @@ void QTomlArray::prepend(QTomlValue&& value)
 
 /**
  * @brief Inserts a value at the specified index.
- * 
+ *
  * Inserts a new element at the given index, shifting elements at that
  * position and beyond to higher indices. The array size increases by one.
- * 
+ *
  * If the index equals the array size, this operation is equivalent to
  * append(). If the index is out of bounds, the behavior depends on the
  * underlying QVector implementation.
- * 
+ *
  * @param i The index at which to insert the value
  * @param value The QTomlValue to insert
- * 
+ *
  * @complexity O(n) where n is the number of elements shifted
  * @threadsafety Not thread-safe; external synchronization required
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(1), QTomlValue(3)};
  * array.insert(1, QTomlValue(2));  // Insert at index 1
- * 
+ *
  * Q_ASSERT(array.size() == 3);
  * Q_ASSERT(array.at(1).toInteger() == 2);  // New element
  * Q_ASSERT(array.at(2).toInteger() == 3);  // Shifted element
  * @endcode
- * 
+ *
  * @warning Index must be valid (0 <= i <= size()) to avoid undefined behavior
  * @see append(), prepend(), insert(qsizetype, QTomlValue&&)
  */
@@ -487,27 +487,27 @@ void QTomlArray::insert(qsizetype i, const QTomlValue& value)
 
 /**
  * @brief Inserts a value at the specified index using move semantics.
- * 
+ *
  * Inserts a new element at the given index by moving the provided value.
  * This is more efficient than the copy version when the source value
  * can be moved from.
- * 
+ *
  * Elements at the insertion point and beyond are shifted to higher indices.
- * 
+ *
  * @param i The index at which to insert the value
  * @param value Rvalue reference to the QTomlValue to move and insert
- * 
+ *
  * @complexity O(n) where n is the number of elements shifted
  * @threadsafety Not thread-safe; external synchronization required
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(1), QTomlValue(3)};
  * array.insert(1, QTomlValue(2));  // Move from temporary
- * 
+ *
  * Q_ASSERT(array.at(1).toInteger() == 2);
  * @endcode
- * 
+ *
  * @see insert(qsizetype, const QTomlValue&), append(QTomlValue&&)
  */
 void QTomlArray::insert(qsizetype i, QTomlValue&& value)
@@ -517,28 +517,28 @@ void QTomlArray::insert(qsizetype i, QTomlValue&& value)
 
 /**
  * @brief Removes the element at the specified index.
- * 
+ *
  * Removes the element at the given index and shifts all subsequent
  * elements to lower indices. The array size decreases by one.
- * 
+ *
  * The implementation includes range checking optimization using Q_LIKELY
  * to hint that valid indices are the common case, improving branch prediction.
- * 
+ *
  * @param i The index of the element to remove
- * 
+ *
  * @complexity O(n) where n is the number of elements shifted
  * @threadsafety Not thread-safe; external synchronization required
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(1), QTomlValue(2), QTomlValue(3)};
  * array.removeAt(1);  // Remove element at index 1
- * 
+ *
  * Q_ASSERT(array.size() == 2);
  * Q_ASSERT(array.at(0).toInteger() == 1);
  * Q_ASSERT(array.at(1).toInteger() == 3);  // Shifted down
  * @endcode
- * 
+ *
  * @warning If index is out of bounds, the operation is silently ignored
  * @note Uses Q_LIKELY for branch prediction optimization
  * @see takeAt(), replace()
@@ -554,28 +554,28 @@ void QTomlArray::removeAt(qsizetype i)
 
 /**
  * @brief Replaces the element at the specified index.
- * 
+ *
  * Replaces the element at the given index with a new value. The array
  * size remains unchanged. If the index is out of bounds, the operation
  * is silently ignored for safety.
- * 
+ *
  * The new value is copied into the array, preserving the original value.
- * 
+ *
  * @param i The index of the element to replace
  * @param value The new QTomlValue to place at the specified index
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Not thread-safe; external synchronization required
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(1), QTomlValue(2), QTomlValue(3)};
  * array.replace(1, QTomlValue(99));
- * 
+ *
  * Q_ASSERT(array.size() == 3);  // Size unchanged
  * Q_ASSERT(array.at(1).toInteger() == 99);  // Replaced element
  * @endcode
- * 
+ *
  * @warning If index is out of bounds, the operation is silently ignored
  * @see replace(qsizetype, QTomlValue&&), removeAt()
  */
@@ -589,25 +589,25 @@ void QTomlArray::replace(qsizetype i, const QTomlValue& value)
 
 /**
  * @brief Replaces the element at the specified index using move semantics.
- * 
+ *
  * Replaces the element at the given index with a new value by moving
  * the provided value. This is more efficient than the copy version
  * when the source value can be moved from.
- * 
+ *
  * @param i The index of the element to replace
  * @param value Rvalue reference to the QTomlValue to move into the array
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Not thread-safe; external synchronization required
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(1), QTomlValue(2)};
  * array.replace(0, QTomlValue(99));  // Move from temporary
- * 
+ *
  * Q_ASSERT(array.at(0).toInteger() == 99);
  * @endcode
- * 
+ *
  * @see replace(qsizetype, const QTomlValue&), insert()
  */
 void QTomlArray::replace(qsizetype i, QTomlValue&& value)
@@ -620,30 +620,30 @@ void QTomlArray::replace(qsizetype i, QTomlValue&& value)
 
 /**
  * @brief Removes and returns the element at the specified index.
- * 
+ *
  * Removes the element at the given index and returns it by value.
  * All subsequent elements are shifted to lower indices, and the array
  * size decreases by one.
- * 
+ *
  * If the index is out of bounds, returns a QTomlValue with Undefined type
  * to indicate the invalid operation.
- * 
+ *
  * @param i The index of the element to take
  * @return The QTomlValue that was removed, or Undefined if index was invalid
- * 
+ *
  * @complexity O(n) where n is the number of elements shifted
  * @threadsafety Not thread-safe; external synchronization required
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(1), QTomlValue(2), QTomlValue(3)};
  * QTomlValue taken = array.takeAt(1);
- * 
+ *
  * Q_ASSERT(taken.toInteger() == 2);
  * Q_ASSERT(array.size() == 2);
  * Q_ASSERT(array.at(1).toInteger() == 3);  // Shifted down
  * @endcode
- * 
+ *
  * @note Returns Undefined value for invalid indices instead of throwing
  * @see removeAt(), at()
  */
@@ -658,29 +658,29 @@ QTomlValue QTomlArray::takeAt(qsizetype i)
 
 /**
  * @brief Returns a copy of the element at the specified index.
- * 
+ *
  * Retrieves the element at the given index without modifying the array.
  * The returned value is a copy, so modifications to it will not affect
  * the original element in the array.
- * 
+ *
  * Uses branch prediction optimization (Q_LIKELY) assuming that most
  * accesses will be within valid bounds.
- * 
+ *
  * @param i The index of the element to retrieve
  * @return Copy of the QTomlValue at the specified index, or Undefined if invalid
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(42), QTomlValue("hello")};
  * QTomlValue value = array.at(0);
- * 
+ *
  * Q_ASSERT(value.toInteger() == 42);
  * // Original array is unchanged
  * @endcode
- * 
+ *
  * @note Returns Undefined value for invalid indices instead of throwing
  * @see at_unsafe(), first(), last()
  */
@@ -696,30 +696,30 @@ QTomlValue QTomlArray::at(qsizetype i) const
 
 /**
  * @brief Returns a const reference to the element at the specified index without bounds checking.
- * 
+ *
  * Provides direct access to the element at the given index without any
  * bounds checking or error handling. This is an optimization for performance-
  * critical code where the caller can guarantee valid indices.
- * 
+ *
  * This method is marked noexcept as it performs no validation and cannot fail.
- * 
+ *
  * @param i The index of the element to retrieve (must be valid)
  * @return Const reference to the QTomlValue at the specified index
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(1), QTomlValue(2)};
- * 
+ *
  * // Safe usage - caller ensures valid index
  * for (qsizetype i = 0; i < array.size(); ++i) {
  *     const QTomlValue& value = array.at_unsafe(i);
  *     // Process value...
  * }
  * @endcode
- * 
+ *
  * @warning Caller must ensure index is valid (0 <= i < size())
  * @warning Undefined behavior if index is out of bounds
  * @note Use only when performance is critical and bounds are guaranteed
@@ -732,28 +732,28 @@ const QTomlValue& QTomlArray::at_unsafe(qsizetype i) const noexcept
 
 /**
  * @brief Returns a copy of the first element in the array.
- * 
+ *
  * Retrieves the first element (at index 0) without modifying the array.
  * If the array is empty, returns a QTomlValue with Undefined type.
- * 
+ *
  * This is a convenience method equivalent to at(0) but with clearer intent.
- * 
+ *
  * @return Copy of the first QTomlValue, or Undefined if array is empty
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(42), QTomlValue("hello")};
  * QTomlValue first = array.first();
- * 
+ *
  * Q_ASSERT(first.toInteger() == 42);
- * 
+ *
  * QTomlArray empty;
  * Q_ASSERT(empty.first().type() == QTomlValue::Undefined);
  * @endcode
- * 
+ *
  * @note Returns Undefined value for empty arrays instead of throwing
  * @see last(), at(), isEmpty()
  */
@@ -768,28 +768,28 @@ QTomlValue QTomlArray::first() const
 
 /**
  * @brief Returns a copy of the last element in the array.
- * 
+ *
  * Retrieves the last element (at index size()-1) without modifying the array.
  * If the array is empty, returns a QTomlValue with Undefined type.
- * 
+ *
  * This is a convenience method for accessing the final element.
- * 
+ *
  * @return Copy of the last QTomlValue, or Undefined if array is empty
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(1), QTomlValue(2), QTomlValue(3)};
  * QTomlValue last = array.last();
- * 
+ *
  * Q_ASSERT(last.toInteger() == 3);
- * 
+ *
  * QTomlArray empty;
  * Q_ASSERT(empty.last().type() == QTomlValue::Undefined);
  * @endcode
- * 
+ *
  * @note Returns Undefined value for empty arrays instead of throwing
  * @see first(), at(), isEmpty()
  */
@@ -804,247 +804,247 @@ QTomlValue QTomlArray::last() const
 
 /**
  * @brief Returns the number of elements in the array.
- * 
+ *
  * Returns the current count of elements stored in the array. This value
  * can range from 0 (empty array) to the maximum capacity supported by
  * the underlying container.
- * 
+ *
  * @return The number of elements currently in the array
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(1), QTomlValue(2)};
  * Q_ASSERT(array.size() == 2);
- * 
+ *
  * array.append(QTomlValue(3));
  * Q_ASSERT(array.size() == 3);
  * @endcode
- * 
+ *
  * @note Marked noexcept as it never throws exceptions
  * @see count(), isEmpty(), capacity()
  */
-qsizetype QTomlArray::size() const noexcept 
-{ 
-	return d_ptr->values_.size(); 
+qsizetype QTomlArray::size() const noexcept
+{
+	return d_ptr->values_.size();
 }
 
 /**
  * @brief Returns the number of elements in the array (alias for size()).
- * 
+ *
  * Provides an alternative name for size() to match Qt container conventions.
  * This method returns exactly the same value as size().
- * 
+ *
  * @return The number of elements currently in the array
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @note This is an alias for size() for API consistency with Qt containers
  * @see size(), isEmpty()
  */
-qsizetype QTomlArray::count() const noexcept 
-{ 
-	return d_ptr->values_.size(); 
+qsizetype QTomlArray::count() const noexcept
+{
+	return d_ptr->values_.size();
 }
 
 /**
  * @brief Checks whether the array contains no elements.
- * 
+ *
  * Returns true if the array has no elements (size() == 0), false otherwise.
  * This is more efficient and expressive than checking if size() equals zero.
- * 
+ *
  * @return true if the array is empty, false if it contains elements
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @example
  * @code
  * QTomlArray array;
  * Q_ASSERT(array.isEmpty());
- * 
+ *
  * array.append(QTomlValue(42));
  * Q_ASSERT(!array.isEmpty());
  * @endcode
- * 
+ *
  * @note Marked noexcept as it never throws exceptions
  * @see size(), count()
  */
-bool QTomlArray::isEmpty() const noexcept 
-{ 
-	return d_ptr->values_.isEmpty(); 
+bool QTomlArray::isEmpty() const noexcept
+{
+	return d_ptr->values_.isEmpty();
 }
 
 /**
  * @brief Returns an iterator to the beginning of the array.
- * 
+ *
  * Provides a mutable iterator pointing to the first element of the array.
  * If the array is empty, this iterator equals end().
- * 
+ *
  * The returned iterator allows both reading and modifying elements.
- * 
+ *
  * @return Mutable iterator to the first element
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Not thread-safe; external synchronization required for modifications
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(1), QTomlValue(2)};
- * 
+ *
  * for (auto it = array.begin(); it != array.end(); ++it) {
  *     // Modify elements through iterator
  *     *it = QTomlValue(it->toInteger() * 2);
  * }
  * @endcode
- * 
+ *
  * @see end(), constBegin(), cbegin()
  */
-QTomlArray::iterator QTomlArray::begin() noexcept 
-{ 
-	return d_ptr->values_.begin(); 
+QTomlArray::iterator QTomlArray::begin() noexcept
+{
+	return d_ptr->values_.begin();
 }
 
 /**
  * @brief Returns a const iterator to the beginning of the array.
- * 
+ *
  * Provides a read-only iterator pointing to the first element of the array.
  * If the array is empty, this iterator equals end().
- * 
+ *
  * @return Const iterator to the first element
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @example
  * @code
  * const QTomlArray array{QTomlValue(1), QTomlValue(2)};
- * 
+ *
  * for (auto it = array.begin(); it != array.end(); ++it) {
  *     qDebug() << it->toInteger();  // Read-only access
  * }
  * @endcode
- * 
+ *
  * @see end(), constBegin()
  */
-QTomlArray::const_iterator QTomlArray::begin() const noexcept 
-{ 
-	return d_ptr->values_.begin(); 
+QTomlArray::const_iterator QTomlArray::begin() const noexcept
+{
+	return d_ptr->values_.begin();
 }
 
 /**
  * @brief Returns a const iterator to the beginning of the array.
- * 
+ *
  * Explicitly provides a read-only iterator pointing to the first element.
  * This method is equivalent to begin() const but makes the const intent clear.
- * 
+ *
  * @return Const iterator to the first element
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @see constEnd(), begin()
  */
-QTomlArray::const_iterator QTomlArray::constBegin() const noexcept 
-{ 
-	return d_ptr->values_.constBegin(); 
+QTomlArray::const_iterator QTomlArray::constBegin() const noexcept
+{
+	return d_ptr->values_.constBegin();
 }
 
 /**
  * @brief Returns an iterator to one past the last element.
- * 
+ *
  * Provides a mutable iterator pointing to the theoretical element following
  * the last element. This iterator is used as the end marker for iteration
  * and should not be dereferenced.
- * 
+ *
  * @return Mutable iterator to one past the last element
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Not thread-safe; external synchronization required for modifications
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(1), QTomlValue(2)};
- * 
+ *
  * // Standard iteration pattern
  * for (auto it = array.begin(); it != array.end(); ++it) {
  *     // Process each element
  * }
  * @endcode
- * 
+ *
  * @warning Never dereference the end() iterator
  * @see begin(), constEnd()
  */
-QTomlArray::iterator QTomlArray::end() noexcept 
-{ 
-	return d_ptr->values_.end(); 
+QTomlArray::iterator QTomlArray::end() noexcept
+{
+	return d_ptr->values_.end();
 }
 
 /**
  * @brief Returns a const iterator to one past the last element.
- * 
+ *
  * Provides a read-only iterator pointing to the theoretical element following
  * the last element. This iterator serves as the end marker for const iteration.
- * 
+ *
  * @return Const iterator to one past the last element
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @see begin(), constEnd()
  */
-QTomlArray::const_iterator QTomlArray::end() const noexcept 
-{ 
-	return d_ptr->values_.end(); 
+QTomlArray::const_iterator QTomlArray::end() const noexcept
+{
+	return d_ptr->values_.end();
 }
 
 /**
  * @brief Returns a const iterator to one past the last element.
- * 
+ *
  * Explicitly provides a read-only iterator pointing to the end marker.
  * This method is equivalent to end() const but makes the const intent clear.
- * 
+ *
  * @return Const iterator to one past the last element
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @see constBegin(), end()
  */
-QTomlArray::const_iterator QTomlArray::constEnd() const noexcept 
-{ 
-	return d_ptr->values_.constEnd(); 
+QTomlArray::const_iterator QTomlArray::constEnd() const noexcept
+{
+	return d_ptr->values_.constEnd();
 }
 
 /**
  * @brief Converts the array to a QVariantList for Qt integration.
- * 
+ *
  * Creates a QVariantList containing QVariant representations of all
  * elements in the array. This enables integration with Qt's property
  * system, QML, and other Qt APIs that work with QVariant.
- * 
+ *
  * Each QTomlValue is converted to its corresponding QVariant representation
  * using the QTomlValue::toVariant() method.
- * 
+ *
  * @return QVariantList containing converted elements
- * 
+ *
  * @complexity O(n) where n is the number of elements in the array
  * @threadsafety Thread-safe for read-only access when array is not being modified
- * 
+ *
  * @example
  * @code
  * QTomlArray array{QTomlValue(42), QTomlValue("hello"), QTomlValue(true)};
  * QVariantList variants = array.toVariantList();
- * 
+ *
  * Q_ASSERT(variants.size() == 3);
  * Q_ASSERT(variants[0].toInt() == 42);
  * Q_ASSERT(variants[1].toString() == "hello");
  * Q_ASSERT(variants[2].toBool() == true);
  * @endcode
- * 
+ *
  * @note Memory is pre-allocated for optimal performance
  * @see fromVariantList(), QTomlValue::toVariant()
  */
@@ -1062,30 +1062,30 @@ QVariantList QTomlArray::toVariantList() const
 
 /**
  * @brief Creates a QTomlArray from a QVariantList.
- * 
+ *
  * Converts a QVariantList to a QTomlArray by attempting to convert each
  * QVariant to a QTomlValue. This is useful for integrating with Qt APIs
  * that provide data as QVariant containers.
- * 
+ *
  * Each QVariant in the list is converted using QVariant::value<QTomlValue>().
  * If a conversion fails, a default-constructed QTomlValue is used.
- * 
+ *
  * @param list The QVariantList to convert
  * @return QTomlArray containing the converted elements
- * 
+ *
  * @complexity O(n) where n is the number of elements in the list
  * @threadsafety Thread-safe (creates new instance)
- * 
+ *
  * @example
  * @code
  * QVariantList variants;
  * variants << 42 << "hello" << true;
- * 
+ *
  * QTomlArray array = QTomlArray::fromVariantList(variants);
  * Q_ASSERT(array.size() == 3);
  * Q_ASSERT(array.at(0).toInteger() == 42);
  * @endcode
- * 
+ *
  * @note Memory is pre-allocated for optimal performance
  * @note Failed conversions result in default QTomlValue objects
  * @see toVariantList(), QTomlValue::fromVariant()

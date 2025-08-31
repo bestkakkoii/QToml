@@ -29,44 +29,44 @@
  * - Qt framework integration and wrapper implementation
  */
 
-/**
- * @file qtomldocument.cpp
- * @brief Implementation of QTomlDocument class providing comprehensive TOML document management.
- * 
- * This file contains the complete implementation of the QTomlDocument class, which serves
- * as the primary interface for TOML document parsing, manipulation, and serialization.
- * The implementation integrates the high-performance toml++ library with Qt's framework
- * to provide a seamless developer experience.
- * 
- * Key implementation features:
- * - High-performance TOML parsing using toml++ v3.x
- * - Efficient data conversion between toml++ and Qt types
- * - Exception-safe error handling with detailed error reporting
- * - Memory-efficient document representation using PIMPL pattern
- * - Full TOML v1.0.0 specification compliance
- * - Optimized serialization with proper formatting
- * 
- * The implementation is organized into several main sections:
- * - Internal conversion helpers for parsing and serialization
- * - Document lifecycle management (construction, copying, moving)
- * - State management (null, empty, populated document states)
- * - Content access and modification interfaces
- * - TOML parsing and serialization operations
- * - Qt integration methods for QVariant interoperability
- * 
- * Performance considerations:
- * - Zero-copy string conversion where possible using string_view
- * - Efficient memory pre-allocation during parsing
- * - Move semantics throughout for optimal resource management
- * - Direct delegation to optimized toml++ operations
- * - Minimal overhead wrapper design
- * 
- * @note This file includes toml++ headers only in the implementation to avoid exposing dependencies
- * @note All parsing operations are thread-safe due to toml++ design
- * @note Document objects themselves are not thread-safe and require external synchronization
- * @see qtomldocument.h for the public interface
- * @see https://github.com/marzer/tomlplusplus for toml++ library documentation
- */
+ /**
+  * @file qtomldocument.cpp
+  * @brief Implementation of QTomlDocument class providing comprehensive TOML document management.
+  *
+  * This file contains the complete implementation of the QTomlDocument class, which serves
+  * as the primary interface for TOML document parsing, manipulation, and serialization.
+  * The implementation integrates the high-performance toml++ library with Qt's framework
+  * to provide a seamless developer experience.
+  *
+  * Key implementation features:
+  * - High-performance TOML parsing using toml++ v3.x
+  * - Efficient data conversion between toml++ and Qt types
+  * - Exception-safe error handling with detailed error reporting
+  * - Memory-efficient document representation using PIMPL pattern
+  * - Full TOML v1.0.0 specification compliance
+  * - Optimized serialization with proper formatting
+  *
+  * The implementation is organized into several main sections:
+  * - Internal conversion helpers for parsing and serialization
+  * - Document lifecycle management (construction, copying, moving)
+  * - State management (null, empty, populated document states)
+  * - Content access and modification interfaces
+  * - TOML parsing and serialization operations
+  * - Qt integration methods for QVariant interoperability
+  *
+  * Performance considerations:
+  * - Zero-copy string conversion where possible using string_view
+  * - Efficient memory pre-allocation during parsing
+  * - Move semantics throughout for optimal resource management
+  * - Direct delegation to optimized toml++ operations
+  * - Minimal overhead wrapper design
+  *
+  * @note This file includes toml++ headers only in the implementation to avoid exposing dependencies
+  * @note All parsing operations are thread-safe due to toml++ design
+  * @note Document objects themselves are not thread-safe and require external synchronization
+  * @see qtomldocument.h for the public interface
+  * @see https://github.com/marzer/tomlplusplus for toml++ library documentation
+  */
 
 #pragma execution_character_set("utf-8")
 
@@ -86,9 +86,7 @@
 #include <utility>
 #include <sstream>
 
-// Include toml++ only in .cpp with lightweight configuration
-#define TOML_ENABLE_FORMATTERS 1
-#include <3rdparty/include/toml++/toml.h>
+#include <3rdparty/toml++/toml.h>
 
 namespace
 {
@@ -101,34 +99,34 @@ namespace
 
 	/**
 	 * @brief Converts toml::table to QTomlHash with performance optimizations.
-	 * 
+	 *
 	 * This function efficiently converts a toml++ table object to a QTomlHash,
 	 * using optimized string conversion techniques to minimize memory allocations
 	 * and copying operations.
-	 * 
+	 *
 	 * The conversion process:
 	 * 1. Creates an empty QTomlHash container
 	 * 2. Iterates through all key-value pairs in the toml::table
 	 * 3. Converts keys directly from string_view to QString (zero-copy when possible)
 	 * 4. Recursively converts values using convert_node_to_value()
 	 * 5. Inserts converted pairs into the QTomlHash
-	 * 
+	 *
 	 * Performance optimizations:
 	 * - Direct string_view to QString conversion avoids intermediate std::string objects
 	 * - Uses structured bindings for efficient iteration
 	 * - Leverages QTomlHash's efficient insertion methods
 	 * - No unnecessary memory pre-allocation (let QHash manage capacity)
-	 * 
+	 *
 	 * @param table The toml++ table object to convert
 	 * @return Converted QTomlHash containing all key-value pairs
-	 * 
+	 *
 	 * @complexity O(n) where n is the number of key-value pairs in the table
 	 * @exception Strong exception safety guarantee through Qt container behavior
-	 * 
+	 *
 	 * @note Key conversion preserves UTF-8 encoding and Unicode characters
 	 * @note Nested tables and arrays are recursively converted
 	 * @note Empty tables result in empty QTomlHash objects
-	 * 
+	 *
 	 * @see convert_node_to_value() for value conversion details
 	 * @see QTomlHash::insert() for insertion behavior
 	 */
@@ -148,34 +146,34 @@ namespace
 
 	/**
 	 * @brief Converts toml::array to QTomlArray with performance optimizations.
-	 * 
+	 *
 	 * This function efficiently converts a toml++ array object to a QTomlArray,
 	 * preserving element order and type information while minimizing overhead
 	 * during the conversion process.
-	 * 
+	 *
 	 * The conversion process:
 	 * 1. Creates an empty QTomlArray container
 	 * 2. Iterates through all elements in the toml::array
 	 * 3. Recursively converts each element using convert_node_to_value()
 	 * 4. Appends converted elements to the QTomlArray
-	 * 
+	 *
 	 * Performance considerations:
 	 * - Elements are processed in order to maintain TOML array semantics
 	 * - Each element conversion is independent and exception-safe
 	 * - No memory pre-allocation to avoid over-allocation for small arrays
 	 * - Direct delegation to QTomlArray's optimized append operations
-	 * 
+	 *
 	 * @param array The toml++ array object to convert
 	 * @return Converted QTomlArray containing all elements in original order
-	 * 
+	 *
 	 * @complexity O(n) where n is the number of elements in the array
 	 * @exception Strong exception safety guarantee through Qt container behavior
-	 * 
+	 *
 	 * @note Element order is preserved according to TOML specification
 	 * @note Heterogeneous arrays (mixed types) are fully supported
 	 * @note Nested arrays and tables within elements are recursively converted
 	 * @note Empty arrays result in empty QTomlArray objects
-	 * 
+	 *
 	 * @see convert_node_to_value() for element conversion details
 	 * @see QTomlArray::append() for element insertion behavior
 	 */
@@ -193,11 +191,11 @@ namespace
 
 	/**
 	 * @brief Recursively converts toml::node to QTomlValue with comprehensive type support.
-	 * 
+	 *
 	 * This is the core conversion function that handles all TOML node types defined
 	 * in the TOML v1.0.0 specification. It provides type-safe conversion with proper
 	 * error handling for unsupported or invalid node types.
-	 * 
+	 *
 	 * Supported node type conversions:
 	 * - **toml::table**: Converted to QTomlValue containing QTomlHash
 	 * - **toml::array**: Converted to QTomlValue containing QTomlArray
@@ -209,24 +207,24 @@ namespace
 	 * - **toml::time**: Converted to QTomlValue containing QTomlDateTime (time-only)
 	 * - **toml::date_time**: Converted to QTomlValue containing QTomlDateTime (full)
 	 * - **toml::none**: Converted to QTomlValue::Undefined (error state)
-	 * 
+	 *
 	 * Conversion details:
 	 * - String conversion uses efficient string_view to QString with proper UTF-8 handling
 	 * - Numeric conversions preserve full precision within target type limits
 	 * - Date/time conversions handle timezone information and nanosecond precision
 	 * - Recursive conversions for nested structures (tables and arrays)
-	 * 
+	 *
 	 * @param node The toml++ node object to convert
 	 * @return QTomlValue containing the converted data with appropriate type
-	 * 
+	 *
 	 * @complexity O(1) for primitive types, O(n) for containers where n is element count
 	 * @exception Strong exception safety guarantee
-	 * 
+	 *
 	 * @note toml::none type should not appear in valid TOML documents per specification
 	 * @note Date/time conversions handle timezone offsets by converting minutes to seconds
 	 * @note Nanosecond precision is converted to millisecond precision for Qt compatibility
 	 * @note Recursive nature allows handling of arbitrarily nested TOML structures
-	 * 
+	 *
 	 * @warning Timezone offset calculation assumes valid timezone data from toml++
 	 * @see QTomlDateTime for date/time representation details
 	 * @see TOML specification for node type definitions
@@ -295,11 +293,11 @@ namespace
 
 	/**
 	 * @brief Converts QTomlValue to toml++ serializable form for table insertion.
-	 * 
+	 *
 	 * This function recursively converts a QTomlValue object into the appropriate
 	 * toml++ type and inserts it into a toml::table with the specified key.
 	 * It handles all TOML value types and properly manages type-specific conversions.
-	 * 
+	 *
 	 * Conversion handling by type:
 	 * - **Hash**: Recursively converts to toml::table
 	 * - **Array**: Recursively converts to toml::array
@@ -309,24 +307,24 @@ namespace
 	 * - **Bool**: Direct conversion to bool
 	 * - **DateTime**: Complex conversion handling date-only, time-only, and full date-time
 	 * - **Null/Undefined**: Skipped (TOML doesn't support null values)
-	 * 
+	 *
 	 * Date-time conversion logic:
 	 * - Date-only: Creates toml::date with year, month, day
 	 * - Time-only: Creates toml::time with hour, minute, second, nanoseconds
 	 * - Full date-time: Creates toml::date_time with timezone offset conversion
-	 * 
+	 *
 	 * @param value The QTomlValue object to convert and insert
 	 * @param table The target toml::table for insertion
 	 * @param key The key name for the table entry
-	 * 
+	 *
 	 * @complexity O(1) for primitive types, O(n) for containers
 	 * @exception Strong exception safety guarantee
-	 * 
+	 *
 	 * @note Null and Undefined values are silently skipped as TOML doesn't support null
 	 * @note Timezone offset conversion: QTimeZone seconds to toml++ minutes
 	 * @note Millisecond precision is converted to nanosecond precision for toml++
 	 * @note Recursive conversion allows handling of nested structures
-	 * 
+	 *
 	 * @warning String conversion assumes valid UTF-8 encoding in QString
 	 * @see convert_hash_to_table() for nested table conversion
 	 * @see convert_array_to_toml_array() for nested array conversion
@@ -411,36 +409,36 @@ namespace
 
 	/**
 	 * @brief Converts QTomlArray element to toml++ serializable form for array insertion.
-	 * 
+	 *
 	 * This function recursively converts a QTomlValue object into the appropriate
 	 * toml++ type and appends it to a toml::array. It handles all TOML value types
 	 * with the same conversion logic as convert_value_to_toml but for array context.
-	 * 
+	 *
 	 * The conversion logic is identical to convert_value_to_toml() but uses
 	 * toml::array::push_back() instead of toml::table::insert_or_assign().
 	 * This separation allows for optimized handling of array vs. table contexts.
-	 * 
+	 *
 	 * Conversion handling by type:
 	 * - **Hash**: Recursively converts to toml::table and appends
-	 * - **Array**: Recursively converts to toml::array and appends  
+	 * - **Array**: Recursively converts to toml::array and appends
 	 * - **String**: Converts QString to std::string and appends
 	 * - **Integer**: Converts qint64 to int64_t and appends
 	 * - **Double**: Direct double conversion and append
 	 * - **Bool**: Direct bool conversion and append
 	 * - **DateTime**: Complex date/time conversion and append
 	 * - **Null/Undefined**: Skipped (TOML doesn't support null values)
-	 * 
+	 *
 	 * @param value The QTomlValue object to convert and append
 	 * @param array The target toml::array for appending
-	 * 
+	 *
 	 * @complexity O(1) for primitive types, O(n) for containers
 	 * @exception Strong exception safety guarantee
-	 * 
+	 *
 	 * @note Identical conversion logic to convert_value_to_toml but for array context
 	 * @note Null and Undefined values are silently skipped
 	 * @note Maintains element order for TOML array semantics
 	 * @note Recursive conversion handles nested structures
-	 * 
+	 *
 	 * @see convert_value_to_toml() for detailed conversion logic
 	 * @see convert_hash_to_table() for nested table conversion
 	 * @see convert_array_to_toml_array() for nested array conversion
@@ -525,35 +523,35 @@ namespace
 
 	/**
 	 * @brief Converts QTomlHash to toml::table with move semantics optimization.
-	 * 
+	 *
 	 * This function converts a QTomlHash to a toml::table for serialization,
 	 * using move semantics where possible to optimize performance. It handles
 	 * null value filtering as required by TOML specification.
-	 * 
+	 *
 	 * The conversion process:
 	 * 1. Creates an empty toml::table
 	 * 2. Iterates through all key-value pairs in the QTomlHash
 	 * 3. Filters out null and undefined values (not supported by TOML)
 	 * 4. Converts keys to std::string using move semantics
 	 * 5. Recursively converts values using convert_value_to_toml()
-	 * 
+	 *
 	 * Performance optimizations:
 	 * - Uses move semantics for key string conversion
 	 * - Skips null/undefined values early to avoid unnecessary work
 	 * - Direct iteration using Qt container iterators
 	 * - Efficient delegation to specialized conversion functions
-	 * 
+	 *
 	 * @param hash The QTomlHash object to convert
 	 * @return Converted toml::table ready for serialization
-	 * 
+	 *
 	 * @complexity O(n) where n is the number of valid key-value pairs
 	 * @exception Strong exception safety guarantee
-	 * 
+	 *
 	 * @note Null and undefined values are filtered out per TOML specification
 	 * @note Move semantics reduce string copying overhead
 	 * @note Recursive conversion handles nested table structures
 	 * @note Empty hash results in empty toml::table
-	 * 
+	 *
 	 * @see convert_value_to_toml() for value conversion details
 	 * @see QTomlHash iteration for container interface
 	 */
@@ -577,34 +575,34 @@ namespace
 
 	/**
 	 * @brief Converts QTomlArray to toml::array with move semantics optimization.
-	 * 
+	 *
 	 * This function converts a QTomlArray to a toml::array for serialization,
 	 * maintaining element order and filtering out unsupported null values.
 	 * The implementation uses efficient iteration and delegation patterns.
-	 * 
+	 *
 	 * The conversion process:
 	 * 1. Creates an empty toml::array
 	 * 2. Iterates through all elements in the QTomlArray
 	 * 3. Filters out null and undefined values (not supported by TOML)
 	 * 4. Recursively converts each element using convert_array_value_to_toml()
-	 * 
+	 *
 	 * Performance considerations:
 	 * - Maintains original element order per TOML array semantics
 	 * - Early filtering of null/undefined values reduces conversion overhead
 	 * - Direct iterator usage for optimal traversal performance
 	 * - Specialized array conversion function avoids generic overhead
-	 * 
+	 *
 	 * @param array The QTomlArray object to convert
 	 * @return Converted toml::array ready for serialization
-	 * 
+	 *
 	 * @complexity O(n) where n is the number of valid elements
 	 * @exception Strong exception safety guarantee
-	 * 
+	 *
 	 * @note Element order is preserved according to TOML specification
-	 * @note Null and undefined elements are filtered out per TOML specification  
+	 * @note Null and undefined elements are filtered out per TOML specification
 	 * @note Recursive conversion handles nested array structures
 	 * @note Empty array results in empty toml::array
-	 * 
+	 *
 	 * @see convert_array_value_to_toml() for element conversion details
 	 * @see QTomlArray iteration for container interface
 	 */
@@ -628,10 +626,10 @@ namespace
 
 /**
  * @brief Default constructor creating an empty TOML document.
- * 
+ *
  * Initializes a QTomlDocument in null state using the PIMPL pattern.
  * The document starts uninitialized and cannot be serialized until content is assigned.
- * 
+ *
  * @note Marked noexcept for optimal performance
  * @note Creates document in null state (isNull() returns true)
  * @note Uses PIMPL pattern for binary compatibility
@@ -644,10 +642,10 @@ QTomlDocument::QTomlDocument() noexcept
 
 /**
  * @brief Constructs TOML document from QTomlHash.
- * 
+ *
  * Creates a QTomlDocument with the specified hash as the root table.
  * The document immediately becomes valid and serializable.
- * 
+ *
  * @param hash The QTomlHash to use as the document's root table
  * @note Document becomes non-null and ready for serialization
  * @note Hash content is copied for independence
@@ -661,10 +659,10 @@ QTomlDocument::QTomlDocument(const QTomlHash& hash)
 
 /**
  * @brief Copy constructor creating deep copy of another document.
- * 
+ *
  * Creates an independent copy using PIMPL copy semantics.
  * All document content and state are fully copied.
- * 
+ *
  * @param other The source document to copy from
  * @note Creates completely independent copy
  * @note Uses PIMPL pattern copy constructor
@@ -691,10 +689,10 @@ QTomlDocument::~QTomlDocument() noexcept = default;
 
 /**
  * @brief Copy assignment operator with self-assignment protection.
- * 
+ *
  * Replaces current document content with copy of source document.
  * Includes safety check for self-assignment scenarios.
- * 
+ *
  * @param other The source document to copy from
  * @return Reference to this document for chaining
  * @note Self-assignment safe through identity check
@@ -764,10 +762,10 @@ QTomlHash QTomlDocument::hash() const
 
 /**
  * @brief Sets the document's root table content.
- * 
+ *
  * Replaces the document's root table and marks it as non-null.
  * The document becomes valid and serializable after this operation.
- * 
+ *
  * @param hash The new root table content
  * @note Document becomes non-null after setting
  * @note Hash content is copied for independence
@@ -780,22 +778,22 @@ void QTomlDocument::setHash(const QTomlHash& hash)
 
 /**
  * @brief Parses TOML text from byte array into document.
- * 
+ *
  * Static method that parses UTF-8 encoded TOML text using the high-performance
  * toml++ library. Provides comprehensive error reporting through optional error parameter.
- * 
+ *
  * The parsing process:
  * 1. Creates string_view from QByteArray for zero-copy access
  * 2. Uses toml++ parser with full TOML v1.0.0 support
  * 3. Converts parsed toml::table to QTomlHash
  * 4. Returns populated document or null document on error
- * 
+ *
  * @param toml UTF-8 encoded TOML text as QByteArray
  * @param error Optional pointer to receive detailed parsing error information
  * @return Valid document on success, null document on parsing failure
- * 
+ *
  * @note Uses zero-copy string_view for optimal performance
- * @note Thread-safe parsing operation  
+ * @note Thread-safe parsing operation
  * @note Supports full TOML v1.0.0 specification
  * @note Error parameter can be nullptr if error details not needed
  */
@@ -829,19 +827,19 @@ QTomlDocument QTomlDocument::fromToml(const QByteArray& toml, QTomlParseError* e
 
 /**
  * @brief Serializes document to TOML format byte array.
- * 
+ *
  * Converts the document's content to TOML v1.0.0 compliant text format.
  * Uses toml++ formatter for high-quality output with proper formatting.
- * 
+ *
  * The serialization process:
  * 1. Checks if document is null (returns empty array if so)
  * 2. Converts QTomlHash to toml::table recursively
  * 3. Uses toml++ formatter for proper TOML formatting
  * 4. Converts output to UTF-8 QByteArray
  * 5. Handles any serialization errors gracefully
- * 
+ *
  * @return UTF-8 encoded TOML text, or empty array for null documents
- * 
+ *
  * @note Returns empty QByteArray for null documents
  * @note Uses toml++ formatter for specification-compliant output
  * @note Serialization errors are returned as commented text
@@ -882,13 +880,13 @@ QByteArray QTomlDocument::toToml() const
 
 /**
  * @brief Creates document from QVariant with type checking.
- * 
+ *
  * Static method that attempts to extract or convert a QVariant to QTomlDocument.
  * Supports direct extraction and conversion from QVariantMap.
- * 
+ *
  * @param variant The QVariant to convert
  * @return Converted document or empty document if conversion fails
- * 
+ *
  * @note Supports QTomlDocument and QVariantMap conversions
  * @note Returns empty document for unsupported types
  * @note Safe conversion with no exceptions thrown
@@ -908,12 +906,12 @@ QTomlDocument QTomlDocument::fromVariant(const QVariant& variant)
 
 /**
  * @brief Converts document to QVariant for Qt integration.
- * 
+ *
  * Wraps the document's root table as QVariant for use with Qt's property
  * system, signals/slots, and other QVariant-based APIs.
- * 
+ *
  * @return QVariant containing root table, or invalid QVariant for null documents
- * 
+ *
  * @note Returns invalid QVariant for null documents
  * @note Uses QVariant::fromValue for proper type wrapping
  * @note Enables integration with Qt property system

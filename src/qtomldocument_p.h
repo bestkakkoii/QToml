@@ -29,119 +29,119 @@
  * - Qt framework integration and wrapper implementation
  */
 
-/**
- * @file qtomldocument_p.h
- * @brief Private implementation details for QTomlDocument class using PIMPL pattern.
- * 
- * This header contains the private implementation class for QTomlDocument,
- * following Qt's PIMPL (Private Implementation) pattern for binary compatibility
- * and compilation hiding. The private class encapsulates all internal state
- * management while keeping the public interface clean and stable.
- * 
- * Design principles:
- * - Minimal data storage with maximum efficiency
- * - Clear separation between null and empty document states
- * - Snake_case naming for internal member variables per project standards
- * - Qt naming conventions for class names (ClassNamePrivate)
- * - Exception-safe design through compiler-generated methods
- * 
- * The implementation focuses on:
- * - Efficient document state management
- * - Fast access to root table data
- * - Clear distinction between null/empty/populated states
- * - Binary compatibility for future library versions
- * 
- * @note This file is part of the private API and should not be included directly
- * @note Implementation details may change between versions without notice
- * @note Only QTomlDocument and internal systems should access this interface
- * @see qtomldocument.h for the public interface
- */
+ /**
+  * @file qtomldocument_p.h
+  * @brief Private implementation details for QTomlDocument class using PIMPL pattern.
+  *
+  * This header contains the private implementation class for QTomlDocument,
+  * following Qt's PIMPL (Private Implementation) pattern for binary compatibility
+  * and compilation hiding. The private class encapsulates all internal state
+  * management while keeping the public interface clean and stable.
+  *
+  * Design principles:
+  * - Minimal data storage with maximum efficiency
+  * - Clear separation between null and empty document states
+  * - Snake_case naming for internal member variables per project standards
+  * - Qt naming conventions for class names (ClassNamePrivate)
+  * - Exception-safe design through compiler-generated methods
+  *
+  * The implementation focuses on:
+  * - Efficient document state management
+  * - Fast access to root table data
+  * - Clear distinction between null/empty/populated states
+  * - Binary compatibility for future library versions
+  *
+  * @note This file is part of the private API and should not be included directly
+  * @note Implementation details may change between versions without notice
+  * @note Only QTomlDocument and internal systems should access this interface
+  * @see qtomldocument.h for the public interface
+  */
 
 #pragma once
 #pragma execution_character_set("utf-8")
 
 #include "qtomlhash.h"
 
-/**
- * @class QTomlDocumentPrivate
- * @brief Private implementation class for QTomlDocument using PIMPL pattern.
- * 
- * This class contains the actual data storage and state management for QTomlDocument
- * objects. It maintains the document's root table and tracks whether the document
- * is in a null state, providing clear semantics for document lifecycle management.
- * 
- * The class is designed for:
- * - **State Management**: Clear tracking of document initialization and content states
- * - **Memory Efficiency**: Minimal storage overhead with efficient data layout
- * - **Performance**: Fast access to document data and state information
- * - **Simplicity**: Straightforward design with compiler-generated operations
- * - **Safety**: Exception-safe operations through Qt container guarantees
- * 
- * State management semantics:
- * The implementation distinguishes between several document states:
- * - **Null**: Default-constructed state with is_null_ = true (uninitialized)
- * - **Empty**: Valid document with empty root table (is_null_ = false, root_hash_.isEmpty() = true)
- * - **Populated**: Valid document with non-empty root table (is_null_ = false, has content)
- * 
- * This distinction allows for precise control over document serialization behavior
- * and provides clear semantics that match TOML specification requirements.
- * 
- * Data layout strategy:
- * The class stores minimal state information:
- * - Root table data (QTomlHash) for actual document content
- * - Null flag (bool) for initialization state tracking
- * 
- * This approach minimizes memory overhead while providing all necessary
- * functionality for document management.
- * 
- * Thread safety:
- * - Read operations are thread-safe when no modifications occur
- * - Write operations require external synchronization
- * - Copy construction is thread-safe with proper synchronization
- * - Qt containers provide thread-safe read access guarantees
- * 
- * @note This class follows Qt's private implementation naming convention
- * @note Member variables use snake_case naming for internal consistency
- * @note Direct manipulation should be avoided; use QTomlDocument public interface
- * @note The class is designed for use only within QTomlDocument implementation
- * 
- * @see QTomlDocument for the public interface
- * @see QTomlHash for root table storage
- * @see PIMPL pattern documentation for design rationale
- */
+  /**
+   * @class QTomlDocumentPrivate
+   * @brief Private implementation class for QTomlDocument using PIMPL pattern.
+   *
+   * This class contains the actual data storage and state management for QTomlDocument
+   * objects. It maintains the document's root table and tracks whether the document
+   * is in a null state, providing clear semantics for document lifecycle management.
+   *
+   * The class is designed for:
+   * - **State Management**: Clear tracking of document initialization and content states
+   * - **Memory Efficiency**: Minimal storage overhead with efficient data layout
+   * - **Performance**: Fast access to document data and state information
+   * - **Simplicity**: Straightforward design with compiler-generated operations
+   * - **Safety**: Exception-safe operations through Qt container guarantees
+   *
+   * State management semantics:
+   * The implementation distinguishes between several document states:
+   * - **Null**: Default-constructed state with is_null_ = true (uninitialized)
+   * - **Empty**: Valid document with empty root table (is_null_ = false, root_hash_.isEmpty() = true)
+   * - **Populated**: Valid document with non-empty root table (is_null_ = false, has content)
+   *
+   * This distinction allows for precise control over document serialization behavior
+   * and provides clear semantics that match TOML specification requirements.
+   *
+   * Data layout strategy:
+   * The class stores minimal state information:
+   * - Root table data (QTomlHash) for actual document content
+   * - Null flag (bool) for initialization state tracking
+   *
+   * This approach minimizes memory overhead while providing all necessary
+   * functionality for document management.
+   *
+   * Thread safety:
+   * - Read operations are thread-safe when no modifications occur
+   * - Write operations require external synchronization
+   * - Copy construction is thread-safe with proper synchronization
+   * - Qt containers provide thread-safe read access guarantees
+   *
+   * @note This class follows Qt's private implementation naming convention
+   * @note Member variables use snake_case naming for internal consistency
+   * @note Direct manipulation should be avoided; use QTomlDocument public interface
+   * @note The class is designed for use only within QTomlDocument implementation
+   *
+   * @see QTomlDocument for the public interface
+   * @see QTomlHash for root table storage
+   * @see PIMPL pattern documentation for design rationale
+   */
 class QTomlDocumentPrivate
 {
 public:
 	/**
 	 * @brief Default constructor initializing document to null state.
-	 * 
+	 *
 	 * Creates a QTomlDocumentPrivate instance representing a null (uninitialized)
 	 * document state. The root hash is default-constructed (empty), and the null
 	 * flag is set to true to indicate that no content has been assigned.
-	 * 
+	 *
 	 * This constructor establishes the foundation for all QTomlDocument objects,
 	 * ensuring they start in a well-defined state before being populated with
 	 * actual TOML content or explicitly assigned data.
-	 * 
+	 *
 	 * Initial state characteristics:
 	 * - is_null_ is set to true indicating uninitialized state
 	 * - root_hash_ is default-constructed (empty but valid QTomlHash)
 	 * - Document cannot be serialized until is_null_ becomes false
 	 * - State can be changed through QTomlDocument::setHash() or parsing operations
-	 * 
+	 *
 	 * @complexity O(1) - Constant time construction
 	 * @exception Strong exception safety through QTomlHash default constructor
-	 * 
+	 *
 	 * @note Uses member initializer list for optimal performance
 	 * @note Null state is distinct from empty document state
 	 * @note Safe default state for uninitialized document objects
-	 * 
+	 *
 	 * @example Internal usage pattern:
 	 * @code
 	 * QTomlDocumentPrivate impl;          // Null state
 	 * Q_ASSERT(impl.is_null_ == true);    // Uninitialized
 	 * Q_ASSERT(impl.root_hash_.isEmpty()); // Empty hash
-	 * 
+	 *
 	 * // State change through content assignment
 	 * impl.is_null_ = false;
 	 * impl.root_hash_.insert("key", QTomlValue("value"));
@@ -155,41 +155,41 @@ public:
 
 	/**
 	 * @brief Copy constructor using compiler-generated implementation.
-	 * 
+	 *
 	 * Creates a deep copy of another QTomlDocumentPrivate instance, copying
 	 * both the root table data and the null state flag. The compiler-generated
 	 * version is sufficient as both member types have proper copy semantics.
-	 * 
+	 *
 	 * Copy behavior:
 	 * - is_null_ flag is copied exactly
 	 * - root_hash_ is deep-copied through QTomlHash copy constructor
 	 * - All nested content within the hash is recursively copied
 	 * - Result is completely independent of the source object
-	 * 
+	 *
 	 * Performance characteristics:
 	 * - Time complexity depends on root_hash_ content size
 	 * - QTomlHash uses Qt's implicit sharing for efficiency where possible
 	 * - State copying is O(1), content copying is O(n) where n is element count
-	 * 
+	 *
 	 * @param other The QTomlDocumentPrivate instance to copy from
-	 * 
+	 *
 	 * @complexity O(n) where n is the number of elements in root_hash_
 	 * @exception Strong exception safety through QTomlHash copy constructor
-	 * 
+	 *
 	 * @note Compiler-generated version is explicitly declared for clarity
 	 * @note Creates completely independent copy suitable for separate modification
 	 * @note QTomlHash copy constructor handles all nested data copying
-	 * 
+	 *
 	 * @example Internal copy semantics:
 	 * @code
 	 * QTomlDocumentPrivate original;
 	 * original.is_null_ = false;
 	 * original.root_hash_.insert("key", QTomlValue("value"));
-	 * 
+	 *
 	 * QTomlDocumentPrivate copy(original);  // Deep copy
 	 * Q_ASSERT(copy.is_null_ == original.is_null_);
 	 * Q_ASSERT(copy.root_hash_.size() == original.root_hash_.size());
-	 * 
+	 *
 	 * // Modifications are independent
 	 * copy.root_hash_.insert("new_key", QTomlValue("new_value"));
 	 * Q_ASSERT(!original.root_hash_.contains("new_key"));  // Original unchanged
@@ -201,56 +201,56 @@ public:
 
 	/**
 	 * @brief The root table containing all document data.
-	 * 
+	 *
 	 * This QTomlHash contains the complete hierarchical structure of the TOML
 	 * document's root table. According to TOML specification, every document
 	 * must have a root table, which this member represents.
-	 * 
+	 *
 	 * Content characteristics:
 	 * - Contains all top-level key-value pairs from the TOML document
 	 * - May contain nested tables, arrays, and all TOML value types
 	 * - Can be empty (no key-value pairs) while still being a valid table
 	 * - Supports all TOML v1.0.0 specification features
-	 * 
+	 *
 	 * State semantics:
 	 * - When is_null_ is true: content is ignored (document is uninitialized)
 	 * - When is_null_ is false: content represents the actual document data
 	 * - Empty hash with is_null_ = false represents valid empty document
 	 * - Non-empty hash with is_null_ = false represents populated document
-	 * 
+	 *
 	 * Performance considerations:
 	 * - QTomlHash uses Qt's efficient hash table implementation
 	 * - Supports fast key lookups and iteration
 	 * - May use copy-on-write optimization for efficient copying
 	 * - Memory usage scales with document content size
-	 * 
+	 *
 	 * Thread safety:
 	 * - Read operations are thread-safe when no modifications occur
 	 * - Write operations require external synchronization
 	 * - Qt's implicit sharing provides thread-safe read access
-	 * 
+	 *
 	 * @note Snake_case naming follows internal implementation convention
 	 * @note Content validity depends on is_null_ flag state
 	 * @note All TOML document content is accessible through this member
 	 * @note Supports full TOML specification feature set
-	 * 
+	 *
 	 * @example Content management:
 	 * @code
 	 * QTomlDocumentPrivate impl;
-	 * 
+	 *
 	 * // Setting document content
 	 * impl.is_null_ = false;              // Mark as initialized
 	 * impl.root_hash_.insert("title", QTomlValue("My App"));
 	 * impl.root_hash_.insert("version", QTomlValue("1.0.0"));
-	 * 
+	 *
 	 * // Accessing nested structures
 	 * QTomlHash database;
 	 * database.insert("host", QTomlValue("localhost"));
 	 * impl.root_hash_.insert("database", QTomlValue(database));
-	 * 
+	 *
 	 * // Content is now fully accessible through root_hash_
 	 * @endcode
-	 * 
+	 *
 	 * @see QTomlHash for table implementation details
 	 * @see is_null_ for state management information
 	 */
@@ -258,60 +258,60 @@ public:
 
 	/**
 	 * @brief Flag indicating whether the document is in null (uninitialized) state.
-	 * 
+	 *
 	 * This boolean flag tracks whether the document has been initialized with
 	 * content. It provides the semantic distinction between a null document
 	 * (never been assigned content) and an empty document (assigned empty content).
-	 * 
+	 *
 	 * State semantics:
 	 * - **true**: Document is in null state (uninitialized, cannot be serialized)
 	 * - **false**: Document is initialized (can be serialized, may or may not have content)
-	 * 
+	 *
 	 * Usage patterns:
 	 * - Default construction sets this to true
 	 * - QTomlDocument::setHash() sets this to false
 	 * - Successful parsing sets this to false
 	 * - Used by QTomlDocument::isNull() for public state queries
 	 * - Controls serialization behavior (null documents cannot be serialized)
-	 * 
+	 *
 	 * Relationship with root_hash_:
 	 * - When true: root_hash_ content is ignored/invalid
 	 * - When false: root_hash_ contains valid document data (may be empty)
 	 * - This distinction allows precise control over document lifecycle
-	 * 
+	 *
 	 * Thread safety:
 	 * - Read operations are atomic for boolean values
 	 * - Write operations require external synchronization
 	 * - Should be updated atomically with root_hash_ modifications
-	 * 
+	 *
 	 * Performance:
 	 * - Single boolean storage with minimal memory overhead
 	 * - O(1) access time for state queries
 	 * - No computational overhead for state checking
-	 * 
+	 *
 	 * @note Snake_case naming follows internal implementation convention
 	 * @note Must be kept synchronized with document content state
 	 * @note Critical for maintaining correct serialization behavior
 	 * @note Provides clear semantics for document lifecycle management
-	 * 
+	 *
 	 * @example State management:
 	 * @code
 	 * QTomlDocumentPrivate impl;
 	 * Q_ASSERT(impl.is_null_ == true);     // Default null state
-	 * 
+	 *
 	 * // Transition to initialized state
 	 * impl.is_null_ = false;
 	 * impl.root_hash_.insert("key", QTomlValue("value"));
-	 * 
+	 *
 	 * // Now document can be serialized
 	 * Q_ASSERT(impl.is_null_ == false);    // Initialized state
-	 * 
+	 *
 	 * // Empty document is still valid (not null)
 	 * impl.root_hash_.clear();
 	 * Q_ASSERT(impl.is_null_ == false);    // Still initialized
 	 * Q_ASSERT(impl.root_hash_.isEmpty()); // But empty
 	 * @endcode
-	 * 
+	 *
 	 * @see root_hash_ for content storage
 	 * @see QTomlDocument::isNull() for public state query interface
 	 */

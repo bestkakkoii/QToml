@@ -38,7 +38,7 @@
 #include <QVariant>
 #include <memory>
 
-// Forward declarations
+ // Forward declarations
 class QTomlArray;
 class QTomlHash;
 class QTomlDateTime;

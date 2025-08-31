@@ -29,22 +29,22 @@
  * - Qt framework integration and wrapper implementation
  */
 
-/**
- * @file qtomlhash_p.h
- * @brief Private implementation header for QTomlHash using PIMPL pattern.
- * 
- * This header contains the private implementation details for the QTomlHash class.
- * It follows Qt's PIMPL (Pointer to Implementation) pattern to provide binary
- * compatibility and hide implementation details from the public interface.
- * 
- * The private implementation is designed to be efficient and thread-safe for
- * read operations while maintaining compatibility with TOML specification
- * requirements for hash tables (which are unordered key-value containers).
- * 
- * @note This file should only be included by QTomlHash implementation files
- * @note Binary compatibility is maintained by keeping all implementation details private
- * @see qtomlhash.h for the public interface
- */
+ /**
+  * @file qtomlhash_p.h
+  * @brief Private implementation header for QTomlHash using PIMPL pattern.
+  *
+  * This header contains the private implementation details for the QTomlHash class.
+  * It follows Qt's PIMPL (Pointer to Implementation) pattern to provide binary
+  * compatibility and hide implementation details from the public interface.
+  *
+  * The private implementation is designed to be efficient and thread-safe for
+  * read operations while maintaining compatibility with TOML specification
+  * requirements for hash tables (which are unordered key-value containers).
+  *
+  * @note This file should only be included by QTomlHash implementation files
+  * @note Binary compatibility is maintained by keeping all implementation details private
+  * @see qtomlhash.h for the public interface
+  */
 
 #pragma once
 #pragma execution_character_set("utf-8")
@@ -53,202 +53,202 @@
 #include <QHash>
 #include <QString>
 
-/**
- * @class QTomlHashPrivate
- * @brief Private implementation class for QTomlHash using PIMPL pattern.
- * 
- * This class contains the actual data storage and implementation details for
- * QTomlHash objects. It is designed to provide efficient storage and manipulation
- * of key-value pairs that represent TOML tables according to the TOML v1.0.0
- * specification.
- * 
- * Key design decisions:
- * - Uses QHash<QString, QTomlValue> for O(1) average-case lookups
- * - Follows TOML's unordered table semantics (insertion order not preserved)
- * - Implements shallow copy semantics for efficient data sharing
- * - Provides exception-safe operations through Qt containers
- * - Uses QString keys to support full Unicode key names
- * 
- * Performance characteristics:
- * - Key lookup: O(1) average case, O(n) worst case
- * - Insertion: O(1) average case, O(n) worst case during rehashing
- * - Removal: O(1) average case, O(n) worst case
- * - Memory overhead: Minimal due to QHash's efficient implementation
- * 
- * Thread safety:
- * - Read operations are thread-safe when no modifications occur
- * - Write operations require external synchronization
- * - Copy construction is thread-safe with proper external synchronization
- * 
- * TOML compliance:
- * - Supports all valid TOML key formats (bare, quoted, dotted)
- * - Handles Unicode characters in keys according to TOML specification
- * - Maintains case sensitivity as required by TOML
- * - Preserves value types through QTomlValue storage
- * 
- * @note This class follows Qt's private implementation naming convention
- * @note Member variables use snake_case naming to distinguish from public interface
- * @note All operations are exception-safe through Qt container guarantees
- * 
- * @example Internal usage within QTomlHash:
- * @code
- * // In QTomlHash constructor
- * QTomlHash::QTomlHash() 
- *     : d_ptr(std::make_unique<QTomlHashPrivate>()) 
- * {
- *     // d_ptr->values_ is automatically default-constructed as empty QHash
- * }
- * 
- * // In QTomlHash::insert()
- * void QTomlHash::insert(const QString& key, const QTomlValue& value) {
- *     d_ptr->values_.insert(key, value);  // O(1) average case
- * }
- * @endcode
- * 
- * @see QTomlHash for the public interface
- * @see QTomlValue for the stored value type
- * @see TOML specification at https://toml.io/en/v1.0.0
- */
+  /**
+   * @class QTomlHashPrivate
+   * @brief Private implementation class for QTomlHash using PIMPL pattern.
+   *
+   * This class contains the actual data storage and implementation details for
+   * QTomlHash objects. It is designed to provide efficient storage and manipulation
+   * of key-value pairs that represent TOML tables according to the TOML v1.0.0
+   * specification.
+   *
+   * Key design decisions:
+   * - Uses QHash<QString, QTomlValue> for O(1) average-case lookups
+   * - Follows TOML's unordered table semantics (insertion order not preserved)
+   * - Implements shallow copy semantics for efficient data sharing
+   * - Provides exception-safe operations through Qt containers
+   * - Uses QString keys to support full Unicode key names
+   *
+   * Performance characteristics:
+   * - Key lookup: O(1) average case, O(n) worst case
+   * - Insertion: O(1) average case, O(n) worst case during rehashing
+   * - Removal: O(1) average case, O(n) worst case
+   * - Memory overhead: Minimal due to QHash's efficient implementation
+   *
+   * Thread safety:
+   * - Read operations are thread-safe when no modifications occur
+   * - Write operations require external synchronization
+   * - Copy construction is thread-safe with proper external synchronization
+   *
+   * TOML compliance:
+   * - Supports all valid TOML key formats (bare, quoted, dotted)
+   * - Handles Unicode characters in keys according to TOML specification
+   * - Maintains case sensitivity as required by TOML
+   * - Preserves value types through QTomlValue storage
+   *
+   * @note This class follows Qt's private implementation naming convention
+   * @note Member variables use snake_case naming to distinguish from public interface
+   * @note All operations are exception-safe through Qt container guarantees
+   *
+   * @example Internal usage within QTomlHash:
+   * @code
+   * // In QTomlHash constructor
+   * QTomlHash::QTomlHash()
+   *     : d_ptr(std::make_unique<QTomlHashPrivate>())
+   * {
+   *     // d_ptr->values_ is automatically default-constructed as empty QHash
+   * }
+   *
+   * // In QTomlHash::insert()
+   * void QTomlHash::insert(const QString& key, const QTomlValue& value) {
+   *     d_ptr->values_.insert(key, value);  // O(1) average case
+   * }
+   * @endcode
+   *
+   * @see QTomlHash for the public interface
+   * @see QTomlValue for the stored value type
+   * @see TOML specification at https://toml.io/en/v1.0.0
+   */
 class QTomlHashPrivate
 {
 public:
-    /**
-     * @brief Default constructor creating an empty hash table.
-     * 
-     * Initializes an empty QTomlHashPrivate instance with no key-value pairs.
-     * The underlying QHash container is default-constructed, which creates
-     * an empty hash table ready for insertions.
-     * 
-     * This constructor is marked as default to ensure optimal performance
-     * and to maintain consistency with Qt's container initialization patterns.
-     * 
-     * @complexity O(1) - Constant time complexity
-     * @exception Strong exception safety guarantee
-     * 
-     * @note The default constructor is implicitly noexcept due to QHash's guarantee
-     * @note No memory allocation occurs until the first key-value pair is inserted
-     * 
-     * @example
-     * @code
-     * QTomlHashPrivate privateImpl;  // Empty hash table
-     * Q_ASSERT(privateImpl.values_.isEmpty());
-     * Q_ASSERT(privateImpl.values_.size() == 0);
-     * @endcode
-     */
-    QTomlHashPrivate() = default;
+	/**
+	 * @brief Default constructor creating an empty hash table.
+	 *
+	 * Initializes an empty QTomlHashPrivate instance with no key-value pairs.
+	 * The underlying QHash container is default-constructed, which creates
+	 * an empty hash table ready for insertions.
+	 *
+	 * This constructor is marked as default to ensure optimal performance
+	 * and to maintain consistency with Qt's container initialization patterns.
+	 *
+	 * @complexity O(1) - Constant time complexity
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note The default constructor is implicitly noexcept due to QHash's guarantee
+	 * @note No memory allocation occurs until the first key-value pair is inserted
+	 *
+	 * @example
+	 * @code
+	 * QTomlHashPrivate privateImpl;  // Empty hash table
+	 * Q_ASSERT(privateImpl.values_.isEmpty());
+	 * Q_ASSERT(privateImpl.values_.size() == 0);
+	 * @endcode
+	 */
+	QTomlHashPrivate() = default;
 
-    /**
-     * @brief Copy constructor performing deep copy of hash table contents.
-     * 
-     * Creates a new QTomlHashPrivate instance by copying all key-value pairs
-     * from the source instance. This operation performs a deep copy of the
-     * underlying QHash container, ensuring that modifications to either
-     * instance do not affect the other.
-     * 
-     * The copy operation preserves all key-value mappings and maintains
-     * the same hash table structure and performance characteristics as
-     * the source instance.
-     * 
-     * QHash's copy-on-write optimization ensures that the actual copying
-     * of data is deferred until one of the instances is modified, providing
-     * efficient copying for read-only use cases.
-     * 
-     * @param other The QTomlHashPrivate instance to copy from
-     * 
-     * @complexity O(1) due to copy-on-write, O(n) when actual copying occurs
-     * @exception Strong exception safety guarantee
-     * 
-     * @note Uses Qt's copy-on-write optimization for efficiency
-     * @note Thread-safe when source instance is not being modified
-     * @note All QTomlValue objects are copied using their copy semantics
-     * 
-     * @example
-     * @code
-     * QTomlHashPrivate original;
-     * original.values_.insert("key1", QTomlValue(42));
-     * original.values_.insert("key2", QTomlValue("hello"));
-     * 
-     * QTomlHashPrivate copy(original);  // Efficient copy-on-write
-     * Q_ASSERT(copy.values_.size() == 2);
-     * Q_ASSERT(copy.values_["key1"].toInteger() == 42);
-     * 
-     * // Modification triggers actual copy
-     * copy.values_.insert("key3", QTomlValue(true));
-     * Q_ASSERT(original.values_.size() == 2);  // Original unchanged
-     * Q_ASSERT(copy.values_.size() == 3);      // Copy has new element
-     * @endcode
-     */
-    QTomlHashPrivate(const QTomlHashPrivate& other) = default;
+	/**
+	 * @brief Copy constructor performing deep copy of hash table contents.
+	 *
+	 * Creates a new QTomlHashPrivate instance by copying all key-value pairs
+	 * from the source instance. This operation performs a deep copy of the
+	 * underlying QHash container, ensuring that modifications to either
+	 * instance do not affect the other.
+	 *
+	 * The copy operation preserves all key-value mappings and maintains
+	 * the same hash table structure and performance characteristics as
+	 * the source instance.
+	 *
+	 * QHash's copy-on-write optimization ensures that the actual copying
+	 * of data is deferred until one of the instances is modified, providing
+	 * efficient copying for read-only use cases.
+	 *
+	 * @param other The QTomlHashPrivate instance to copy from
+	 *
+	 * @complexity O(1) due to copy-on-write, O(n) when actual copying occurs
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Uses Qt's copy-on-write optimization for efficiency
+	 * @note Thread-safe when source instance is not being modified
+	 * @note All QTomlValue objects are copied using their copy semantics
+	 *
+	 * @example
+	 * @code
+	 * QTomlHashPrivate original;
+	 * original.values_.insert("key1", QTomlValue(42));
+	 * original.values_.insert("key2", QTomlValue("hello"));
+	 *
+	 * QTomlHashPrivate copy(original);  // Efficient copy-on-write
+	 * Q_ASSERT(copy.values_.size() == 2);
+	 * Q_ASSERT(copy.values_["key1"].toInteger() == 42);
+	 *
+	 * // Modification triggers actual copy
+	 * copy.values_.insert("key3", QTomlValue(true));
+	 * Q_ASSERT(original.values_.size() == 2);  // Original unchanged
+	 * Q_ASSERT(copy.values_.size() == 3);      // Copy has new element
+	 * @endcode
+	 */
+	QTomlHashPrivate(const QTomlHashPrivate& other) = default;
 
-    /**
-     * @brief The main data storage container for key-value pairs.
-     * 
-     * This QHash container stores the actual TOML table data as key-value pairs,
-     * where keys are QString objects representing TOML keys, and values are
-     * QTomlValue objects that can hold any valid TOML value type.
-     * 
-     * Container characteristics:
-     * - QHash provides O(1) average-case lookup performance
-     * - Unordered storage matches TOML table semantics
-     * - Supports full Unicode key names as per TOML specification
-     * - Automatically handles memory management and resizing
-     * - Implements copy-on-write for efficient copying
-     * 
-     * Key format support:
-     * - Bare keys: alphanumeric and underscores (e.g., "key", "host_name")
-     * - Quoted keys: any Unicode characters in quotes (e.g., "key with spaces")
-     * - Unicode keys: full Unicode support including non-ASCII characters
-     * 
-     * Value type support through QTomlValue:
-     * - Strings (basic, multiline, literal)
-     * - Integers (decimal, hexadecimal, octal, binary)
-     * - Floating-point numbers (including inf, -inf, nan)
-     * - Booleans (true, false)
-     * - Date and time values (RFC 3339 format)
-     * - Arrays (ordered lists of values)
-     * - Nested tables (hash tables)
-     * 
-     * Performance considerations:
-     * - Hash function optimized for QString keys
-     * - Automatic load factor management prevents performance degradation
-     * - Memory usage scales linearly with number of key-value pairs
-     * - Rehashing occurs automatically when load factor exceeds threshold
-     * 
-     * Thread safety:
-     * - Multiple threads can safely read simultaneously
-     * - Write operations require external synchronization
-     * - Copy-on-write sharing is thread-safe for immutable operations
-     * 
-     * @note Snake_case naming follows internal implementation convention
-     * @note Direct access is intended only for QTomlHash implementation
-     * @note Modification should preserve TOML specification compliance
-     * 
-     * @example Typical usage patterns:
-     * @code
-     * // Insertion
-     * values_.insert("database_host", QTomlValue("localhost"));
-     * values_["port"] = QTomlValue(5432);
-     * 
-     * // Lookup
-     * if (values_.contains("timeout")) {
-     *     int timeout = values_["timeout"].toInteger();
-     * }
-     * 
-     * // Iteration
-     * for (auto it = values_.begin(); it != values_.end(); ++it) {
-     *     qDebug() << it.key() << "=" << it.value().toString();
-     * }
-     * 
-     * // Size and emptiness checks
-     * if (!values_.isEmpty()) {
-     *     qDebug() << "Hash contains" << values_.size() << "entries";
-     * }
-     * @endcode
-     * 
-     * @see QHash for container documentation
-     * @see QString for key type documentation  
-     * @see QTomlValue for value type documentation
-     * @see TOML key specification at https://toml.io/en/v1.0.0#keys
-     */
-    QHash<QString, QTomlValue> values_;
+	/**
+	 * @brief The main data storage container for key-value pairs.
+	 *
+	 * This QHash container stores the actual TOML table data as key-value pairs,
+	 * where keys are QString objects representing TOML keys, and values are
+	 * QTomlValue objects that can hold any valid TOML value type.
+	 *
+	 * Container characteristics:
+	 * - QHash provides O(1) average-case lookup performance
+	 * - Unordered storage matches TOML table semantics
+	 * - Supports full Unicode key names as per TOML specification
+	 * - Automatically handles memory management and resizing
+	 * - Implements copy-on-write for efficient copying
+	 *
+	 * Key format support:
+	 * - Bare keys: alphanumeric and underscores (e.g., "key", "host_name")
+	 * - Quoted keys: any Unicode characters in quotes (e.g., "key with spaces")
+	 * - Unicode keys: full Unicode support including non-ASCII characters
+	 *
+	 * Value type support through QTomlValue:
+	 * - Strings (basic, multiline, literal)
+	 * - Integers (decimal, hexadecimal, octal, binary)
+	 * - Floating-point numbers (including inf, -inf, nan)
+	 * - Booleans (true, false)
+	 * - Date and time values (RFC 3339 format)
+	 * - Arrays (ordered lists of values)
+	 * - Nested tables (hash tables)
+	 *
+	 * Performance considerations:
+	 * - Hash function optimized for QString keys
+	 * - Automatic load factor management prevents performance degradation
+	 * - Memory usage scales linearly with number of key-value pairs
+	 * - Rehashing occurs automatically when load factor exceeds threshold
+	 *
+	 * Thread safety:
+	 * - Multiple threads can safely read simultaneously
+	 * - Write operations require external synchronization
+	 * - Copy-on-write sharing is thread-safe for immutable operations
+	 *
+	 * @note Snake_case naming follows internal implementation convention
+	 * @note Direct access is intended only for QTomlHash implementation
+	 * @note Modification should preserve TOML specification compliance
+	 *
+	 * @example Typical usage patterns:
+	 * @code
+	 * // Insertion
+	 * values_.insert("database_host", QTomlValue("localhost"));
+	 * values_["port"] = QTomlValue(5432);
+	 *
+	 * // Lookup
+	 * if (values_.contains("timeout")) {
+	 *     int timeout = values_["timeout"].toInteger();
+	 * }
+	 *
+	 * // Iteration
+	 * for (auto it = values_.begin(); it != values_.end(); ++it) {
+	 *     qDebug() << it.key() << "=" << it.value().toString();
+	 * }
+	 *
+	 * // Size and emptiness checks
+	 * if (!values_.isEmpty()) {
+	 *     qDebug() << "Hash contains" << values_.size() << "entries";
+	 * }
+	 * @endcode
+	 *
+	 * @see QHash for container documentation
+	 * @see QString for key type documentation
+	 * @see QTomlValue for value type documentation
+	 * @see TOML key specification at https://toml.io/en/v1.0.0#keys
+	 */
+	QHash<QString, QTomlValue> values_;
 };

@@ -40,367 +40,367 @@
 #include <QString>
 #include <variant>
 
-/**
- * @file qtomlvalue_p.h
- * @brief Private implementation header for QTomlValue using PIMPL pattern and std::variant.
- * 
- * This header contains the private implementation details for the QTomlValue class.
- * It uses std::variant to provide type-safe storage for all TOML value types,
- * combined with the PIMPL pattern for binary compatibility and implementation hiding.
- * 
- * The implementation leverages modern C++17 features, specifically std::variant
- * for discriminated union functionality, providing both type safety and performance
- * benefits over traditional union-based approaches.
- * 
- * Key design principles:
- * - Type safety through std::variant
- * - Zero-overhead abstractions where possible
- * - Exception safety guarantees
- * - Memory efficiency through variant optimization
- * - Compatibility with TOML v1.0.0 specification
- * 
- * @note This file should only be included by QTomlValue implementation files
- * @note Binary compatibility is maintained through PIMPL pattern
- * @note Requires C++17 or later for std::variant support
- * @see qtomlvalue.h for the public interface
- */
+ /**
+  * @file qtomlvalue_p.h
+  * @brief Private implementation header for QTomlValue using PIMPL pattern and std::variant.
+  *
+  * This header contains the private implementation details for the QTomlValue class.
+  * It uses std::variant to provide type-safe storage for all TOML value types,
+  * combined with the PIMPL pattern for binary compatibility and implementation hiding.
+  *
+  * The implementation leverages modern C++17 features, specifically std::variant
+  * for discriminated union functionality, providing both type safety and performance
+  * benefits over traditional union-based approaches.
+  *
+  * Key design principles:
+  * - Type safety through std::variant
+  * - Zero-overhead abstractions where possible
+  * - Exception safety guarantees
+  * - Memory efficiency through variant optimization
+  * - Compatibility with TOML v1.0.0 specification
+  *
+  * @note This file should only be included by QTomlValue implementation files
+  * @note Binary compatibility is maintained through PIMPL pattern
+  * @note Requires C++17 or later for std::variant support
+  * @see qtomlvalue.h for the public interface
+  */
 
-/**
- * @class QTomlValuePrivate
- * @brief Private implementation class for QTomlValue using std::variant for type-safe storage.
- * 
- * This class contains the actual data storage and type management for QTomlValue objects.
- * It uses std::variant as the core storage mechanism to provide type-safe, efficient
- * storage for all TOML value types according to the TOML v1.0.0 specification.
- * 
- * Architecture overview:
- * - std::variant provides discriminated union functionality
- * - Type information is stored separately for quick access
- * - All TOML types are directly represented in the variant
- * - std::monostate represents null/undefined states
- * - Exception safety is guaranteed by std::variant
- * 
- * Performance characteristics:
- * - Storage size equals the largest contained type plus discriminator
- * - Type queries are O(1) operations
- * - Value access is O(1) with type checking
- * - Copy/move operations depend on the contained type
- * - No dynamic memory allocation for basic types
- * 
- * Type mapping to TOML specification:
- * - std::monostate: Null or Undefined values
- * - bool: TOML boolean values (true/false)
- * - qint64: TOML integer values (64-bit signed)
- * - double: TOML floating-point values (IEEE 754 double)
- * - QString: TOML string values (UTF-8 encoded)
- * - QTomlDateTime: TOML date-time values (RFC 3339)
- * - QTomlArray: TOML array values (heterogeneous)
- * - QTomlHash: TOML table/hash values (key-value pairs)
- * 
- * Exception safety:
- * - Strong exception safety guarantee for all operations
- * - No-throw guarantee for type queries and basic operations
- * - std::variant provides automatic cleanup on exceptions
- * - RAII principles ensure resource management
- * 
- * Thread safety:
- * - Read operations are thread-safe when no modifications occur
- * - Write operations require external synchronization
- * - std::variant operations are not inherently thread-safe
- * - Copy construction is safe with proper synchronization
- * 
- * @note This class follows Qt's private implementation naming convention
- * @note Member variables use snake_case naming for internal consistency
- * @note All operations preserve TOML specification compliance
- * @note The variant approach eliminates runtime type errors
- * 
- * @example Internal usage pattern:
- * @code
- * // Creating a private implementation with integer value
- * QTomlValuePrivate impl;
- * impl.type_ = QTomlValue::Integer;
- * impl.value_.emplace<qint64>(42);
- * 
- * // Type-safe value retrieval
- * if (impl.type_ == QTomlValue::Integer) {
- *     qint64 value = std::get<qint64>(impl.value_);
- * }
- * 
- * // Using std::visit for type dispatching
- * std::visit([](auto&& arg) {
- *     using T = std::decay_t<decltype(arg)>;
- *     if constexpr (std::is_same_v<T, qint64>) {
- *         // Handle integer case
- *     } else if constexpr (std::is_same_v<T, QString>) {
- *         // Handle string case
- *     }
- *     // ... other type cases
- * }, impl.value_);
- * @endcode
- * 
- * @see QTomlValue for the public interface
- * @see std::variant for the underlying storage mechanism
- * @see TOML specification at https://toml.io/en/v1.0.0
- */
+  /**
+   * @class QTomlValuePrivate
+   * @brief Private implementation class for QTomlValue using std::variant for type-safe storage.
+   *
+   * This class contains the actual data storage and type management for QTomlValue objects.
+   * It uses std::variant as the core storage mechanism to provide type-safe, efficient
+   * storage for all TOML value types according to the TOML v1.0.0 specification.
+   *
+   * Architecture overview:
+   * - std::variant provides discriminated union functionality
+   * - Type information is stored separately for quick access
+   * - All TOML types are directly represented in the variant
+   * - std::monostate represents null/undefined states
+   * - Exception safety is guaranteed by std::variant
+   *
+   * Performance characteristics:
+   * - Storage size equals the largest contained type plus discriminator
+   * - Type queries are O(1) operations
+   * - Value access is O(1) with type checking
+   * - Copy/move operations depend on the contained type
+   * - No dynamic memory allocation for basic types
+   *
+   * Type mapping to TOML specification:
+   * - std::monostate: Null or Undefined values
+   * - bool: TOML boolean values (true/false)
+   * - qint64: TOML integer values (64-bit signed)
+   * - double: TOML floating-point values (IEEE 754 double)
+   * - QString: TOML string values (UTF-8 encoded)
+   * - QTomlDateTime: TOML date-time values (RFC 3339)
+   * - QTomlArray: TOML array values (heterogeneous)
+   * - QTomlHash: TOML table/hash values (key-value pairs)
+   *
+   * Exception safety:
+   * - Strong exception safety guarantee for all operations
+   * - No-throw guarantee for type queries and basic operations
+   * - std::variant provides automatic cleanup on exceptions
+   * - RAII principles ensure resource management
+   *
+   * Thread safety:
+   * - Read operations are thread-safe when no modifications occur
+   * - Write operations require external synchronization
+   * - std::variant operations are not inherently thread-safe
+   * - Copy construction is safe with proper synchronization
+   *
+   * @note This class follows Qt's private implementation naming convention
+   * @note Member variables use snake_case naming for internal consistency
+   * @note All operations preserve TOML specification compliance
+   * @note The variant approach eliminates runtime type errors
+   *
+   * @example Internal usage pattern:
+   * @code
+   * // Creating a private implementation with integer value
+   * QTomlValuePrivate impl;
+   * impl.type_ = QTomlValue::Integer;
+   * impl.value_.emplace<qint64>(42);
+   *
+   * // Type-safe value retrieval
+   * if (impl.type_ == QTomlValue::Integer) {
+   *     qint64 value = std::get<qint64>(impl.value_);
+   * }
+   *
+   * // Using std::visit for type dispatching
+   * std::visit([](auto&& arg) {
+   *     using T = std::decay_t<decltype(arg)>;
+   *     if constexpr (std::is_same_v<T, qint64>) {
+   *         // Handle integer case
+   *     } else if constexpr (std::is_same_v<T, QString>) {
+   *         // Handle string case
+   *     }
+   *     // ... other type cases
+   * }, impl.value_);
+   * @endcode
+   *
+   * @see QTomlValue for the public interface
+   * @see std::variant for the underlying storage mechanism
+   * @see TOML specification at https://toml.io/en/v1.0.0
+   */
 class QTomlValuePrivate
 {
 public:
-    /**
-     * @brief Type alias for the variant storage container.
-     * 
-     * This variant type defines all possible value types that can be stored
-     * in a QTomlValue. The order of types in the variant affects the internal
-     * storage layout and should be optimized for common use cases.
-     * 
-     * Type mapping and rationale:
-     * - std::monostate: Represents null/undefined states with zero storage overhead
-     * - bool: Fundamental boolean type for TOML true/false values
-     * - qint64: 64-bit signed integer for TOML integer specification compliance
-     * - double: IEEE 754 double precision for TOML floating-point numbers
-     * - QString: Qt's Unicode string class for TOML string values
-     * - QTomlDateTime: Custom date-time type for TOML temporal values
-     * - QTomlArray: Container for TOML array values (heterogeneous)
-     * - QTomlHash: Container for TOML table/object values
-     * 
-     * Storage considerations:
-     * - Variant size equals the largest contained type plus discriminator
-     * - QString and containers may use dynamic allocation
-     * - Basic types (bool, qint64, double) have no allocation overhead
-     * - std::monostate provides zero-cost null representation
-     * 
-     * Exception safety:
-     * - All contained types provide strong exception safety
-     * - std::variant guarantees exception-safe type switching
-     * - Resource cleanup is automatic through RAII
-     * 
-     * @note Using declaration for clarity and maintainability
-     * @note Snake_case naming follows internal implementation convention
-     * @note Order optimized for performance and memory layout
-     * @note All types are copy-constructible and copy-assignable
-     * 
-     * @example Usage with std::visit:
-     * @code
-     * value_variant_ variant = QString("hello");
-     * 
-     * // Type-safe visiting
-     * auto result = std::visit([](auto&& arg) -> QString {
-     *     using T = std::decay_t<decltype(arg)>;
-     *     if constexpr (std::is_same_v<T, QString>) {
-     *         return arg;
-     *     } else if constexpr (std::is_same_v<T, qint64>) {
-     *         return QString::number(arg);
-     *     } else {
-     *         return QString("unsupported");
-     *     }
-     * }, variant);
-     * @endcode
-     * 
-     * @see std::variant for detailed documentation
-     * @see std::monostate for null state representation
-     */
-    using value_variant_ = std::variant<
-        std::monostate, // Corresponds to Null or Undefined states - zero storage cost
-        bool,           // TOML boolean values: true, false
-        qint64,         // TOML integer values: 64-bit signed integers
-        double,         // TOML floating-point values: IEEE 754 double precision
-        QString,        // TOML string values: UTF-8 encoded text
-        QTomlDateTime,  // TOML date-time values: RFC 3339 compliant timestamps
-        QTomlArray,     // TOML array values: ordered, heterogeneous collections
-        QTomlHash       // TOML table values: unordered key-value mappings
-    >;
+	/**
+	 * @brief Type alias for the variant storage container.
+	 *
+	 * This variant type defines all possible value types that can be stored
+	 * in a QTomlValue. The order of types in the variant affects the internal
+	 * storage layout and should be optimized for common use cases.
+	 *
+	 * Type mapping and rationale:
+	 * - std::monostate: Represents null/undefined states with zero storage overhead
+	 * - bool: Fundamental boolean type for TOML true/false values
+	 * - qint64: 64-bit signed integer for TOML integer specification compliance
+	 * - double: IEEE 754 double precision for TOML floating-point numbers
+	 * - QString: Qt's Unicode string class for TOML string values
+	 * - QTomlDateTime: Custom date-time type for TOML temporal values
+	 * - QTomlArray: Container for TOML array values (heterogeneous)
+	 * - QTomlHash: Container for TOML table/object values
+	 *
+	 * Storage considerations:
+	 * - Variant size equals the largest contained type plus discriminator
+	 * - QString and containers may use dynamic allocation
+	 * - Basic types (bool, qint64, double) have no allocation overhead
+	 * - std::monostate provides zero-cost null representation
+	 *
+	 * Exception safety:
+	 * - All contained types provide strong exception safety
+	 * - std::variant guarantees exception-safe type switching
+	 * - Resource cleanup is automatic through RAII
+	 *
+	 * @note Using declaration for clarity and maintainability
+	 * @note Snake_case naming follows internal implementation convention
+	 * @note Order optimized for performance and memory layout
+	 * @note All types are copy-constructible and copy-assignable
+	 *
+	 * @example Usage with std::visit:
+	 * @code
+	 * value_variant_ variant = QString("hello");
+	 *
+	 * // Type-safe visiting
+	 * auto result = std::visit([](auto&& arg) -> QString {
+	 *     using T = std::decay_t<decltype(arg)>;
+	 *     if constexpr (std::is_same_v<T, QString>) {
+	 *         return arg;
+	 *     } else if constexpr (std::is_same_v<T, qint64>) {
+	 *         return QString::number(arg);
+	 *     } else {
+	 *         return QString("unsupported");
+	 *     }
+	 * }, variant);
+	 * @endcode
+	 *
+	 * @see std::variant for detailed documentation
+	 * @see std::monostate for null state representation
+	 */
+	using value_variant_ = std::variant<
+		std::monostate, // Corresponds to Null or Undefined states - zero storage cost
+		bool,           // TOML boolean values: true, false
+		qint64,         // TOML integer values: 64-bit signed integers
+		double,         // TOML floating-point values: IEEE 754 double precision
+		QString,        // TOML string values: UTF-8 encoded text
+		QTomlDateTime,  // TOML date-time values: RFC 3339 compliant timestamps
+		QTomlArray,     // TOML array values: ordered, heterogeneous collections
+		QTomlHash       // TOML table values: unordered key-value mappings
+	>;
 
-    /**
-     * @brief Default constructor initializing to null state.
-     * 
-     * Creates a QTomlValuePrivate instance representing a null TOML value.
-     * The variant is initialized with std::monostate to represent the absence
-     * of a value, and the type is explicitly set to Null.
-     * 
-     * This constructor provides the foundation for all QTomlValue objects,
-     * ensuring they start in a well-defined, safe state before being assigned
-     * actual TOML values.
-     * 
-     * Initialization details:
-     * - Type is set to QTomlValue::Null for consistency
-     * - Variant is emplaced with std::monostate for efficiency
-     * - No dynamic memory allocation occurs
-     * - Exception safety is guaranteed by std::variant
-     * 
-     * @complexity O(1) - Constant time complexity
-     * @exception Strong exception safety guarantee (no-throw in practice)
-     * 
-     * @note Marked as implicit for seamless default construction
-     * @note std::monostate requires no construction parameters
-     * @note Provides optimal storage efficiency for null values
-     * 
-     * @example
-     * @code
-     * QTomlValuePrivate impl;  // Null state
-     * Q_ASSERT(impl.type_ == QTomlValue::Null);
-     * Q_ASSERT(std::holds_alternative<std::monostate>(impl.value_));
-     * @endcode
-     */
-    QTomlValuePrivate()
-        : type_(QTomlValue::Null)
-    {
-        value_.emplace<std::monostate>();
-    }
+	/**
+	 * @brief Default constructor initializing to null state.
+	 *
+	 * Creates a QTomlValuePrivate instance representing a null TOML value.
+	 * The variant is initialized with std::monostate to represent the absence
+	 * of a value, and the type is explicitly set to Null.
+	 *
+	 * This constructor provides the foundation for all QTomlValue objects,
+	 * ensuring they start in a well-defined, safe state before being assigned
+	 * actual TOML values.
+	 *
+	 * Initialization details:
+	 * - Type is set to QTomlValue::Null for consistency
+	 * - Variant is emplaced with std::monostate for efficiency
+	 * - No dynamic memory allocation occurs
+	 * - Exception safety is guaranteed by std::variant
+	 *
+	 * @complexity O(1) - Constant time complexity
+	 * @exception Strong exception safety guarantee (no-throw in practice)
+	 *
+	 * @note Marked as implicit for seamless default construction
+	 * @note std::monostate requires no construction parameters
+	 * @note Provides optimal storage efficiency for null values
+	 *
+	 * @example
+	 * @code
+	 * QTomlValuePrivate impl;  // Null state
+	 * Q_ASSERT(impl.type_ == QTomlValue::Null);
+	 * Q_ASSERT(std::holds_alternative<std::monostate>(impl.value_));
+	 * @endcode
+	 */
+	QTomlValuePrivate()
+		: type_(QTomlValue::Null)
+	{
+		value_.emplace<std::monostate>();
+	}
 
-    /**
-     * @brief Copy constructor performing deep copy of value and type.
-     * 
-     * Creates a new QTomlValuePrivate instance by copying both the variant
-     * value and type information from the source instance. This operation
-     * preserves the exact state and type of the original object.
-     * 
-     * The copy operation leverages std::variant's copy semantics, which
-     * automatically handles the correct copying behavior for the currently
-     * stored type. Complex types like QString and containers perform deep
-     * copies to ensure independence between instances.
-     * 
-     * Copy behavior by type:
-     * - std::monostate: No-op copy (stateless)
-     * - bool, qint64, double: Trivial copy (value types)
-     * - QString: Deep copy with copy-on-write optimization
-     * - QTomlDateTime: Value type copy
-     * - QTomlArray: Deep copy of all elements
-     * - QTomlHash: Deep copy of all key-value pairs
-     * 
-     * @param other The QTomlValuePrivate instance to copy from
-     * 
-     * @complexity Depends on stored type; O(1) for primitives, O(n) for containers
-     * @exception Strong exception safety guarantee
-     * 
-     * @note Uses compiler-generated default copy constructor for efficiency
-     * @note std::variant ensures type-safe copying
-     * @note Qt containers may use copy-on-write optimization
-     * @note Thread-safe when source is not being modified
-     * 
-     * @example
-     * @code
-     * QTomlValuePrivate original;
-     * original.type_ = QTomlValue::String;
-     * original.value_.emplace<QString>("hello");
-     * 
-     * QTomlValuePrivate copy(original);  // Deep copy
-     * Q_ASSERT(copy.type_ == original.type_);
-     * Q_ASSERT(std::get<QString>(copy.value_) == std::get<QString>(original.value_));
-     * 
-     * // Modifications are independent
-     * std::get<QString>(copy.value_) += " world";
-     * Q_ASSERT(std::get<QString>(original.value_) == "hello");  // Original unchanged
-     * @endcode
-     */
-    QTomlValuePrivate(const QTomlValuePrivate& other) = default;
+	/**
+	 * @brief Copy constructor performing deep copy of value and type.
+	 *
+	 * Creates a new QTomlValuePrivate instance by copying both the variant
+	 * value and type information from the source instance. This operation
+	 * preserves the exact state and type of the original object.
+	 *
+	 * The copy operation leverages std::variant's copy semantics, which
+	 * automatically handles the correct copying behavior for the currently
+	 * stored type. Complex types like QString and containers perform deep
+	 * copies to ensure independence between instances.
+	 *
+	 * Copy behavior by type:
+	 * - std::monostate: No-op copy (stateless)
+	 * - bool, qint64, double: Trivial copy (value types)
+	 * - QString: Deep copy with copy-on-write optimization
+	 * - QTomlDateTime: Value type copy
+	 * - QTomlArray: Deep copy of all elements
+	 * - QTomlHash: Deep copy of all key-value pairs
+	 *
+	 * @param other The QTomlValuePrivate instance to copy from
+	 *
+	 * @complexity Depends on stored type; O(1) for primitives, O(n) for containers
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Uses compiler-generated default copy constructor for efficiency
+	 * @note std::variant ensures type-safe copying
+	 * @note Qt containers may use copy-on-write optimization
+	 * @note Thread-safe when source is not being modified
+	 *
+	 * @example
+	 * @code
+	 * QTomlValuePrivate original;
+	 * original.type_ = QTomlValue::String;
+	 * original.value_.emplace<QString>("hello");
+	 *
+	 * QTomlValuePrivate copy(original);  // Deep copy
+	 * Q_ASSERT(copy.type_ == original.type_);
+	 * Q_ASSERT(std::get<QString>(copy.value_) == std::get<QString>(original.value_));
+	 *
+	 * // Modifications are independent
+	 * std::get<QString>(copy.value_) += " world";
+	 * Q_ASSERT(std::get<QString>(original.value_) == "hello");  // Original unchanged
+	 * @endcode
+	 */
+	QTomlValuePrivate(const QTomlValuePrivate& other) = default;
 
-    /**
-     * @brief The variant storage for the actual TOML value.
-     * 
-     * This std::variant member holds the actual data for the TOML value,
-     * providing type-safe storage for all supported TOML types. The variant
-     * automatically manages the lifetime and type information of the stored value.
-     * 
-     * Storage characteristics:
-     * - Size equals the largest alternative plus discriminator overhead
-     * - Alignment requirements are automatically handled by std::variant
-     * - Type switching is exception-safe with strong guarantees
-     * - Access requires type checking for safety
-     * - Memory layout is optimized by the compiler
-     * 
-     * Access patterns:
-     * - std::get<T>() for direct access with type checking
-     * - std::get_if<T>() for safe access returning pointer or nullptr
-     * - std::visit() for type-safe visiting with functors
-     * - std::holds_alternative<T>() for type checking
-     * 
-     * Exception safety:
-     * - Strong exception safety for all operations
-     * - Automatic cleanup on type changes
-     * - No undefined behavior on incorrect type access
-     * - RAII principles ensure resource management
-     * 
-     * @note Snake_case naming follows internal implementation convention
-     * @note Direct access should be protected by type checking
-     * @note Prefer std::visit for type-safe operations
-     * @note std::variant never holds invalid state
-     * 
-     * @example Safe access patterns:
-     * @code
-     * // Direct access with type checking
-     * if (std::holds_alternative<QString>(value_)) {
-     *     QString& str = std::get<QString>(value_);
-     *     // Safe to use str
-     * }
-     * 
-     * // Safe access with pointer check
-     * if (auto* str = std::get_if<QString>(&value_)) {
-     *     // Safe to dereference str
-     * }
-     * 
-     * // Type-safe visiting
-     * std::visit([](auto&& arg) {
-     *     using T = std::decay_t<decltype(arg)>;
-     *     // Handle different types safely
-     * }, value_);
-     * @endcode
-     * 
-     * @see std::variant for detailed API documentation
-     * @see value_variant_ for the specific type definition
-     */
-    value_variant_ value_;
+	/**
+	 * @brief The variant storage for the actual TOML value.
+	 *
+	 * This std::variant member holds the actual data for the TOML value,
+	 * providing type-safe storage for all supported TOML types. The variant
+	 * automatically manages the lifetime and type information of the stored value.
+	 *
+	 * Storage characteristics:
+	 * - Size equals the largest alternative plus discriminator overhead
+	 * - Alignment requirements are automatically handled by std::variant
+	 * - Type switching is exception-safe with strong guarantees
+	 * - Access requires type checking for safety
+	 * - Memory layout is optimized by the compiler
+	 *
+	 * Access patterns:
+	 * - std::get<T>() for direct access with type checking
+	 * - std::get_if<T>() for safe access returning pointer or nullptr
+	 * - std::visit() for type-safe visiting with functors
+	 * - std::holds_alternative<T>() for type checking
+	 *
+	 * Exception safety:
+	 * - Strong exception safety for all operations
+	 * - Automatic cleanup on type changes
+	 * - No undefined behavior on incorrect type access
+	 * - RAII principles ensure resource management
+	 *
+	 * @note Snake_case naming follows internal implementation convention
+	 * @note Direct access should be protected by type checking
+	 * @note Prefer std::visit for type-safe operations
+	 * @note std::variant never holds invalid state
+	 *
+	 * @example Safe access patterns:
+	 * @code
+	 * // Direct access with type checking
+	 * if (std::holds_alternative<QString>(value_)) {
+	 *     QString& str = std::get<QString>(value_);
+	 *     // Safe to use str
+	 * }
+	 *
+	 * // Safe access with pointer check
+	 * if (auto* str = std::get_if<QString>(&value_)) {
+	 *     // Safe to dereference str
+	 * }
+	 *
+	 * // Type-safe visiting
+	 * std::visit([](auto&& arg) {
+	 *     using T = std::decay_t<decltype(arg)>;
+	 *     // Handle different types safely
+	 * }, value_);
+	 * @endcode
+	 *
+	 * @see std::variant for detailed API documentation
+	 * @see value_variant_ for the specific type definition
+	 */
+	value_variant_ value_;
 
-    /**
-     * @brief The explicit type identifier for the stored value.
-     * 
-     * This member stores the QTomlValue::Type enumeration value that corresponds
-     * to the currently stored type in the variant. While std::variant maintains
-     * its own type index, this explicit type member provides:
-     * 
-     * Design rationale:
-     * - Fast O(1) type queries without variant introspection
-     * - Consistency with QTomlValue public API expectations
-     * - Separation between internal variant index and logical TOML type
-     * - Support for special states like Undefined vs Null distinction
-     * - Compatibility with existing Qt-style type checking patterns
-     * 
-     * Type consistency:
-     * - Must always match the actual type stored in the variant
-     * - Updated atomically with variant modifications
-     * - Provides single source of truth for type information
-     * - Enables fast type switching in conditional logic
-     * 
-     * Performance benefits:
-     * - Avoids std::variant's index() calls in hot paths
-     * - Reduces template instantiation overhead
-     * - Enables optimized branch prediction
-     * - Simplifies debugging and logging
-     * 
-     * Thread safety:
-     * - Read operations are thread-safe
-     * - Must be updated atomically with variant changes
-     * - No synchronization primitives required for single-threaded use
-     * 
-     * @note Snake_case naming follows internal implementation convention
-     * @note Must remain synchronized with variant content
-     * @note Used for fast type dispatching in public API
-     * @note Enables special handling of Null vs Undefined states
-     * 
-     * @example Maintaining consistency:
-     * @code
-     * // Correct way to change type and value
-     * void setValue(const QString& str) {
-     *     value_.emplace<QString>(str);  // Update variant first
-     *     type_ = QTomlValue::String;    // Then update type
-     * }
-     * 
-     * // Fast type checking
-     * bool isString() const noexcept {
-     *     return type_ == QTomlValue::String;  // O(1) operation
-     * }
-     * @endcode
-     * 
-     * @see QTomlValue::Type for enumeration values
-     * @see value_ for the corresponding variant storage
-     */
-    QTomlValue::Type type_;
+	/**
+	 * @brief The explicit type identifier for the stored value.
+	 *
+	 * This member stores the QTomlValue::Type enumeration value that corresponds
+	 * to the currently stored type in the variant. While std::variant maintains
+	 * its own type index, this explicit type member provides:
+	 *
+	 * Design rationale:
+	 * - Fast O(1) type queries without variant introspection
+	 * - Consistency with QTomlValue public API expectations
+	 * - Separation between internal variant index and logical TOML type
+	 * - Support for special states like Undefined vs Null distinction
+	 * - Compatibility with existing Qt-style type checking patterns
+	 *
+	 * Type consistency:
+	 * - Must always match the actual type stored in the variant
+	 * - Updated atomically with variant modifications
+	 * - Provides single source of truth for type information
+	 * - Enables fast type switching in conditional logic
+	 *
+	 * Performance benefits:
+	 * - Avoids std::variant's index() calls in hot paths
+	 * - Reduces template instantiation overhead
+	 * - Enables optimized branch prediction
+	 * - Simplifies debugging and logging
+	 *
+	 * Thread safety:
+	 * - Read operations are thread-safe
+	 * - Must be updated atomically with variant changes
+	 * - No synchronization primitives required for single-threaded use
+	 *
+	 * @note Snake_case naming follows internal implementation convention
+	 * @note Must remain synchronized with variant content
+	 * @note Used for fast type dispatching in public API
+	 * @note Enables special handling of Null vs Undefined states
+	 *
+	 * @example Maintaining consistency:
+	 * @code
+	 * // Correct way to change type and value
+	 * void setValue(const QString& str) {
+	 *     value_.emplace<QString>(str);  // Update variant first
+	 *     type_ = QTomlValue::String;    // Then update type
+	 * }
+	 *
+	 * // Fast type checking
+	 * bool isString() const noexcept {
+	 *     return type_ == QTomlValue::String;  // O(1) operation
+	 * }
+	 * @endcode
+	 *
+	 * @see QTomlValue::Type for enumeration values
+	 * @see value_ for the corresponding variant storage
+	 */
+	QTomlValue::Type type_;
 };

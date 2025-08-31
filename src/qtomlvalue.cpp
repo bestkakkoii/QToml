@@ -29,63 +29,63 @@
  * - Qt framework integration and wrapper implementation
  */
 
-/**
- * @file qtomlvalue.cpp
- * @brief Implementation of QTomlValue class providing unified TOML value representation.
- * 
- * This file contains the complete implementation of the QTomlValue class, which implements
- * the Variant Pattern to represent all TOML data types in a type-safe, efficient manner.
- * The implementation uses modern C++17 std::variant internally combined with the PIMPL
- * pattern for optimal performance and binary compatibility.
- * 
- * Key implementation features:
- * - Type-safe value storage using std::variant with all TOML types
- * - PIMPL pattern for binary compatibility and implementation hiding
- * - Comprehensive constructor overloads for all supported types
- * - Move semantics throughout for optimal resource management
- * - Efficient type conversion methods with implicit conversions where safe
- * - Qt meta-type registration for QVariant and signal/slot integration
- * - Exception-safe operations with strong guarantees
- * - Zero-overhead abstractions for primitive types
- * 
- * Supported TOML types and their mappings:
- * - **Null/Undefined**: std::monostate (zero storage cost)
- * - **Bool**: C++ bool for true/false values
- * - **Integer**: qint64 for 64-bit signed integers  
- * - **Double**: C++ double for IEEE 754 floating-point
- * - **String**: QString for UTF-8 text with Unicode support
- * - **DateTime**: QTomlDateTime for RFC 3339 compliant timestamps
- * - **Array**: QTomlArray for ordered, heterogeneous collections
- * - **Hash**: QTomlHash for unordered key-value mappings
- * 
- * Performance characteristics:
- * - Storage size equals largest contained type plus discriminator
- * - Type queries are O(1) operations through cached type information
- * - Value access is O(1) with compile-time type checking
- * - Copy/move operations depend on contained type
- * - No dynamic allocation for primitive types
- * - std::variant provides exception-safe type switching
- * 
- * The implementation is organized into sections:
- * - Meta-type registration for Qt integration
- * - Construction with type-specific initialization
- * - Copy and move semantics with optimal resource management
- * - Type checking methods for runtime type identification
- * - Type conversion methods with safe implicit conversions
- * - Utility methods for object management
- * 
- * Thread safety:
- * - Read operations are thread-safe when no modifications occur
- * - Write operations require external synchronization
- * - Copy construction is thread-safe with proper synchronization
- * - std::variant operations provide strong exception safety
- * 
- * @note This file uses modern C++17 features (std::variant, constexpr if)
- * @note All operations preserve TOML specification compliance
- * @note The variant approach eliminates runtime type errors
- * @see qtomlvalue.h for the public interface
- * @see qtomlvalue_p.h for private implementation details
- */
+ /**
+  * @file qtomlvalue.cpp
+  * @brief Implementation of QTomlValue class providing unified TOML value representation.
+  *
+  * This file contains the complete implementation of the QTomlValue class, which implements
+  * the Variant Pattern to represent all TOML data types in a type-safe, efficient manner.
+  * The implementation uses modern C++17 std::variant internally combined with the PIMPL
+  * pattern for optimal performance and binary compatibility.
+  *
+  * Key implementation features:
+  * - Type-safe value storage using std::variant with all TOML types
+  * - PIMPL pattern for binary compatibility and implementation hiding
+  * - Comprehensive constructor overloads for all supported types
+  * - Move semantics throughout for optimal resource management
+  * - Efficient type conversion methods with implicit conversions where safe
+  * - Qt meta-type registration for QVariant and signal/slot integration
+  * - Exception-safe operations with strong guarantees
+  * - Zero-overhead abstractions for primitive types
+  *
+  * Supported TOML types and their mappings:
+  * - **Null/Undefined**: std::monostate (zero storage cost)
+  * - **Bool**: C++ bool for true/false values
+  * - **Integer**: qint64 for 64-bit signed integers
+  * - **Double**: C++ double for IEEE 754 floating-point
+  * - **String**: QString for UTF-8 text with Unicode support
+  * - **DateTime**: QTomlDateTime for RFC 3339 compliant timestamps
+  * - **Array**: QTomlArray for ordered, heterogeneous collections
+  * - **Hash**: QTomlHash for unordered key-value mappings
+  *
+  * Performance characteristics:
+  * - Storage size equals largest contained type plus discriminator
+  * - Type queries are O(1) operations through cached type information
+  * - Value access is O(1) with compile-time type checking
+  * - Copy/move operations depend on contained type
+  * - No dynamic allocation for primitive types
+  * - std::variant provides exception-safe type switching
+  *
+  * The implementation is organized into sections:
+  * - Meta-type registration for Qt integration
+  * - Construction with type-specific initialization
+  * - Copy and move semantics with optimal resource management
+  * - Type checking methods for runtime type identification
+  * - Type conversion methods with safe implicit conversions
+  * - Utility methods for object management
+  *
+  * Thread safety:
+  * - Read operations are thread-safe when no modifications occur
+  * - Write operations require external synchronization
+  * - Copy construction is thread-safe with proper synchronization
+  * - std::variant operations provide strong exception safety
+  *
+  * @note This file uses modern C++17 features (std::variant, constexpr if)
+  * @note All operations preserve TOML specification compliance
+  * @note The variant approach eliminates runtime type errors
+  * @see qtomlvalue.h for the public interface
+  * @see qtomlvalue_p.h for private implementation details
+  */
 
 #pragma execution_character_set("utf-8")
 
@@ -103,7 +103,7 @@ namespace
 {
 	/**
 	 * @brief Global meta-type registration for QTomlValue.
-	 * 
+	 *
 	 * Ensures that QTomlValue is registered with Qt's meta-object system during
 	 * static initialization. This registration enables comprehensive Qt framework
 	 * integration including:
@@ -113,11 +113,11 @@ namespace
 	 * - QML type support and automatic conversions
 	 * - Debug stream operations
 	 * - Serialization through Qt's property system
-	 * 
+	 *
 	 * The registration occurs automatically during program startup as part of
 	 * static initialization, ensuring the type is available throughout the
 	 * program's lifetime without manual intervention.
-	 * 
+	 *
 	 * @note Registration is performed once per program execution
 	 * @note Essential for full Qt framework integration
 	 * @note Enables type-safe QVariant operations and conversions
@@ -129,11 +129,11 @@ namespace
 
 /**
  * @brief Type constructor creating value of specified type with default content.
- * 
+ *
  * Creates a QTomlValue of the specified type with appropriate default content.
  * Each type is initialized with sensible defaults according to TOML semantics
  * and C++ best practices.
- * 
+ *
  * Default value initialization by type:
  * - **Null/Undefined**: std::monostate (represents absence of value)
  * - **Bool**: false (TOML boolean default)
@@ -143,23 +143,23 @@ namespace
  * - **DateTime**: Empty QTomlDateTime (invalid date-time)
  * - **Array**: Empty QTomlArray (no elements)
  * - **Hash**: Empty QTomlHash (no key-value pairs)
- * 
+ *
  * @param type The QTomlValue::Type to create, defaults to Null
- * 
+ *
  * @complexity O(1) - Constant time for all types
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Marked noexcept for optimal performance
  * @note All defaults are sensible and type-appropriate
  * @note Container types (Array, Hash) are immediately usable
- * 
+ *
  * @example
  * @code
  * QTomlValue nullValue;                           // Default: Null type
  * QTomlValue boolValue(QTomlValue::Bool);         // false
  * QTomlValue intValue(QTomlValue::Integer);       // 0
  * QTomlValue arrayValue(QTomlValue::Array);       // Empty array
- * 
+ *
  * Q_ASSERT(nullValue.isNull());
  * Q_ASSERT(boolValue.toBool() == false);
  * Q_ASSERT(arrayValue.toArray().isEmpty());
@@ -186,18 +186,18 @@ QTomlValue::QTomlValue(Type type) noexcept
 
 /**
  * @brief Boolean constructor creating value from bool.
- * 
+ *
  * Creates a QTomlValue containing the specified boolean value.
  * TOML boolean values are represented as true or false (lowercase).
- * 
+ *
  * @param b The boolean value to store
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Marked noexcept for optimal performance
  * @note Direct storage without conversion overhead
- * 
+ *
  * @example
  * @code
  * QTomlValue trueValue(true);
@@ -215,20 +215,20 @@ QTomlValue::QTomlValue(bool b) noexcept
 
 /**
  * @brief 32-bit integer constructor with automatic promotion.
- * 
+ *
  * Creates a QTomlValue from a 32-bit integer, automatically promoting
  * to 64-bit storage to ensure no precision loss and consistency with
  * TOML's integer precision requirements.
- * 
+ *
  * @param v The 32-bit integer value to store
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Marked noexcept for optimal performance
  * @note Automatically promoted to qint64 for consistency
  * @note No precision loss during promotion
- * 
+ *
  * @example
  * @code
  * QTomlValue value(42);                   // int promoted to qint64
@@ -245,20 +245,20 @@ QTomlValue::QTomlValue(int v) noexcept
 
 /**
  * @brief 64-bit integer constructor for full-precision storage.
- * 
+ *
  * Creates a QTomlValue containing a 64-bit signed integer value.
  * This matches TOML's recommended integer precision and provides
  * sufficient range for most use cases.
- * 
+ *
  * @param v The 64-bit integer value to store
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Marked noexcept for optimal performance
  * @note Direct storage without conversion
  * @note Preferred constructor for integer values
- * 
+ *
  * @example
  * @code
  * QTomlValue bigValue(9223372036854775807LL); // Max qint64
@@ -275,20 +275,20 @@ QTomlValue::QTomlValue(qint64 v) noexcept
 
 /**
  * @brief Double-precision floating-point constructor.
- * 
+ *
  * Creates a QTomlValue containing a double-precision floating-point number.
  * Supports all legal IEEE 754 values including positive/negative infinity
  * and NaN (Not-a-Number) as per TOML specification.
- * 
+ *
  * @param v The double-precision floating-point value to store
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Marked noexcept for optimal performance
  * @note Supports special values (inf, -inf, nan)
  * @note Direct storage with full precision preservation
- * 
+ *
  * @example
  * @code
  * QTomlValue piValue(3.14159265359);
@@ -306,26 +306,26 @@ QTomlValue::QTomlValue(double v) noexcept
 
 /**
  * @brief C-style string constructor with UTF-8 conversion.
- * 
+ *
  * Creates a QTomlValue from a C-style null-terminated string.
  * The string is automatically converted to UTF-8 encoded QString
  * for proper Unicode handling and Qt integration.
- * 
+ *
  * @param s Pointer to null-terminated C-style string
- * 
+ *
  * @complexity O(n) where n is the string length
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Handles nullptr input safely (creates empty string)
  * @note Automatic UTF-8 conversion for Unicode support
  * @note String content is copied for safety
- * 
+ *
  * @example
  * @code
  * QTomlValue value("Hello, TOML!");
  * Q_ASSERT(value.isString());
  * Q_ASSERT(value.toString() == "Hello, TOML!");
- * 
+ *
  * QTomlValue empty(nullptr);              // Safe handling
  * Q_ASSERT(empty.toString().isEmpty());
  * @endcode
@@ -339,20 +339,20 @@ QTomlValue::QTomlValue(const char* s)
 
 /**
  * @brief QString constructor with copy semantics.
- * 
+ *
  * Creates a QTomlValue from a QString object using copy semantics.
  * The string content is copied, ensuring the original string remains
  * unchanged and can be safely modified after construction.
- * 
+ *
  * @param s The QString object to copy
- * 
+ *
  * @complexity O(n) where n is the string length
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note String content is copied for independence
  * @note Preserves original string for continued use
  * @note Full Unicode support through QString
- * 
+ *
  * @example
  * @code
  * QString original = "Hello, World!";
@@ -370,20 +370,20 @@ QTomlValue::QTomlValue(const QString& s)
 
 /**
  * @brief QString constructor with move semantics optimization.
- * 
+ *
  * Creates a QTomlValue from a QString using move semantics to avoid
  * unnecessary copying. The source string becomes empty but remains
  * in a valid state after the move operation.
- * 
+ *
  * @param s The QString object to move (rvalue reference)
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Marked noexcept for optimal move semantics
  * @note High performance through resource transfer
  * @note Source string becomes empty after move
- * 
+ *
  * @example
  * @code
  * QString temp = generateLargeString();
@@ -401,20 +401,20 @@ QTomlValue::QTomlValue(QString&& s) noexcept
 
 /**
  * @brief QTomlArray constructor with copy semantics.
- * 
+ *
  * Creates a QTomlValue containing a QTomlArray using copy semantics.
  * The array content is deep-copied, ensuring complete independence
  * between the source array and the stored array.
- * 
+ *
  * @param a The QTomlArray object to copy
- * 
+ *
  * @complexity O(n) where n is the number of elements in the array
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Creates Array type QTomlValue
  * @note Deep copy ensures independence
  * @note All nested elements are recursively copied
- * 
+ *
  * @example
  * @code
  * QTomlArray original{QTomlValue(1), QTomlValue(2)};
@@ -432,20 +432,20 @@ QTomlValue::QTomlValue(const QTomlArray& a)
 
 /**
  * @brief QTomlArray constructor with move semantics optimization.
- * 
+ *
  * Creates a QTomlValue containing a QTomlArray using move semantics
  * to avoid deep copying. The source array becomes empty but remains
  * in a valid state after the move.
- * 
+ *
  * @param a The QTomlArray object to move (rvalue reference)
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Marked noexcept for optimal move semantics
  * @note High performance through resource transfer
  * @note Source array becomes empty after move
- * 
+ *
  * @example
  * @code
  * QTomlArray temp = generateLargeArray();
@@ -463,20 +463,20 @@ QTomlValue::QTomlValue(QTomlArray&& a) noexcept
 
 /**
  * @brief QTomlHash constructor with copy semantics.
- * 
+ *
  * Creates a QTomlValue containing a QTomlHash using copy semantics.
  * The hash table content is deep-copied, ensuring complete independence
  * between the source table and the stored table.
- * 
+ *
  * @param h The QTomlHash object to copy
- * 
+ *
  * @complexity O(n) where n is the number of key-value pairs
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Creates Hash type QTomlValue
  * @note Deep copy ensures independence
  * @note All nested values are recursively copied
- * 
+ *
  * @example
  * @code
  * QTomlHash original{{"key1", QTomlValue(42)}};
@@ -494,20 +494,20 @@ QTomlValue::QTomlValue(const QTomlHash& h)
 
 /**
  * @brief QTomlHash constructor with move semantics optimization.
- * 
+ *
  * Creates a QTomlValue containing a QTomlHash using move semantics
  * to avoid deep copying. The source hash becomes empty but remains
  * in a valid state after the move.
- * 
+ *
  * @param h The QTomlHash object to move (rvalue reference)
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Marked noexcept for optimal move semantics
  * @note High performance through resource transfer
  * @note Source hash becomes empty after move
- * 
+ *
  * @example
  * @code
  * QTomlHash temp = generateLargeHash();
@@ -525,20 +525,20 @@ QTomlValue::QTomlValue(QTomlHash&& h) noexcept
 
 /**
  * @brief QTomlDateTime constructor for date-time values.
- * 
+ *
  * Creates a QTomlValue containing a QTomlDateTime object for representing
  * date, time, or date-time values according to TOML specification and
  * RFC 3339 format requirements.
- * 
+ *
  * @param dt The QTomlDateTime object to store
- * 
+ *
  * @complexity O(1) - Constant time (QTomlDateTime is lightweight)
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Creates DateTime type QTomlValue
  * @note Supports date-only, time-only, and full date-time values
  * @note RFC 3339 compliant formatting and parsing
- * 
+ *
  * @example
  * @code
  * QTomlDateTime dateTime(QDate(2023, 12, 25), QTime(10, 30, 0));
@@ -556,20 +556,20 @@ QTomlValue::QTomlValue(const QTomlDateTime& dt)
 
 /**
  * @brief Copy constructor creating independent copy.
- * 
+ *
  * Creates a new QTomlValue instance that is a complete copy of the source
  * value. Uses PIMPL copy semantics to ensure proper resource management
  * and complete data independence.
- * 
+ *
  * @param other The QTomlValue instance to copy from
- * 
+ *
  * @complexity Depends on stored type; O(1) for primitives, O(n) for containers
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Creates completely independent copy
  * @note All nested data is deep-copied
  * @note Uses PIMPL copy constructor for proper management
- * 
+ *
  * @example
  * @code
  * QTomlValue original(42);
@@ -600,19 +600,19 @@ QTomlValue::~QTomlValue() noexcept = default;
 
 /**
  * @brief Copy assignment operator with self-assignment protection.
- * 
+ *
  * Replaces current value content with copy of source value data.
  * Includes self-assignment checking for safety and efficiency.
- * 
+ *
  * @param other The QTomlValue instance to copy from
  * @return Reference to this value for chaining assignments
- * 
+ *
  * @complexity Depends on stored types; O(1) for primitives, O(n) for containers
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Self-assignment safe through identity check
  * @note Uses PIMPL assignment for proper resource management
- * 
+ *
  * @example
  * @code
  * QTomlValue value1, value2(42);
@@ -708,26 +708,26 @@ bool QTomlValue::isUndefined() const noexcept { return d_ptr->type_ == Undefined
 
 /**
  * @brief Converts value to QTomlArray with type safety.
- * 
+ *
  * Returns the contained QTomlArray if the value is of Array type,
  * otherwise returns an empty QTomlArray. Uses optimized std::get_if
  * to avoid exceptions and unnecessary type checking overhead.
- * 
+ *
  * @return QTomlArray content or empty array if wrong type
- * 
+ *
  * @complexity O(1) for type checking, O(n) for array copying
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Returns copy for safety
  * @note Only returns content for Array type values
  * @note Empty array returned for type mismatches
- * 
+ *
  * @example
  * @code
  * QTomlValue arrayValue(QTomlArray{QTomlValue(1), QTomlValue(2)});
  * QTomlArray array = arrayValue.toArray();
  * Q_ASSERT(array.size() == 2);
- * 
+ *
  * QTomlValue stringValue("not an array");
  * QTomlArray empty = stringValue.toArray();
  * Q_ASSERT(empty.isEmpty());
@@ -745,27 +745,27 @@ QTomlArray QTomlValue::toArray() const
 
 /**
  * @brief Converts value to boolean with default fallback.
- * 
+ *
  * Returns the contained boolean value if the value is of Bool type,
  * otherwise returns the specified default value. No implicit type
  * conversion is performed from other types.
- * 
+ *
  * @param defaultValue Default return value for type mismatches
  * @return Boolean value or default if wrong type
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception noexcept guarantee
- * 
+ *
  * @note Marked noexcept for performance
  * @note No implicit conversion from numbers or strings
  * @note Only Bool type returns actual value
- * 
+ *
  * @example
  * @code
  * QTomlValue boolValue(true);
  * Q_ASSERT(boolValue.toBool() == true);
  * Q_ASSERT(boolValue.toBool(false) == true);
- * 
+ *
  * QTomlValue stringValue("true");
  * Q_ASSERT(stringValue.toBool(false) == false); // No implicit conversion
  * @endcode
@@ -781,29 +781,29 @@ bool QTomlValue::toBool(bool defaultValue) const noexcept
 
 /**
  * @brief Converts value to double with implicit integer conversion.
- * 
+ *
  * Returns the contained double value if the value is of Double type,
  * or automatically converts from Integer type (may lose precision for
  * very large integers). Returns default value for other types.
- * 
+ *
  * @param defaultValue Default return value for type mismatches
  * @return Double value, converted integer, or default if wrong type
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception noexcept guarantee
- * 
+ *
  * @note Marked noexcept for performance
  * @note Supports safe conversion from Integer to Double
  * @note Large integers may lose precision beyond 2^53
- * 
+ *
  * @example
  * @code
  * QTomlValue doubleValue(3.14);
  * Q_ASSERT(doubleValue.toDouble() == 3.14);
- * 
+ *
  * QTomlValue intValue(42);
  * Q_ASSERT(intValue.toDouble() == 42.0);        // Implicit conversion
- * 
+ *
  * QTomlValue stringValue("not a number");
  * Q_ASSERT(stringValue.toDouble(0.0) == 0.0);   // Default returned
  * @endcode
@@ -823,29 +823,29 @@ double QTomlValue::toDouble(double defaultValue) const noexcept
 
 /**
  * @brief Converts value to integer with truncating double conversion.
- * 
+ *
  * Returns the contained integer value if the value is of Integer type,
  * or truncates from Double type (discards fractional part). Returns
  * default value for other types.
- * 
+ *
  * @param defaultValue Default return value for type mismatches
  * @return Integer value, truncated double, or default if wrong type
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception noexcept guarantee
- * 
+ *
  * @note Marked noexcept for performance
  * @note Truncation conversion from Double (no rounding)
  * @note Conversion result undefined for doubles outside integer range
- * 
+ *
  * @example
  * @code
  * QTomlValue intValue(42);
  * Q_ASSERT(intValue.toInteger() == 42);
- * 
+ *
  * QTomlValue doubleValue(3.14);
  * Q_ASSERT(doubleValue.toInteger() == 3);       // Truncation conversion
- * 
+ *
  * QTomlValue stringValue("not a number");
  * Q_ASSERT(stringValue.toInteger(0) == 0);      // Default returned
  * @endcode
@@ -865,24 +865,24 @@ qint64 QTomlValue::toInteger(qint64 defaultValue) const noexcept
 
 /**
  * @brief Converts value to QTomlHash with type safety.
- * 
+ *
  * Returns the contained QTomlHash if the value is of Hash type,
  * otherwise returns an empty QTomlHash.
- * 
+ *
  * @return QTomlHash content or empty hash if wrong type
- * 
+ *
  * @complexity O(1) for type checking, O(n) for hash copying
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Returns copy for safety
  * @note Only returns content for Hash type values
- * 
+ *
  * @example
  * @code
  * QTomlValue hashValue(QTomlHash{{"key", QTomlValue(42)}});
  * QTomlHash hash = hashValue.toHash();
  * Q_ASSERT(hash.size() == 1);
- * 
+ *
  * QTomlValue stringValue("not a hash");
  * QTomlHash empty = stringValue.toHash();
  * Q_ASSERT(empty.isEmpty());
@@ -899,25 +899,25 @@ QTomlHash QTomlValue::toHash() const
 
 /**
  * @brief Converts value to QTomlDateTime with type safety.
- * 
+ *
  * Returns the contained QTomlDateTime if the value is of DateTime type,
  * otherwise returns an empty QTomlDateTime.
- * 
+ *
  * @return QTomlDateTime content or empty date-time if wrong type
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Returns copy for safety
  * @note Only returns content for DateTime type values
- * 
+ *
  * @example
  * @code
  * QTomlDateTime dt(QDate(2023, 12, 25));
  * QTomlValue dateValue(dt);
  * QTomlDateTime retrieved = dateValue.toDateTime();
  * Q_ASSERT(retrieved.date().year() == 2023);
- * 
+ *
  * QTomlValue stringValue("not a date");
  * QTomlDateTime empty = stringValue.toDateTime();
  * Q_ASSERT(!empty.date().isValid());
@@ -934,26 +934,26 @@ QTomlDateTime QTomlValue::toDateTime() const
 
 /**
  * @brief Converts value to QString with type safety.
- * 
+ *
  * Returns the contained QString if the value is of String type,
  * otherwise returns an empty QString. No stringification of other
  * types is performed for type safety.
- * 
+ *
  * @return QString content or empty string if wrong type
- * 
+ *
  * @complexity O(1) for type checking, O(n) for string copying
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Returns copy for safety
  * @note No automatic conversion from numbers or other types
  * @note Only String type returns actual content
- * 
+ *
  * @example
  * @code
  * QTomlValue stringValue("Hello, TOML!");
  * QString str = stringValue.toString();
  * Q_ASSERT(str == "Hello, TOML!");
- * 
+ *
  * QTomlValue intValue(42);
  * QString empty = intValue.toString();
  * Q_ASSERT(empty.isEmpty());              // No conversion
@@ -970,33 +970,33 @@ QString QTomlValue::toString() const
 
 /**
  * @brief Converts value to QVariant for Qt integration.
- * 
+ *
  * Converts the QTomlValue to its corresponding QVariant representation
  * for seamless integration with Qt's property system, signals/slots,
  * and other QVariant-based APIs. Uses std::visit for efficient type
  * dispatching and constexpr if for compile-time optimization.
- * 
+ *
  * Conversion mapping:
  * - **std::monostate**: Invalid QVariant (null/undefined)
  * - **bool, qint64, double, QString**: Direct QVariant construction
  * - **Complex types**: QVariant::fromValue() wrapping
- * 
+ *
  * @return Corresponding QVariant object for Qt integration
- * 
+ *
  * @complexity O(1) for primitives, O(n) for complex types
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Uses std::visit for optimal performance
  * @note Primitive types use direct QVariant construction
  * @note Complex types wrapped using QVariant::fromValue
- * 
+ *
  * @example
  * @code
  * QTomlValue intValue(42);
  * QVariant var = intValue.toVariant();
  * Q_ASSERT(var.type() == QVariant::LongLong);
  * Q_ASSERT(var.toLongLong() == 42);
- * 
+ *
  * QTomlValue arrayValue(QTomlArray{QTomlValue(1)});
  * QVariant arrayVar = arrayValue.toVariant();
  * Q_ASSERT(arrayVar.canConvert<QTomlArray>());
@@ -1024,20 +1024,20 @@ QVariant QTomlValue::toVariant() const
 
 /**
  * @brief Gets the runtime type of the stored value.
- * 
+ *
  * Returns the QTomlValue::Type enumeration value representing
  * the currently stored data type for runtime type checking
  * and conditional logic.
- * 
+ *
  * @return Type enumeration value for the stored type
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception noexcept guarantee
- * 
+ *
  * @note Marked noexcept for performance
  * @note Cached type information for fast access
  * @note Suitable for switch statements and conditional logic
- * 
+ *
  * @example
  * @code
  * QTomlValue value(42);
@@ -1057,25 +1057,25 @@ QTomlValue::Type QTomlValue::type() const noexcept { return d_ptr->type_; }
 
 /**
  * @brief Efficiently swaps content with another QTomlValue.
- * 
+ *
  * Swaps the complete content of two QTomlValue objects without copying.
  * Uses smart pointer swap for optimal performance and exception safety.
  * After swapping, both objects have exchanged their types and values.
- * 
+ *
  * @param other The other QTomlValue to swap content with
- * 
+ *
  * @complexity O(1) - Constant time
  * @exception noexcept guarantee
- * 
+ *
  * @note Marked noexcept for optimal performance
  * @note Uses PIMPL smart pointer swap for efficiency
  * @note Both objects' content are completely exchanged
- * 
+ *
  * @example
  * @code
  * QTomlValue value1(42);
  * QTomlValue value2("hello");
- * 
+ *
  * value1.swap(value2);                    // Efficient swap
  * Q_ASSERT(value1.toString() == "hello");
  * Q_ASSERT(value2.toInteger() == 42);

@@ -29,32 +29,32 @@
  * - Qt framework integration and wrapper implementation
  */
 
-/**
- * @file qtomlparseerror.h
- * @brief Declaration of QTomlParseError class for comprehensive TOML parsing error reporting.
- * 
- * This header defines the QTomlParseError class, which provides detailed error
- * information when TOML parsing operations fail. The class encapsulates both
- * human-readable error descriptions and precise location information to assist
- * developers in diagnosing and fixing TOML syntax issues.
- * 
- * Error reporting features:
- * - Detailed error messages describing the specific parsing failure
- * - Precise position information (line, column, byte offset)
- * - Integration with Qt's exception-safe error handling patterns
- * - Efficient copying and move semantics for error propagation
- * - Qt Meta-Object System integration for use in signals and QVariant
- * 
- * The implementation follows Qt's established patterns for error reporting,
- * similar to QJsonParseError, providing familiar interfaces for Qt developers.
- * The class uses the PIMPL pattern for binary compatibility and efficient
- * resource management.
- * 
- * @note All position information is 1-based for consistency with text editors
- * @note Error objects are safe to copy and store for later analysis
- * @note Thread-safe for read operations; synchronization required for modifications
- * @see QTomlDocument::fromToml() for primary usage context
- */
+ /**
+  * @file qtomlparseerror.h
+  * @brief Declaration of QTomlParseError class for comprehensive TOML parsing error reporting.
+  *
+  * This header defines the QTomlParseError class, which provides detailed error
+  * information when TOML parsing operations fail. The class encapsulates both
+  * human-readable error descriptions and precise location information to assist
+  * developers in diagnosing and fixing TOML syntax issues.
+  *
+  * Error reporting features:
+  * - Detailed error messages describing the specific parsing failure
+  * - Precise position information (line, column, byte offset)
+  * - Integration with Qt's exception-safe error handling patterns
+  * - Efficient copying and move semantics for error propagation
+  * - Qt Meta-Object System integration for use in signals and QVariant
+  *
+  * The implementation follows Qt's established patterns for error reporting,
+  * similar to QJsonParseError, providing familiar interfaces for Qt developers.
+  * The class uses the PIMPL pattern for binary compatibility and efficient
+  * resource management.
+  *
+  * @note All position information is 1-based for consistency with text editors
+  * @note Error objects are safe to copy and store for later analysis
+  * @note Thread-safe for read operations; synchronization required for modifications
+  * @see QTomlDocument::fromToml() for primary usage context
+  */
 
 #pragma once
 #pragma execution_character_set("utf-8")
@@ -64,107 +64,107 @@
 #include <QtGlobal>
 #include <memory>
 
- /**
-  * @class QTomlParseError
-  * @brief Encapsulates error information from TOML parsing operations with detailed location data.
-  * 
-  * QTomlParseError provides comprehensive error reporting for TOML parsing failures,
-  * including both descriptive error messages and precise location information. This
-  * enables developers to quickly identify and resolve syntax issues in TOML documents.
-  * 
-  * The class serves multiple purposes:
-  * - **Error Description**: Human-readable error messages explaining what went wrong
-  * - **Location Tracking**: Precise position information for error location
-  * - **Error Propagation**: Efficient copying and movement for error handling chains
-  * - **Integration**: Seamless use with Qt's error handling and signal/slot systems
-  * - **Analysis**: Detailed information for automated error analysis tools
-  * 
-  * Position information includes three complementary views:
-  * - **Byte offset**: Absolute position in the input data for programmatic use
-  * - **Line number**: 1-based line number for human-readable error reporting
-  * - **Column number**: 1-based column number for precise cursor positioning
-  * 
-  * Error categories typically include:
-  * - Syntax errors (invalid TOML syntax)
-  * - Structural errors (malformed tables or arrays)
-  * - Value errors (invalid literal values)
-  * - Encoding errors (invalid UTF-8 sequences)
-  * - Semantic errors (duplicate keys, invalid types)
-  * 
-  * Design characteristics:
-  * - **Value semantics**: Safe to copy, store, and pass by value
-  * - **Exception safety**: Strong exception guarantees throughout
-  * - **Resource efficiency**: Minimal memory overhead through PIMPL
-  * - **Binary compatibility**: Stable ABI through private implementation
-  * - **Performance**: Optimized for both error and success cases
-  * 
-  * @note Position information uses 1-based indexing to match text editor conventions
-  * @note Error objects are immutable after construction for thread safety
-  * @note Integration with Qt's Meta-Object System enables use in signals and QVariant
-  * 
-  * @example Basic error handling:
-  * @code
-  * QByteArray tomlData = "invalid = [toml syntax";
-  * QTomlParseError error;
-  * QTomlDocument doc = QTomlDocument::fromToml(tomlData, &error);
-  * 
-  * if (!error.errorString().contains("No error")) {
-  *     qWarning() << "TOML parsing failed:" << error.errorString();
-  *     qWarning() << "Error location: line" << error.line 
-  *                << "column" << error.column;
-  *     qWarning() << "Byte offset:" << error.offset;
-  * }
-  * @endcode
-  * 
-  * @example Error location highlighting:
-  * @code
-  * QTomlParseError error;
-  * QTomlDocument doc = QTomlDocument::fromToml(problemData, &error);
-  * 
-  * if (!error.errorString().contains("No error")) {
-  *     // Extract the problematic line for highlighting
-  *     QStringList lines = QString::fromUtf8(problemData).split('\n');
-  *     if (error.line <= lines.size()) {
-  *         QString problemLine = lines[error.line - 1];
-  *         QString pointer = QString(error.column - 1, ' ') + "^";
-  *         
-  *         qDebug() << "Error in TOML:";
-  *         qDebug() << problemLine;
-  *         qDebug() << pointer;
-  *     }
-  * }
-  * @endcode
-  * 
-  * @see QTomlDocument::fromToml() for error reporting context
-  * @see QString for error message handling
-  * @see QJsonParseError for similar Qt error reporting patterns
-  */
+  /**
+   * @class QTomlParseError
+   * @brief Encapsulates error information from TOML parsing operations with detailed location data.
+   *
+   * QTomlParseError provides comprehensive error reporting for TOML parsing failures,
+   * including both descriptive error messages and precise location information. This
+   * enables developers to quickly identify and resolve syntax issues in TOML documents.
+   *
+   * The class serves multiple purposes:
+   * - **Error Description**: Human-readable error messages explaining what went wrong
+   * - **Location Tracking**: Precise position information for error location
+   * - **Error Propagation**: Efficient copying and movement for error handling chains
+   * - **Integration**: Seamless use with Qt's error handling and signal/slot systems
+   * - **Analysis**: Detailed information for automated error analysis tools
+   *
+   * Position information includes three complementary views:
+   * - **Byte offset**: Absolute position in the input data for programmatic use
+   * - **Line number**: 1-based line number for human-readable error reporting
+   * - **Column number**: 1-based column number for precise cursor positioning
+   *
+   * Error categories typically include:
+   * - Syntax errors (invalid TOML syntax)
+   * - Structural errors (malformed tables or arrays)
+   * - Value errors (invalid literal values)
+   * - Encoding errors (invalid UTF-8 sequences)
+   * - Semantic errors (duplicate keys, invalid types)
+   *
+   * Design characteristics:
+   * - **Value semantics**: Safe to copy, store, and pass by value
+   * - **Exception safety**: Strong exception guarantees throughout
+   * - **Resource efficiency**: Minimal memory overhead through PIMPL
+   * - **Binary compatibility**: Stable ABI through private implementation
+   * - **Performance**: Optimized for both error and success cases
+   *
+   * @note Position information uses 1-based indexing to match text editor conventions
+   * @note Error objects are immutable after construction for thread safety
+   * @note Integration with Qt's Meta-Object System enables use in signals and QVariant
+   *
+   * @example Basic error handling:
+   * @code
+   * QByteArray tomlData = "invalid = [toml syntax";
+   * QTomlParseError error;
+   * QTomlDocument doc = QTomlDocument::fromToml(tomlData, &error);
+   *
+   * if (!error.errorString().contains("No error")) {
+   *     qWarning() << "TOML parsing failed:" << error.errorString();
+   *     qWarning() << "Error location: line" << error.line
+   *                << "column" << error.column;
+   *     qWarning() << "Byte offset:" << error.offset;
+   * }
+   * @endcode
+   *
+   * @example Error location highlighting:
+   * @code
+   * QTomlParseError error;
+   * QTomlDocument doc = QTomlDocument::fromToml(problemData, &error);
+   *
+   * if (!error.errorString().contains("No error")) {
+   *     // Extract the problematic line for highlighting
+   *     QStringList lines = QString::fromUtf8(problemData).split('\n');
+   *     if (error.line <= lines.size()) {
+   *         QString problemLine = lines[error.line - 1];
+   *         QString pointer = QString(error.column - 1, ' ') + "^";
+   *
+   *         qDebug() << "Error in TOML:";
+   *         qDebug() << problemLine;
+   *         qDebug() << pointer;
+   *     }
+   * }
+   * @endcode
+   *
+   * @see QTomlDocument::fromToml() for error reporting context
+   * @see QString for error message handling
+   * @see QJsonParseError for similar Qt error reporting patterns
+   */
 class Q_CORE_EXPORT QTomlParseError
 {
 	Q_GADGET
 public:
 	// ==================== Construction and Destruction ====================
-	
+
 	/**
 	 * @brief Default constructor creating a "no error" state.
-	 * 
+	 *
 	 * Creates a QTomlParseError object representing successful parsing
 	 * with no errors. The error string will indicate success, and all
 	 * position information will be initialized to safe default values.
-	 * 
+	 *
 	 * Default state characteristics:
 	 * - Error string indicates no error occurred
 	 * - Position values are set to reasonable defaults (typically 0 or 1)
 	 * - Object is safe to query and copy
 	 * - Can be used to initialize error parameters before parsing
-	 * 
+	 *
 	 * @complexity O(1) - Constant time initialization
 	 * @exception noexcept guarantee
-	 * 
+	 *
 	 * @note Creates a "success" state, not an error state
 	 * @note Safe default values for all position information
 	 * @note Commonly used as output parameter initialization
-	 * 
+	 *
 	 * @example
 	 * @code
 	 * QTomlParseError error;  // No error state
@@ -175,89 +175,89 @@ public:
 	 * @endcode
 	 */
 	QTomlParseError() noexcept;
-	
+
 	/**
 	 * @brief Copy constructor creating independent error object copy.
-	 * 
+	 *
 	 * Creates a new QTomlParseError object that is an exact copy of
 	 * another error object, including all error information and position
 	 * data. The copy is completely independent of the source.
-	 * 
+	 *
 	 * @param other The QTomlParseError object to copy from
-	 * 
+	 *
 	 * @complexity O(1) - Constant time with small string copying overhead
 	 * @exception Strong exception safety guarantee
-	 * 
+	 *
 	 * @note Creates completely independent copy
 	 * @note All error information is preserved exactly
 	 * @note Uses PIMPL pattern for efficient copying
 	 */
 	QTomlParseError(const QTomlParseError& other);
-	
+
 	/**
 	 * @brief Move constructor for efficient error object transfer.
-	 * 
+	 *
 	 * Creates a QTomlParseError object by taking ownership of another
 	 * object's resources, leaving the source in a valid but unspecified
 	 * state. Enables efficient error propagation through return values.
-	 * 
+	 *
 	 * @param other Rvalue reference to QTomlParseError to move from
-	 * 
+	 *
 	 * @complexity O(1) - Constant time resource transfer
 	 * @exception noexcept guarantee
-	 * 
+	 *
 	 * @note Source object remains valid but should not be used
 	 * @note Enables efficient return value optimization
 	 * @note Optimal for error handling chains
 	 */
 	QTomlParseError(QTomlParseError&& other) noexcept;
-	
+
 	/**
 	 * @brief Destructor ensuring proper resource cleanup.
-	 * 
+	 *
 	 * Automatically releases all resources through RAII principles.
 	 * Uses std::unique_ptr for automatic memory management of the
 	 * private implementation.
-	 * 
+	 *
 	 * @complexity O(1) - Constant time cleanup
 	 * @exception noexcept guarantee
-	 * 
+	 *
 	 * @note Automatic cleanup through RAII
 	 * @note No manual resource management required
 	 */
 	~QTomlParseError() noexcept;
-	
+
 	/**
 	 * @brief Copy assignment operator with self-assignment protection.
-	 * 
+	 *
 	 * Replaces this object's contents with a copy of another error
 	 * object's information. Includes protection against self-assignment
 	 * for safety and efficiency.
-	 * 
+	 *
 	 * @param other The QTomlParseError object to copy from
 	 * @return Reference to this object for assignment chaining
-	 * 
+	 *
 	 * @complexity O(1) - Constant time with copying overhead
 	 * @exception Strong exception safety guarantee
-	 * 
+	 *
 	 * @note Self-assignment is detected and handled safely
 	 * @note Supports assignment chaining
 	 * @note All error information is copied exactly
 	 */
 	QTomlParseError& operator=(const QTomlParseError& other);
-	
+
 	/**
 	 * @brief Move assignment operator for efficient resource transfer.
-	 * 
+	 *
 	 * Replaces this object's contents by taking ownership of another
 	 * object's resources. Previous contents are automatically cleaned up.
-	 * 
+	 *
 	 * @param other Rvalue reference to QTomlParseError to move from
 	 * @return Reference to this object for assignment chaining
-	 * 
+	 *
 	 * @complexity O(1) - Constant time resource transfer
 	 * @exception noexcept guarantee
-	 * 
+	 *
 	 * @note Previous contents are automatically cleaned up
 	 * @note Source object should not be used after move
 	 * @note Supports assignment chaining
@@ -265,85 +265,85 @@ public:
 	QTomlParseError& operator=(QTomlParseError&& other) noexcept;
 
 	// ==================== Error Information Access ====================
-	
+
 	/**
 	 * @brief Retrieves the human-readable error description.
-	 * 
+	 *
 	 * Returns a detailed error message describing what went wrong during
 	 * TOML parsing. For successful parsing operations, returns a message
 	 * indicating no error occurred. Error messages are typically in English
 	 * and provide specific details about the parsing failure.
-	 * 
+	 *
 	 * Error message categories:
 	 * - Syntax errors: Invalid TOML syntax constructs
 	 * - Structural errors: Problems with document structure
 	 * - Value errors: Invalid literal values or formats
 	 * - Encoding errors: Character encoding problems
 	 * - Semantic errors: Logical inconsistencies (duplicate keys, etc.)
-	 * 
+	 *
 	 * Message characteristics:
 	 * - Human-readable English text
 	 * - Specific details about the failure cause
 	 * - Consistent format for programmatic analysis
 	 * - No sensitive information exposure
-	 * 
+	 *
 	 * @return QString containing the error description or success message
-	 * 
+	 *
 	 * @complexity O(1) - Constant time access with potential string copying
 	 * @exception noexcept guarantee
-	 * 
+	 *
 	 * @note Returns success message for non-error states
 	 * @note Error messages are typically in English
 	 * @note Safe to call multiple times (idempotent)
-	 * 
+	 *
 	 * @example
 	 * @code
 	 * QTomlParseError error;
 	 * QTomlDocument doc = QTomlDocument::fromToml("invalid=[", &error);
-	 * 
+	 *
 	 * QString message = error.errorString();
 	 * if (!message.contains("No error")) {
 	 *     qWarning() << "Parsing failed:" << message;
 	 *     // Might output: "Expected closing bracket ']' at line 1"
 	 * }
 	 * @endcode
-	 * 
+	 *
 	 * @see offset, line, column for position information
 	 */
 	QString errorString() const noexcept;
 
 	// ==================== Public Position Information ====================
-	
+
 	/**
 	 * @brief Byte offset position of the error in the input data.
-	 * 
+	 *
 	 * Absolute byte position where the parsing error occurred, measured
 	 * from the beginning of the input data. This provides precise location
 	 * information for programmatic error handling and analysis.
-	 * 
+	 *
 	 * Offset characteristics:
 	 * - Zero-based indexing (first byte is offset 0)
 	 * - Counts actual bytes, not Unicode code points
 	 * - Useful for programmatic error location and correction
 	 * - Corresponds to C++ iterator/pointer arithmetic
-	 * 
+	 *
 	 * Usage scenarios:
 	 * - Extracting error context from input data
 	 * - Implementing error correction algorithms
 	 * - Building debugging and analysis tools
 	 * - Precise error location for automated processing
-	 * 
+	 *
 	 * @note Zero-based indexing unlike line and column numbers
 	 * @note Measures bytes, not Unicode characters
 	 * @note May be 0 for errors at the beginning of input
 	 * @note Value is -1 or 0 for non-error states
-	 * 
+	 *
 	 * @example
 	 * @code
 	 * QByteArray data = "valid = true\ninvalid = [";
 	 * QTomlParseError error;
 	 * QTomlDocument::fromToml(data, &error);
-	 * 
+	 *
 	 * if (!error.errorString().contains("No error")) {
 	 *     // Extract 10 characters around the error for context
 	 *     int start = qMax(0, error.offset - 5);
@@ -354,36 +354,36 @@ public:
 	 * @endcode
 	 */
 	int offset;
-	
+
 	/**
 	 * @brief Line number where the error occurred (1-based indexing).
-	 * 
+	 *
 	 * Line number in the input data where the parsing error was detected.
 	 * Uses 1-based indexing to match text editor and user interface
 	 * conventions, making error reports more intuitive for developers.
-	 * 
+	 *
 	 * Line counting characteristics:
 	 * - 1-based indexing (first line is line 1)
 	 * - Counts logical lines, respecting different line ending styles
 	 * - Handles Unix (LF), Windows (CRLF), and classic Mac (CR) line endings
 	 * - Consistent with most text editors and development tools
-	 * 
+	 *
 	 * Display and usage:
 	 * - Perfect for user-facing error messages
 	 * - Compatible with text editor "Go to line" functionality
 	 * - Useful for error highlighting in IDEs
 	 * - Standard format for compiler-style error reporting
-	 * 
+	 *
 	 * @note 1-based indexing to match text editor conventions
 	 * @note Handles all common line ending formats correctly
 	 * @note Value is 1 for errors on the first line
 	 * @note May be 0 or 1 for non-error states
-	 * 
+	 *
 	 * @example
 	 * @code
 	 * QTomlParseError error;
 	 * QTomlDocument::fromToml(multilineData, &error);
-	 * 
+	 *
 	 * if (!error.errorString().contains("No error")) {
 	 *     qWarning() << QString("Error at line %1, column %2: %3")
 	 *                   .arg(error.line)
@@ -393,38 +393,38 @@ public:
 	 * @endcode
 	 */
 	int line;
-	
+
 	/**
 	 * @brief Column number where the error occurred (1-based indexing).
-	 * 
+	 *
 	 * Column position within the line where the parsing error was detected.
 	 * Uses 1-based indexing for consistency with text editors and provides
 	 * precise character-level positioning for error highlighting.
-	 * 
+	 *
 	 * Column counting characteristics:
 	 * - 1-based indexing (first column is column 1)
 	 * - Counts Unicode code points, not bytes
 	 * - Handles multi-byte UTF-8 characters correctly
 	 * - Tab characters typically count as single columns
 	 * - Reset to 1 at the beginning of each line
-	 * 
+	 *
 	 * Character handling:
 	 * - Unicode-aware counting for international text
 	 * - Consistent behavior across different character encodings
 	 * - Proper handling of combining characters and emoji
 	 * - Tab expansion may vary depending on context
-	 * 
+	 *
 	 * @note 1-based indexing to match text editor conventions
 	 * @note Counts Unicode code points, not bytes
 	 * @note Value is 1 for errors at the beginning of a line
 	 * @note May be 0 or 1 for non-error states
-	 * 
+	 *
 	 * @example
 	 * @code
 	 * QString tomlLine = "key = \"invalid unicode: \\uXXXX\"";
 	 * QTomlParseError error;
 	 * QTomlDocument::fromToml(tomlLine.toUtf8(), &error);
-	 * 
+	 *
 	 * if (!error.errorString().contains("No error")) {
 	 *     // Create visual pointer to error location
 	 *     QString pointer = QString(error.column - 1, ' ') + "^";
@@ -439,39 +439,39 @@ public:
 private:
 	/**
 	 * @brief Private implementation pointer (PIMPL pattern).
-	 * 
+	 *
 	 * Pointer to private implementation containing detailed error information
 	 * and internal state. Provides binary compatibility, compilation hiding,
 	 * and efficient memory management.
-	 * 
+	 *
 	 * @note Uses std::unique_ptr for automatic memory management
 	 * @note Enables binary compatibility across library versions
 	 * @note Hides implementation details from client code
 	 */
 	std::unique_ptr<class QTomlParseErrorPrivate> d_ptr;
-	
+
 	/**
 	 * @brief Private constructor for internal error object creation.
-	 * 
+	 *
 	 * Creates a QTomlParseError object from internal parser error information.
 	 * This constructor is used internally by the parsing system to convert
 	 * native parser errors into Qt-compatible error objects.
-	 * 
+	 *
 	 * @param toml_parse_error_ptr Opaque pointer to internal error object
-	 * 
+	 *
 	 * @note This constructor is private and only accessible to friend classes
 	 * @note Used internally by the TOML parsing system
 	 * @note Handles conversion from native parser errors to Qt objects
 	 */
 	explicit QTomlParseError(const void* toml_parse_error_ptr);
-	
+
 	/**
 	 * @brief Friend class declaration for internal error creation.
-	 * 
+	 *
 	 * Grants QTomlDocument access to the private constructor for creating
 	 * error objects during parsing operations. This maintains encapsulation
 	 * while enabling efficient error object creation.
-	 * 
+	 *
 	 * @note Enables internal error object creation
 	 * @note Maintains proper encapsulation boundaries
 	 * @note Used during TOML parsing operations

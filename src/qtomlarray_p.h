@@ -29,109 +29,109 @@
  * - Qt framework integration and wrapper implementation
  */
 
-/**
- * @file qtomlarray_p.h
- * @brief Private implementation details for QTomlArray class using PIMPL pattern.
- * 
- * This header contains the private implementation class for QTomlArray,
- * following Qt's PIMPL (Private Implementation) pattern for binary compatibility
- * and compilation hiding. The private class encapsulates the actual container
- * storage while keeping the public interface clean and stable.
- * 
- * Design principles:
- * - Minimal overhead with maximum performance
- * - Direct use of Qt containers for optimal integration
- * - Snake_case naming for internal member variables per project standards
- * - Qt naming conventions for class names (ClassNamePrivate)
- * - Exception-safe design through Qt container guarantees
- * 
- * The implementation focuses on:
- * - Efficient element storage and access
- * - STL-compatible iterator support
- * - Memory management through Qt's proven container architecture
- * - High-performance operations for both small and large arrays
- * 
- * @note This file is part of the private API and should not be included directly
- * @note Implementation details may change between versions without notice
- * @note Only QTomlArray and internal systems should access this interface
- * @see qtomlarray.h for the public interface
- */
+ /**
+  * @file qtomlarray_p.h
+  * @brief Private implementation details for QTomlArray class using PIMPL pattern.
+  *
+  * This header contains the private implementation class for QTomlArray,
+  * following Qt's PIMPL (Private Implementation) pattern for binary compatibility
+  * and compilation hiding. The private class encapsulates the actual container
+  * storage while keeping the public interface clean and stable.
+  *
+  * Design principles:
+  * - Minimal overhead with maximum performance
+  * - Direct use of Qt containers for optimal integration
+  * - Snake_case naming for internal member variables per project standards
+  * - Qt naming conventions for class names (ClassNamePrivate)
+  * - Exception-safe design through Qt container guarantees
+  *
+  * The implementation focuses on:
+  * - Efficient element storage and access
+  * - STL-compatible iterator support
+  * - Memory management through Qt's proven container architecture
+  * - High-performance operations for both small and large arrays
+  *
+  * @note This file is part of the private API and should not be included directly
+  * @note Implementation details may change between versions without notice
+  * @note Only QTomlArray and internal systems should access this interface
+  * @see qtomlarray.h for the public interface
+  */
 
 #pragma once
 #pragma execution_character_set("utf-8")
 #include "qtomlvalue.h"
 #include <QVector>
 
-/**
- * @class QTomlArrayPrivate
- * @brief Private implementation class for QTomlArray using PIMPL pattern.
- * 
- * This class contains the actual data storage for QTomlArray objects,
- * using QVector<QTomlValue> as the underlying container for optimal
- * performance and Qt integration. The design emphasizes simplicity
- * and efficiency through direct container delegation.
- * 
- * The class is designed for:
- * - **Performance**: Direct QVector usage for optimal memory layout and access patterns
- * - **Compatibility**: Full STL iterator support through QVector's interface
- * - **Integration**: Seamless interoperability with Qt's container ecosystem
- * - **Simplicity**: Minimal wrapper overhead with direct delegation to QVector
- * - **Memory Efficiency**: Leverages QVector's optimized memory management
- * 
- * Container characteristics:
- * QVector provides excellent characteristics for TOML array storage:
- * - Contiguous memory layout for cache-friendly access
- * - Amortized O(1) append operations
- * - O(1) random access by index
- * - Efficient memory reallocation strategies
- * - Built-in capacity management and growth policies
- * 
- * Performance profile:
- * - Random access: O(1) constant time
- * - Append operations: O(1) amortized, O(n) worst case during reallocation
- * - Insert/remove in middle: O(n) due to element shifting
- * - Memory usage: Minimal overhead beyond stored elements
- * - Iterator operations: STL-compatible with full performance
- * 
- * Thread safety:
- * - Read operations are thread-safe when no modifications occur
- * - Write operations require external synchronization
- * - QVector provides standard Qt container thread safety guarantees
- * - Copy construction is thread-safe with proper synchronization
- * 
- * @note This class follows Qt's private implementation naming convention
- * @note Member variables use snake_case naming for internal consistency
- * @note Direct manipulation should be avoided; use QTomlArray public interface
- * @note Designed for minimal overhead and maximum performance
- * 
- * @see QTomlArray for the public interface
- * @see QVector for underlying container documentation
- * @see QTomlValue for element type information
- * @see PIMPL pattern documentation for design rationale
- */
+  /**
+   * @class QTomlArrayPrivate
+   * @brief Private implementation class for QTomlArray using PIMPL pattern.
+   *
+   * This class contains the actual data storage for QTomlArray objects,
+   * using QVector<QTomlValue> as the underlying container for optimal
+   * performance and Qt integration. The design emphasizes simplicity
+   * and efficiency through direct container delegation.
+   *
+   * The class is designed for:
+   * - **Performance**: Direct QVector usage for optimal memory layout and access patterns
+   * - **Compatibility**: Full STL iterator support through QVector's interface
+   * - **Integration**: Seamless interoperability with Qt's container ecosystem
+   * - **Simplicity**: Minimal wrapper overhead with direct delegation to QVector
+   * - **Memory Efficiency**: Leverages QVector's optimized memory management
+   *
+   * Container characteristics:
+   * QVector provides excellent characteristics for TOML array storage:
+   * - Contiguous memory layout for cache-friendly access
+   * - Amortized O(1) append operations
+   * - O(1) random access by index
+   * - Efficient memory reallocation strategies
+   * - Built-in capacity management and growth policies
+   *
+   * Performance profile:
+   * - Random access: O(1) constant time
+   * - Append operations: O(1) amortized, O(n) worst case during reallocation
+   * - Insert/remove in middle: O(n) due to element shifting
+   * - Memory usage: Minimal overhead beyond stored elements
+   * - Iterator operations: STL-compatible with full performance
+   *
+   * Thread safety:
+   * - Read operations are thread-safe when no modifications occur
+   * - Write operations require external synchronization
+   * - QVector provides standard Qt container thread safety guarantees
+   * - Copy construction is thread-safe with proper synchronization
+   *
+   * @note This class follows Qt's private implementation naming convention
+   * @note Member variables use snake_case naming for internal consistency
+   * @note Direct manipulation should be avoided; use QTomlArray public interface
+   * @note Designed for minimal overhead and maximum performance
+   *
+   * @see QTomlArray for the public interface
+   * @see QVector for underlying container documentation
+   * @see QTomlValue for element type information
+   * @see PIMPL pattern documentation for design rationale
+   */
 class QTomlArrayPrivate
 {
 public:
 	/**
 	 * @brief Default constructor using compiler-generated implementation.
-	 * 
+	 *
 	 * Creates a QTomlArrayPrivate instance with an empty QVector container.
 	 * The compiler-generated version is optimal as QVector has efficient
 	 * default construction with no initial memory allocation.
-	 * 
+	 *
 	 * Construction characteristics:
 	 * - No memory allocation occurs during construction
 	 * - Container is ready for immediate use
 	 * - Zero capacity and size initially
 	 * - First element addition will trigger initial allocation
-	 * 
+	 *
 	 * @complexity O(1) - Constant time construction
 	 * @exception Strong exception safety through QVector default constructor
-	 * 
+	 *
 	 * @note Uses compiler-generated implementation for optimal performance
 	 * @note No custom initialization required for QVector
 	 * @note Safe default state for array private implementation
-	 * 
+	 *
 	 * @example Internal usage:
 	 * @code
 	 * QTomlArrayPrivate impl;              // Empty state
@@ -143,41 +143,41 @@ public:
 
 	/**
 	 * @brief Copy constructor using compiler-generated implementation.
-	 * 
+	 *
 	 * Creates a deep copy of another QTomlArrayPrivate instance by copying
 	 * the underlying QVector container. The compiler-generated version is
 	 * sufficient as QVector has proper copy semantics with efficient
 	 * copy-on-write optimization where applicable.
-	 * 
+	 *
 	 * Copy characteristics:
 	 * - All elements are deep-copied through QTomlValue copy constructors
 	 * - Container capacity may be optimized in the copy
 	 * - Copy-on-write optimization may defer actual copying until modification
 	 * - Result is completely independent of the source object
-	 * 
+	 *
 	 * Performance:
 	 * - Time complexity is O(n) where n is the number of elements
 	 * - QVector's copy constructor is highly optimized
 	 * - Memory allocation occurs for the new container's storage
 	 * - QTomlValue copying may benefit from internal optimizations
-	 * 
+	 *
 	 * @param other The QTomlArrayPrivate instance to copy from
-	 * 
+	 *
 	 * @complexity O(n) where n is the number of elements in values_
 	 * @exception Strong exception safety through QVector copy constructor
-	 * 
+	 *
 	 * @note Compiler-generated version is explicitly declared for clarity
 	 * @note QVector handles all memory management and element copying
 	 * @note Creates completely independent copy suitable for separate modification
-	 * 
+	 *
 	 * @example Copy independence:
 	 * @code
 	 * QTomlArrayPrivate original;
 	 * original.values_.append(QTomlValue("test"));
-	 * 
+	 *
 	 * QTomlArrayPrivate copy(original);    // Deep copy
 	 * Q_ASSERT(copy.values_.size() == original.values_.size());
-	 * 
+	 *
 	 * // Modifications are independent
 	 * copy.values_.append(QTomlValue("new"));
 	 * Q_ASSERT(original.values_.size() == 1);  // Original unchanged
@@ -190,25 +190,25 @@ public:
 
 	/**
 	 * @brief The underlying container storing all array elements.
-	 * 
+	 *
 	 * This QVector<QTomlValue> serves as the primary storage for all elements
 	 * in the TOML array. QVector is chosen for its excellent performance
 	 * characteristics and seamless integration with Qt's ecosystem.
-	 * 
+	 *
 	 * Container benefits:
 	 * - **Memory Layout**: Contiguous storage for optimal cache performance
 	 * - **Access Performance**: O(1) random access to elements by index
 	 * - **Growth Strategy**: Intelligent capacity management with geometric growth
 	 * - **STL Compatibility**: Full iterator support for algorithms and range-based loops
 	 * - **Qt Integration**: Native compatibility with Qt's container interfaces
-	 * 
+	 *
 	 * Storage characteristics:
 	 * - Elements are stored in insertion order (TOML arrays are ordered)
 	 * - Supports heterogeneous element types through QTomlValue
 	 * - Automatic memory management with RAII principles
 	 * - Efficient reallocation strategies for growing arrays
 	 * - Capacity can exceed size for amortized append performance
-	 * 
+	 *
 	 * Operation complexity:
 	 * - Element access by index: O(1)
 	 * - Append to end: O(1) amortized
@@ -216,48 +216,48 @@ public:
 	 * - Insert in middle: O(n) due to element shifting
 	 * - Remove from end: O(1)
 	 * - Remove from middle: O(n) due to element shifting
-	 * 
+	 *
 	 * Memory management:
 	 * - Automatic allocation and deallocation
 	 * - Geometric growth strategy (typically 2x capacity increase)
 	 * - Memory released when container is destroyed
 	 * - Capacity can be managed through reserve() and squeeze() operations
-	 * 
+	 *
 	 * Thread safety:
 	 * - Read operations are thread-safe when no modifications occur
 	 * - Concurrent modifications require external synchronization
 	 * - Iterator invalidation follows standard Qt container rules
 	 * - Safe for concurrent read access from multiple threads
-	 * 
+	 *
 	 * @note Snake_case naming follows internal implementation convention
 	 * @note All QTomlArray operations delegate to this container
 	 * @note Supports full TOML specification array semantics
 	 * @note Memory layout is optimized for sequential access patterns
-	 * 
+	 *
 	 * @example Element management:
 	 * @code
 	 * QTomlArrayPrivate impl;
-	 * 
+	 *
 	 * // Adding elements
 	 * impl.values_.append(QTomlValue(42));
 	 * impl.values_.append(QTomlValue("hello"));
 	 * impl.values_.append(QTomlValue(true));
-	 * 
+	 *
 	 * // Accessing elements
 	 * Q_ASSERT(impl.values_[0].toInteger() == 42);
 	 * Q_ASSERT(impl.values_[1].toString() == "hello");
 	 * Q_ASSERT(impl.values_[2].toBool() == true);
-	 * 
+	 *
 	 * // Container properties
 	 * Q_ASSERT(impl.values_.size() == 3);
 	 * Q_ASSERT(!impl.values_.isEmpty());
-	 * 
+	 *
 	 * // Iterator support
 	 * for (const auto& value : impl.values_) {
 	 *     // Process each QTomlValue
 	 * }
 	 * @endcode
-	 * 
+	 *
 	 * @see QVector for complete container documentation
 	 * @see QTomlValue for element type details
 	 * @see QTomlArray for public interface operations

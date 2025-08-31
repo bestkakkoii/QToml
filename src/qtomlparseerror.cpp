@@ -29,38 +29,38 @@
  * - Qt framework integration and wrapper implementation
  */
 
-/**
- * @file qtomlparseerror.cpp
- * @brief Implementation of QTomlParseError class for TOML parsing error reporting.
- * 
- * This implementation provides comprehensive error reporting for TOML parsing
- * operations, bridging between the native toml++ error system and Qt's error
- * handling patterns. The implementation focuses on accuracy, performance, and
- * comprehensive error information extraction.
- * 
- * Key implementation features:
- * - Accurate error message extraction from toml++ parse_error exceptions
- * - Precise position information conversion (line, column, offset)
- * - Efficient string handling with memory pre-allocation optimizations
- * - Exception-safe construction and resource management through PIMPL
- * - Integration with Qt's string and error handling systems
- * 
- * The implementation uses selective inclusion of the toml++ library with
- * formatters disabled for reduced compilation overhead while maintaining
- * full access to error diagnostic information.
- * 
- * Performance considerations:
- * - Pre-allocation of string storage to avoid reallocations
- * - Direct construction from string_view to minimize copying
- * - Efficient error object creation during parsing failures
- * - Minimal overhead for success cases (default construction)
- * 
- * @note This implementation bridges native C++ exceptions to Qt error objects
- * @note String formatting is optimized for performance with pre-allocation
- * @note Error position information follows Qt and text editor conventions
- * @see qtomlparseerror.h for the public interface
- * @see qtomlparseerror_p.h for private implementation details
- */
+ /**
+  * @file qtomlparseerror.cpp
+  * @brief Implementation of QTomlParseError class for TOML parsing error reporting.
+  *
+  * This implementation provides comprehensive error reporting for TOML parsing
+  * operations, bridging between the native toml++ error system and Qt's error
+  * handling patterns. The implementation focuses on accuracy, performance, and
+  * comprehensive error information extraction.
+  *
+  * Key implementation features:
+  * - Accurate error message extraction from toml++ parse_error exceptions
+  * - Precise position information conversion (line, column, offset)
+  * - Efficient string handling with memory pre-allocation optimizations
+  * - Exception-safe construction and resource management through PIMPL
+  * - Integration with Qt's string and error handling systems
+  *
+  * The implementation uses selective inclusion of the toml++ library with
+  * formatters disabled for reduced compilation overhead while maintaining
+  * full access to error diagnostic information.
+  *
+  * Performance considerations:
+  * - Pre-allocation of string storage to avoid reallocations
+  * - Direct construction from string_view to minimize copying
+  * - Efficient error object creation during parsing failures
+  * - Minimal overhead for success cases (default construction)
+  *
+  * @note This implementation bridges native C++ exceptions to Qt error objects
+  * @note String formatting is optimized for performance with pre-allocation
+  * @note Error position information follows Qt and text editor conventions
+  * @see qtomlparseerror.h for the public interface
+  * @see qtomlparseerror_p.h for private implementation details
+  */
 
 #pragma execution_character_set("utf-8")
 
@@ -70,66 +70,65 @@
 #include <QString>
 #include <string>
 
-/**
- * @brief Selective inclusion of toml++ library for error handling.
- * 
- * Includes the toml++ library with formatters disabled to reduce compilation
- * overhead while maintaining access to parse_error exception information.
- * This approach minimizes binary size and compilation time while providing
- * full error diagnostic capabilities.
- * 
- * Configuration:
- * - TOML_ENABLE_FORMATTERS=0: Disables formatting utilities for size optimization
- * - Full access to toml::parse_error and source location information
- * - Namespace-qualified access to avoid naming conflicts
- * 
- * @note Only included in implementation file to avoid header pollution
- * @note Formatters are disabled for performance and size optimization
- * @note Full parse_error diagnostic information remains available
- */
-#define TOML_ENABLE_FORMATTERS 0
-#include <3rdparty/include/toml++/toml.h>
+  /**
+   * @brief Selective inclusion of toml++ library for error handling.
+   *
+   * Includes the toml++ library with formatters disabled to reduce compilation
+   * overhead while maintaining access to parse_error exception information.
+   * This approach minimizes binary size and compilation time while providing
+   * full error diagnostic capabilities.
+   *
+   * Configuration:
+   * - TOML_ENABLE_FORMATTERS=0: Disables formatting utilities for size optimization
+   * - Full access to toml::parse_error and source location information
+   * - Namespace-qualified access to avoid naming conflicts
+   *
+   * @note Only included in implementation file to avoid header pollution
+   * @note Formatters are disabled for performance and size optimization
+   * @note Full parse_error diagnostic information remains available
+   */
+#include <3rdparty/toml++/toml.h>
 
-/**
- * @brief Default constructor creating a "no error" state object.
- * 
- * Creates a QTomlParseError object representing successful parsing with
- * no errors detected. This constructor is used to initialize error output
- * parameters before parsing operations and provides a known-good state
- * for error checking.
- * 
- * Initialization details:
- * - Error string set to indicate successful parsing
- * - All position values initialized to safe defaults (0)
- * - Private implementation allocated with default success state
- * - Object ready for immediate use in error checking logic
- * 
- * Performance optimization:
- * Uses make_unique for exception-safe allocation and initializes position
- * values directly in the member initializer list for optimal performance.
- * 
- * @complexity O(1) - Constant time construction with small string allocation
- * @exception noexcept guarantee through careful exception-safe design
- * 
- * @note Creates success state, not error state
- * @note Position values are initialized to 0 for consistency
- * @note Ready for immediate use in error checking patterns
- * 
- * @example
- * @code
- * QTomlParseError error;  // Default success state
- * QTomlDocument doc = QTomlDocument::fromToml(data, &error);
- * 
- * // Check for parsing success
- * if (error.errorString().contains("No error")) {
- *     // Parsing succeeded, doc contains valid data
- *     qDebug() << "TOML parsing successful";
- * }
- * @endcode
- * 
- * @see errorString() for success/error state checking
- * @see QTomlDocument::fromToml() for typical usage context
- */
+   /**
+	* @brief Default constructor creating a "no error" state object.
+	*
+	* Creates a QTomlParseError object representing successful parsing with
+	* no errors detected. This constructor is used to initialize error output
+	* parameters before parsing operations and provides a known-good state
+	* for error checking.
+	*
+	* Initialization details:
+	* - Error string set to indicate successful parsing
+	* - All position values initialized to safe defaults (0)
+	* - Private implementation allocated with default success state
+	* - Object ready for immediate use in error checking logic
+	*
+	* Performance optimization:
+	* Uses make_unique for exception-safe allocation and initializes position
+	* values directly in the member initializer list for optimal performance.
+	*
+	* @complexity O(1) - Constant time construction with small string allocation
+	* @exception noexcept guarantee through careful exception-safe design
+	*
+	* @note Creates success state, not error state
+	* @note Position values are initialized to 0 for consistency
+	* @note Ready for immediate use in error checking patterns
+	*
+	* @example
+	* @code
+	* QTomlParseError error;  // Default success state
+	* QTomlDocument doc = QTomlDocument::fromToml(data, &error);
+	*
+	* // Check for parsing success
+	* if (error.errorString().contains("No error")) {
+	*     // Parsing succeeded, doc contains valid data
+	*     qDebug() << "TOML parsing successful";
+	* }
+	* @endcode
+	*
+	* @see errorString() for success/error state checking
+	* @see QTomlDocument::fromToml() for typical usage context
+	*/
 QTomlParseError::QTomlParseError() noexcept
 	: d_ptr(std::make_unique<QTomlParseErrorPrivate>())
 	, offset(0)
@@ -142,40 +141,40 @@ QTomlParseError::QTomlParseError() noexcept
 
 /**
  * @brief Private constructor for converting native parser errors to Qt objects.
- * 
+ *
  * Creates a QTomlParseError object from a native toml++ parse_error exception,
  * extracting all available diagnostic information including error descriptions
  * and precise source location data. This constructor bridges the gap between
  * C++ exception-based error handling and Qt's value-based error objects.
- * 
+ *
  * Error information extraction:
  * - Error description from parse_error exception message
  * - Line and column numbers from source region information
  * - Formatted error string combining description and location
  * - Safe handling of string encoding conversion (UTF-8 to QString)
- * 
+ *
  * Position information handling:
  * - Line numbers converted from toml++ 1-based format
  * - Column numbers converted from toml++ 1-based format
  * - Offset information handled gracefully (may not be available)
  * - All position data validated and sanitized
- * 
+ *
  * Performance optimizations:
  * - String pre-allocation based on estimated final size
  * - Direct construction from string_view to minimize copying
  * - Efficient format string construction with reserve() optimization
  * - Minimal string operations through careful buffer management
- * 
+ *
  * @param toml_parse_error_ptr Opaque pointer to toml::parse_error object
- * 
+ *
  * @complexity O(n) where n is the length of the error description
  * @exception Strong exception safety through RAII and careful resource management
- * 
+ *
  * @note This constructor is private and only accessible to friend classes
  * @note Handles encoding conversion from UTF-8 to Qt's internal format
  * @note Optimized for performance with string pre-allocation
  * @note All position information is converted to Qt/text editor conventions
- * 
+ *
  * @example Internal usage:
  * @code
  * // Inside QTomlDocument::fromToml() implementation
@@ -189,7 +188,7 @@ QTomlParseError::QTomlParseError() noexcept
  *     return QTomlDocument(); // Return null document
  * }
  * @endcode
- * 
+ *
  * @see QTomlDocument::fromToml() for usage context
  * @see toml::parse_error for source error object structure
  * @see QString::fromUtf8() for encoding conversion details
@@ -213,7 +212,7 @@ QTomlParseError::QTomlParseError(const void* toml_parse_error_ptr)
 	// Optimize string construction with pre-allocation to avoid reallocations
 	// Estimate final string size as description length plus formatting overhead
 	d_ptr->formatted_error_string_.reserve(description_view.length() + 50);
-	
+
 	// Construct formatted error message with position information
 	// Uses arg() formatting for localization compatibility and performance
 	d_ptr->formatted_error_string_ = QString(u"%1\n(error occurred at line %2, column %3)")
@@ -224,43 +223,43 @@ QTomlParseError::QTomlParseError(const void* toml_parse_error_ptr)
 
 /**
  * @brief Copy constructor creating independent error object copy.
- * 
+ *
  * Creates a new QTomlParseError object that is an exact copy of another
  * error object, including all error information, position data, and internal
  * state. The copy is completely independent and modifications to either
  * object will not affect the other.
- * 
+ *
  * Copy semantics:
  * - Deep copy of private implementation through PIMPL copy constructor
  * - Exact duplication of all position information (offset, line, column)
  * - Independent string storage for error messages
  * - Complete separation from source object
- * 
+ *
  * Implementation details:
  * Uses the private implementation's copy constructor through make_unique
  * and explicitly copies all public member variables to ensure complete
  * independence between objects.
- * 
+ *
  * @param other The QTomlParseError object to copy from
- * 
+ *
  * @complexity O(n) where n is the length of the error message string
  * @exception Strong exception safety guarantee through RAII
- * 
+ *
  * @note Creates completely independent copy
  * @note All error information is preserved exactly
  * @note Uses PIMPL pattern for efficient and safe copying
- * 
+ *
  * @example
  * @code
  * QTomlParseError originalError = getParsingError();
  * QTomlParseError errorCopy(originalError);
- * 
+ *
  * // Both objects are independent
  * Q_ASSERT(errorCopy.errorString() == originalError.errorString());
  * Q_ASSERT(errorCopy.line == originalError.line);
  * Q_ASSERT(errorCopy.column == originalError.column);
  * @endcode
- * 
+ *
  * @see operator=(const QTomlParseError&) for copy assignment
  * @see QTomlParseErrorPrivate copy constructor for implementation details
  */
@@ -274,40 +273,40 @@ QTomlParseError::QTomlParseError(const QTomlParseError& other)
 
 /**
  * @brief Move constructor for efficient error object transfer.
- * 
+ *
  * Creates a QTomlParseError object by taking ownership of another object's
  * resources, leaving the source in a valid but unspecified state. This
  * enables efficient error propagation through return values and temporary
  * object optimization.
- * 
+ *
  * Move semantics:
  * - Transfer of private implementation ownership through unique_ptr move
  * - Source object remains valid but in unspecified state
  * - No copying of error strings or position data
  * - Optimal performance for temporary objects and return values
- * 
+ *
  * The implementation uses the compiler-generated default move constructor
  * which properly handles unique_ptr transfer and primitive member movement.
- * 
+ *
  * @param other Rvalue reference to QTomlParseError to move from
- * 
+ *
  * @complexity O(1) - Constant time resource transfer
  * @exception noexcept guarantee for optimal performance
- * 
+ *
  * @note Source object remains valid but should not be used
  * @note Enables return value optimization and efficient temporary handling
  * @note Uses compiler-generated default implementation for safety
- * 
+ *
  * @example
  * @code
  * QTomlParseError createError() {
  *     // ... error creation logic
  *     return QTomlParseError(error_data); // Move constructor called
  * }
- * 
+ *
  * QTomlParseError error = createError(); // Efficient move, no copying
  * @endcode
- * 
+ *
  * @see operator=(QTomlParseError&&) for move assignment
  * @see std::unique_ptr move semantics for implementation details
  */
@@ -315,24 +314,24 @@ QTomlParseError::QTomlParseError(QTomlParseError&& other) noexcept = default;
 
 /**
  * @brief Destructor ensuring proper cleanup of resources.
- * 
+ *
  * Automatically releases all resources associated with the QTomlParseError
  * object through RAII principles. The std::unique_ptr automatically handles
  * destruction of the private implementation, ensuring no memory leaks occur.
- * 
+ *
  * Cleanup process:
  * - Private implementation is automatically destroyed through unique_ptr
  * - Error strings and position data are automatically cleaned up
  * - No manual resource management required
  * - Exception safety guaranteed through RAII
- * 
+ *
  * @complexity O(1) - Constant time cleanup
  * @exception noexcept guarantee for exception safety
- * 
+ *
  * @note Uses RAII through std::unique_ptr for automatic cleanup
  * @note No manual resource management required
  * @note Marked noexcept for exception safety guarantees
- * 
+ *
  * @see std::unique_ptr destruction for implementation details
  * @see QTomlParseErrorPrivate destructor for private implementation cleanup
  */
@@ -340,47 +339,47 @@ QTomlParseError::~QTomlParseError() noexcept = default;
 
 /**
  * @brief Copy assignment operator with self-assignment protection.
- * 
+ *
  * Replaces the contents of this QTomlParseError object with a copy of
  * another object's error information. The operation includes self-assignment
  * protection and ensures that all error data is properly copied.
- * 
+ *
  * Assignment process:
  * - Self-assignment check prevents unnecessary work and potential issues
  * - Deep copy of private implementation data
  * - Exact copying of all position information
  * - Atomic replacement ensures consistent state during assignment
- * 
+ *
  * Self-assignment safety:
  * The explicit check for self-assignment (this != &other) prevents
  * unnecessary work and potential issues that could arise from an object
  * assigning to itself, particularly important for objects with custom
  * resource management.
- * 
+ *
  * @param other The QTomlParseError object to copy from
  * @return Reference to this object for chaining assignments
- * 
+ *
  * @complexity O(n) where n is the length of the error message string
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Self-assignment is handled safely and efficiently
  * @note All error information is preserved in the copy
  * @note Supports assignment chaining through reference return
- * 
+ *
  * @example
  * @code
  * QTomlParseError error1 = getFirstError();
  * QTomlParseError error2 = getSecondError();
  * QTomlParseError error3;
- * 
+ *
  * // Assignment chain
  * error3 = error2 = error1;
  * Q_ASSERT(error3.errorString() == error1.errorString());
- * 
+ *
  * // Self-assignment safety
  * error1 = error1;  // Safe, no-op due to self-assignment check
  * @endcode
- * 
+ *
  * @see operator=(QTomlParseError&&) for move assignment
  * @see QTomlParseErrorPrivate::operator= for implementation details
  */
@@ -398,47 +397,47 @@ QTomlParseError& QTomlParseError::operator=(const QTomlParseError& other)
 
 /**
  * @brief Move assignment operator for efficient resource transfer.
- * 
+ *
  * Replaces the contents of this QTomlParseError object by taking ownership
  * of another object's resources. This provides optimal performance by
  * avoiding unnecessary copying, especially useful for temporary objects
  * and return value optimization.
- * 
+ *
  * Move assignment characteristics:
  * - Transfer of private implementation ownership through unique_ptr move
  * - Automatic cleanup of previous contents
  * - Source object left in valid but unspecified state
  * - No copying of error strings or position data
- * 
+ *
  * The implementation uses the compiler-generated default move assignment
  * which efficiently transfers the unique_ptr ownership and moves primitive
  * member variables. The previous contents are automatically cleaned up.
- * 
+ *
  * @param other Rvalue reference to QTomlParseError to move from
  * @return Reference to this object for chaining assignments
- * 
+ *
  * @complexity O(1) - Constant time resource transfer
  * @exception noexcept guarantee for optimal performance and exception safety
- * 
+ *
  * @note Previous contents are automatically cleaned up
  * @note Source object should not be used after the move
  * @note Uses compiler-generated default implementation for safety
- * 
+ *
  * @example
  * @code
  * QTomlParseError error1 = getError();
  * QTomlParseError error2;
- * 
+ *
  * // Move assignment
  * error2 = std::move(error1);
  * // error1 is now in valid but unspecified state
- * 
+ *
  * // Chain assignment with temporary
  * QTomlParseError error3;
  * error3 = QTomlParseError(internal_error_data);
  * // Move assignment from temporary object
  * @endcode
- * 
+ *
  * @see operator=(const QTomlParseError&) for copy assignment
  * @see std::unique_ptr move assignment for implementation details
  */
@@ -446,55 +445,55 @@ QTomlParseError& QTomlParseError::operator=(QTomlParseError&& other) noexcept = 
 
 /**
  * @brief Retrieves the formatted error description string.
- * 
+ *
  * Returns the complete error message including both the error description
  * and position information in a human-readable format. For successful
  * parsing operations, returns a message indicating no error occurred.
- * 
+ *
  * String format:
  * - Error description on the first line
  * - Position information on the second line in parentheses
  * - Success message for non-error states
  * - Consistent formatting for programmatic parsing if needed
- * 
+ *
  * Performance characteristics:
  * - Direct access to pre-formatted string (no formatting overhead)
  * - String sharing through Qt's implicit sharing (copy-on-write)
  * - No string modification or computation during access
  * - Optimal performance for repeated access
- * 
+ *
  * Error message examples:
  * - "Invalid value format\n(error occurred at line 5, column 12)"
  * - "Unexpected end of input\n(error occurred at line 1, column 23)"
  * - "No error occurred" (for success cases)
- * 
+ *
  * @return QString containing the complete error message or success indication
- * 
+ *
  * @complexity O(1) - Constant time access with potential string sharing
  * @exception noexcept guarantee - string access cannot fail
- * 
+ *
  * @note Returns pre-formatted string with no computation overhead
  * @note Uses Qt's implicit string sharing for efficiency
  * @note Safe to call multiple times (idempotent operation)
  * @note Consistent format enables programmatic error analysis
- * 
+ *
  * @example
  * @code
  * QTomlParseError error;
  * QTomlDocument doc = QTomlDocument::fromToml(invalidData, &error);
- * 
+ *
  * QString message = error.errorString();
  * if (!message.contains("No error")) {
  *     // Parse the error message for logging
  *     QStringList lines = message.split('\n');
  *     QString description = lines.first();
  *     QString location = lines.value(1, QString());
- *     
+ *
  *     qCritical() << "TOML Error:" << description;
  *     qCritical() << "Location:" << location;
  * }
  * @endcode
- * 
+ *
  * @see line, column, offset for individual position components
  * @see QString for string handling and manipulation methods
  */

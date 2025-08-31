@@ -29,53 +29,53 @@
  * - Qt framework integration and wrapper implementation
  */
 
-/**
- * @file qtomlhash.cpp
- * @brief Implementation of QTomlHash class providing efficient TOML table operations.
- * 
- * This file contains the complete implementation of the QTomlHash class, which represents
- * TOML tables (key-value pair collections) with hash table efficiency. The implementation
- * uses the PIMPL pattern with QHash as the underlying container to provide optimal
- * performance for table operations while maintaining Qt framework integration.
- * 
- * Key implementation features:
- * - High-performance hash table operations using QHash<QString, QTomlValue>
- * - PIMPL pattern for binary compatibility and implementation hiding
- * - Full STL-compatible iterator interface for traversal and algorithms
- * - Capacity management with memory pre-allocation support
- * - Move semantics throughout for optimal resource management
- * - Qt meta-type registration for QVariant and signal/slot integration
- * - Comprehensive type conversion support for Qt interoperability
- * 
- * Performance characteristics:
- * - Average O(1) lookup, insertion, and removal operations
- * - O(n) worst-case for hash collisions (rare with QString hash function)
- * - Memory usage scales linearly with number of key-value pairs
- * - Automatic load factor management for consistent performance
- * - Copy-on-write optimization where applicable through Qt containers
- * 
- * The implementation is organized into sections:
- * - Meta-type registration for Qt integration
- * - Construction and destruction with PIMPL management
- * - Assignment operations with copy and move semantics
- * - Capacity management for performance optimization
- * - Element modification operations (insert, remove, replace)
- * - Element access and queries with safe bounds checking
- * - Iterator interface for STL compatibility
- * - Type conversion methods for Qt framework integration
- * 
- * Thread safety:
- * - Read operations are thread-safe when no modifications occur
- * - Write operations require external synchronization
- * - Copy construction is thread-safe with proper synchronization
- * - Qt container guarantees are preserved throughout
- * 
- * @note This file only includes necessary headers to minimize compilation dependencies
- * @note All operations maintain TOML specification compliance for table behavior
- * @note Iterator invalidation follows Qt container rules
- * @see qtomlhash.h for the public interface
- * @see qtomlhash_p.h for private implementation details
- */
+ /**
+  * @file qtomlhash.cpp
+  * @brief Implementation of QTomlHash class providing efficient TOML table operations.
+  *
+  * This file contains the complete implementation of the QTomlHash class, which represents
+  * TOML tables (key-value pair collections) with hash table efficiency. The implementation
+  * uses the PIMPL pattern with QHash as the underlying container to provide optimal
+  * performance for table operations while maintaining Qt framework integration.
+  *
+  * Key implementation features:
+  * - High-performance hash table operations using QHash<QString, QTomlValue>
+  * - PIMPL pattern for binary compatibility and implementation hiding
+  * - Full STL-compatible iterator interface for traversal and algorithms
+  * - Capacity management with memory pre-allocation support
+  * - Move semantics throughout for optimal resource management
+  * - Qt meta-type registration for QVariant and signal/slot integration
+  * - Comprehensive type conversion support for Qt interoperability
+  *
+  * Performance characteristics:
+  * - Average O(1) lookup, insertion, and removal operations
+  * - O(n) worst-case for hash collisions (rare with QString hash function)
+  * - Memory usage scales linearly with number of key-value pairs
+  * - Automatic load factor management for consistent performance
+  * - Copy-on-write optimization where applicable through Qt containers
+  *
+  * The implementation is organized into sections:
+  * - Meta-type registration for Qt integration
+  * - Construction and destruction with PIMPL management
+  * - Assignment operations with copy and move semantics
+  * - Capacity management for performance optimization
+  * - Element modification operations (insert, remove, replace)
+  * - Element access and queries with safe bounds checking
+  * - Iterator interface for STL compatibility
+  * - Type conversion methods for Qt framework integration
+  *
+  * Thread safety:
+  * - Read operations are thread-safe when no modifications occur
+  * - Write operations require external synchronization
+  * - Copy construction is thread-safe with proper synchronization
+  * - Qt container guarantees are preserved throughout
+  *
+  * @note This file only includes necessary headers to minimize compilation dependencies
+  * @note All operations maintain TOML specification compliance for table behavior
+  * @note Iterator invalidation follows Qt container rules
+  * @see qtomlhash.h for the public interface
+  * @see qtomlhash_p.h for private implementation details
+  */
 
 #pragma execution_character_set("utf-8")
 
@@ -91,7 +91,7 @@ namespace
 {
 	/**
 	 * @brief Global meta-type registration for QTomlHash.
-	 * 
+	 *
 	 * Ensures that QTomlHash is registered with Qt's meta-object system during
 	 * static initialization. This registration enables:
 	 * - Use in QVariant containers
@@ -99,10 +99,10 @@ namespace
 	 * - Property system integration
 	 * - QML type support
 	 * - Debug stream operations
-	 * 
+	 *
 	 * The registration occurs automatically during program startup as part of
 	 * static initialization, ensuring availability throughout the program lifetime.
-	 * 
+	 *
 	 * @note Registration occurs once per program execution
 	 * @note Essential for Qt framework integration
 	 * @note Enables type-safe QVariant operations
@@ -113,24 +113,24 @@ namespace
 
 /**
  * @brief Default constructor creating an empty TOML table.
- * 
+ *
  * Initializes a QTomlHash with no key-value pairs using the PIMPL pattern.
  * The underlying QHash container is default-constructed, providing an empty
  * table ready for immediate use.
- * 
+ *
  * Construction characteristics:
  * - Creates empty hash table with zero elements
  * - No memory allocation for key-value storage
  * - Minimal overhead through PIMPL smart pointer allocation
  * - Exception-safe construction through Qt container guarantees
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Marked noexcept for optimal performance
  * @note Uses PIMPL pattern for binary compatibility
  * @note Ready for immediate insertion operations
- * 
+ *
  * @example
  * @code
  * QTomlHash table;                    // Empty table
@@ -145,32 +145,32 @@ QTomlHash::QTomlHash() noexcept
 
 /**
  * @brief Initializer list constructor for convenient table creation.
- * 
+ *
  * Creates a QTomlHash with the provided key-value pairs using brace initialization
  * syntax. This constructor enables compile-time table creation with known content
  * and provides optimal performance through memory pre-allocation.
- * 
+ *
  * Construction process:
  * 1. Creates PIMPL private implementation
  * 2. Pre-allocates memory based on initializer list size
  * 3. Inserts each key-value pair using QHash efficient insertion
  * 4. Handles duplicate keys with last-value-wins semantics
- * 
+ *
  * Performance optimizations:
  * - Memory pre-allocation avoids multiple reallocations
  * - Direct insertion to underlying QHash for efficiency
  * - Move semantics where applicable for large values
  * - Optimal hash table load factor management
- * 
+ *
  * @param args Initializer list of QString-QTomlValue pairs
- * 
+ *
  * @complexity O(n) where n is the number of pairs in initializer list
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Duplicate keys result in last-value-wins behavior
  * @note Memory is pre-allocated for optimal performance
  * @note All pairs are copied into the table
- * 
+ *
  * @example
  * @code
  * QTomlHash config{
@@ -194,26 +194,26 @@ QTomlHash::QTomlHash(std::initializer_list<std::pair<QString, QTomlValue>> args)
 
 /**
  * @brief Copy constructor creating deep copy of another table.
- * 
+ *
  * Creates a new QTomlHash instance that is an independent copy of the source
  * table. Uses PIMPL pattern copy semantics to ensure complete data independence
  * while leveraging Qt's copy-on-write optimization where applicable.
- * 
+ *
  * Copy characteristics:
  * - Deep copy of all key-value pairs
  * - Complete independence from source table
  * - Qt's copy-on-write optimization for efficiency
  * - Exception-safe copying through Qt container guarantees
- * 
+ *
  * @param other The QTomlHash instance to copy from
- * 
+ *
  * @complexity O(1) due to copy-on-write, O(n) when actual copying occurs
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Uses PIMPL copy constructor for proper resource management
  * @note Leverages Qt's copy-on-write for performance
  * @note Source table should not be modified during copying for thread safety
- * 
+ *
  * @example
  * @code
  * QTomlHash original{{"key1", QTomlValue(42)}};
@@ -244,19 +244,19 @@ QTomlHash::~QTomlHash() noexcept = default;
 
 /**
  * @brief Copy assignment operator with self-assignment protection.
- * 
+ *
  * Replaces current table content with copy of source table data.
  * Includes self-assignment checking for safety and efficiency.
- * 
+ *
  * @param other The QTomlHash instance to copy from
  * @return Reference to this table for chaining assignments
- * 
+ *
  * @complexity O(n) where n is the number of pairs in source table
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Self-assignment safe through identity check
  * @note Uses PIMPL assignment for proper resource management
- * 
+ *
  * @example
  * @code
  * QTomlHash table1, table2{{"key", QTomlValue(42)}};
@@ -286,31 +286,31 @@ QTomlHash& QTomlHash::operator=(QTomlHash&& other) noexcept = default;
 
 /**
  * @brief Reserves memory capacity for future key-value pairs.
- * 
+ *
  * Pre-allocates internal hash table capacity to hold at least the specified
  * number of key-value pairs without triggering reallocations. This optimization
  * is valuable when the approximate final size is known in advance.
- * 
+ *
  * Reservation behavior:
  * - No effect if current capacity already meets or exceeds requested size
  * - Never reduces existing capacity (reserve is not squeeze)
  * - Optimizes future insertions by avoiding multiple reallocations
  * - Does not change table size, only underlying storage capacity
- * 
+ *
  * @param size Minimum number of key-value pairs to reserve space for
- * 
+ *
  * @complexity O(n) if reallocation occurs, O(1) otherwise
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Does not change table size, only capacity
  * @note Particularly beneficial for bulk insertion scenarios
  * @note Delegates to underlying QHash reserve implementation
- * 
+ *
  * @example
  * @code
  * QTomlHash config;
  * config.reserve(100);                 // Pre-allocate for 100 entries
- * 
+ *
  * for (int i = 0; i < 100; ++i) {     // Efficient bulk insertion
  *     config.insert(QString("key%1").arg(i), QTomlValue(i));
  * }
@@ -323,20 +323,20 @@ void QTomlHash::reserve(qsizetype size)
 
 /**
  * @brief Returns current memory capacity of the table.
- * 
+ *
  * Reports the number of key-value pairs that can be stored in currently
  * allocated memory before reallocation becomes necessary. Always greater
  * than or equal to size().
- * 
+ *
  * @return Current capacity of the underlying hash table
- * 
+ *
  * @complexity O(1) - Constant time complexity
  * @exception noexcept guarantee
- * 
+ *
  * @note Marked noexcept as it never throws exceptions
  * @note Useful for performance analysis and memory usage optimization
  * @note Delegates to underlying QHash capacity implementation
- * 
+ *
  * @example
  * @code
  * QTomlHash table;
@@ -354,22 +354,22 @@ qsizetype QTomlHash::capacity() const noexcept
 
 /**
  * @brief Inserts key-value pair into the table.
- * 
+ *
  * Inserts the specified key-value pair into the table using copy semantics.
  * If the key already exists, its value is replaced with the new value.
  * Returns an iterator pointing to the inserted or updated element.
- * 
+ *
  * @param key The key to insert (copied)
  * @param value The value to associate with the key (copied)
  * @return Iterator pointing to the inserted/updated key-value pair
- * 
+ *
  * @complexity O(1) average case, O(n) worst case if rehashing occurs
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Key and value are copied into the table
  * @note Existing key values are replaced
  * @note May trigger hash table expansion for optimal load factor
- * 
+ *
  * @example
  * @code
  * QTomlHash config;
@@ -385,21 +385,21 @@ QTomlHash::iterator QTomlHash::insert(const QString& key, const QTomlValue& valu
 
 /**
  * @brief Inserts key-value pair using move semantics for the value.
- * 
+ *
  * Performance optimization that moves the value into the table while copying
  * the key. More efficient than copy version when source value is temporary
  * or can be moved from.
- * 
+ *
  * @param key The key to insert (copied)
  * @param value The value to move into the table
  * @return Iterator pointing to the inserted/updated key-value pair
- * 
+ *
  * @complexity O(1) average case, O(n) worst case if rehashing occurs
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Key is copied, value is moved for efficiency
  * @note Optimal for temporary or movable values
- * 
+ *
  * @example
  * @code
  * QTomlHash config;
@@ -413,20 +413,20 @@ QTomlHash::iterator QTomlHash::insert(const QString& key, QTomlValue&& value)
 
 /**
  * @brief Inserts key-value pair using move semantics for both.
- * 
+ *
  * Maximum performance optimization that moves both key and value into the table.
  * This is the most efficient insertion method when both parameters can be moved.
- * 
+ *
  * @param key The key to move into the table
  * @param value The value to move into the table
  * @return Iterator pointing to the inserted/updated key-value pair
- * 
+ *
  * @complexity O(1) average case, O(n) worst case if rehashing occurs
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Both key and value are moved for maximum efficiency
  * @note Optimal for scenarios with movable key-value pairs
- * 
+ *
  * @example
  * @code
  * QTomlHash config;
@@ -441,18 +441,18 @@ QTomlHash::iterator QTomlHash::insert(QString&& key, QTomlValue&& value)
 
 /**
  * @brief Removes key and its associated value from the table.
- * 
+ *
  * Removes the key-value pair with the specified key from the table.
  * If the key doesn't exist, the operation is safe and has no effect.
- * 
+ *
  * @param key The key of the pair to remove
- * 
+ *
  * @complexity O(1) average case, O(n) worst case
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Safe to call with non-existent keys
  * @note Does not return removed value (use take() for that)
- * 
+ *
  * @example
  * @code
  * QTomlHash config{{"temp", QTomlValue(123)}};
@@ -467,19 +467,19 @@ void QTomlHash::remove(const QString& key)
 
 /**
  * @brief Removes key and returns its associated value.
- * 
+ *
  * Removes the key-value pair with the specified key and returns the value.
  * If the key doesn't exist, returns a default-constructed QTomlValue.
- * 
+ *
  * @param key The key of the pair to remove and retrieve
  * @return The value associated with the key, or default QTomlValue if not found
- * 
+ *
  * @complexity O(1) average case, O(n) worst case
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Returns default QTomlValue for non-existent keys
  * @note Useful for extracting values while removing them
- * 
+ *
  * @example
  * @code
  * QTomlHash config{{"temp", QTomlValue(123)}};
@@ -497,19 +497,19 @@ QTomlValue QTomlHash::take(const QString& key)
 
 /**
  * @brief Checks if the table contains a specific key.
- * 
+ *
  * Tests for the existence of a key in the table without accessing the value.
  * This is an efficient way to check for key presence before value access.
- * 
+ *
  * @param key The key to search for
  * @return true if the key exists, false otherwise
- * 
+ *
  * @complexity O(1) average case, O(n) worst case
  * @exception noexcept guarantee
- * 
+ *
  * @note Does not modify the table
  * @note More efficient than checking value() for null
- * 
+ *
  * @example
  * @code
  * QTomlHash config{{"debug", QTomlValue(true)}};
@@ -525,26 +525,26 @@ bool QTomlHash::contains(const QString& key) const
 
 /**
  * @brief Retrieves value for a specific key.
- * 
+ *
  * Returns the value associated with the specified key. If the key doesn't exist,
  * returns a QTomlValue with Undefined type. Uses optimized single-lookup approach.
- * 
+ *
  * @param key The key to look up
  * @return The associated value, or Undefined QTomlValue if key not found
- * 
+ *
  * @complexity O(1) average case, O(n) worst case
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Returns copy of the value for safety
  * @note Optimized to avoid double lookup using find()
  * @note Returns Undefined type for missing keys
- * 
+ *
  * @example
  * @code
  * QTomlHash config{{"port", QTomlValue(8080)}};
  * QTomlValue port = config.value("port");
  * Q_ASSERT(port.toInteger() == 8080);
- * 
+ *
  * QTomlValue missing = config.value("nonexistent");
  * Q_ASSERT(missing.isUndefined());
  * @endcode
@@ -562,28 +562,28 @@ QTomlValue QTomlHash::value(const QString& key) const
 
 /**
  * @brief Retrieves value for a specific key with default fallback.
- * 
+ *
  * Returns the value associated with the specified key, or the provided default
  * value if the key doesn't exist. Optimized for single lookup efficiency.
- * 
+ *
  * @param key The key to look up
  * @param defaultValue The value to return if key doesn't exist
  * @return The associated value or defaultValue if key not found
- * 
+ *
  * @complexity O(1) average case, O(n) worst case
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Provides custom default instead of Undefined type
  * @note Single lookup optimization for performance
  * @note Useful for configuration with sensible defaults
- * 
+ *
  * @example
  * @code
  * QTomlHash config{{"port", QTomlValue(8080)}};
- * 
+ *
  * int port = config.value("port", QTomlValue(80)).toInteger();
  * Q_ASSERT(port == 8080);              // Key exists
- * 
+ *
  * int timeout = config.value("timeout", QTomlValue(30)).toInteger();
  * Q_ASSERT(timeout == 30);             // Key missing, default used
  * @endcode
@@ -600,19 +600,19 @@ QTomlValue QTomlHash::value(const QString& key, const QTomlValue& defaultValue) 
 
 /**
  * @brief Returns list of all keys in the table.
- * 
+ *
  * Creates and returns a QStringList containing all keys currently in the table.
  * Key order is not guaranteed due to hash table nature.
- * 
+ *
  * @return QStringList containing all keys
- * 
+ *
  * @complexity O(n) where n is the number of key-value pairs
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Key order is not guaranteed (hash table semantics)
  * @note Creates new list; modifications don't affect original table
  * @note Useful for iteration when key names are needed
- * 
+ *
  * @example
  * @code
  * QTomlHash config{{"host", QTomlValue("localhost")}, {"port", QTomlValue(8080)}};
@@ -638,7 +638,7 @@ qsizetype QTomlHash::size() const noexcept { return d_ptr->values_.size(); }
 
 /**
  * @brief Returns number of key-value pairs (alias for size).
- * @return Count of key-value pairs  
+ * @return Count of key-value pairs
  * @note Alias for size() for Qt container consistency
  * @note Marked noexcept for performance
  */
@@ -656,21 +656,21 @@ bool QTomlHash::isEmpty() const noexcept { return d_ptr->values_.isEmpty(); }
 
 /**
  * @brief Const subscript operator for read-only access.
- * 
+ *
  * Provides read-only access to values by key. Returns copy of the value
  * associated with the key, or Undefined QTomlValue if key doesn't exist.
  * Does not modify the table.
- * 
+ *
  * @param key The key to look up
  * @return Copy of associated value or Undefined if key not found
- * 
+ *
  * @complexity O(1) average case, O(n) worst case
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Returns copy for safety
  * @note Does not create missing keys (unlike non-const version)
  * @note Safe for use with non-existent keys
- * 
+ *
  * @example
  * @code
  * const QTomlHash config{{"port", QTomlValue(8080)}};
@@ -685,27 +685,27 @@ QTomlValue QTomlHash::operator[](const QString& key) const
 
 /**
  * @brief Mutable subscript operator for read-write access.
- * 
+ *
  * Provides mutable access to values by key. If the key doesn't exist,
  * creates it with a default-constructed QTomlValue (Null type) and
  * returns a reference to it.
- * 
+ *
  * @param key The key to access or create
  * @return Reference to the value associated with the key
- * 
+ *
  * @complexity O(1) average case, O(n) worst case if rehashing occurs
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Creates missing keys with Null values
  * @note Returns reference allowing direct modification
  * @note May modify table by creating missing keys
- * 
+ *
  * @example
  * @code
  * QTomlHash config;
  * config["host"] = QTomlValue("localhost");  // Creates key
  * config["port"] = QTomlValue(8080);         // Creates key
- * 
+ *
  * config["port"] = QTomlValue(9090);         // Modifies existing
  * Q_ASSERT(config["port"].toInteger() == 9090);
  * @endcode
@@ -768,20 +768,20 @@ QTomlHash::const_iterator QTomlHash::constEnd() const noexcept { return d_ptr->v
 
 /**
  * @brief Finds key-value pair and returns mutable iterator.
- * 
+ *
  * Searches for the specified key and returns an iterator pointing to the
  * key-value pair. Returns end() if the key is not found.
- * 
+ *
  * @param key The key to search for
  * @return Iterator to found pair, or end() if not found
- * 
+ *
  * @complexity O(1) average case, O(n) worst case
  * @exception noexcept guarantee
- * 
+ *
  * @note Marked noexcept for performance
  * @note Returns end() for non-existent keys
  * @note Allows modification through returned iterator
- * 
+ *
  * @example
  * @code
  * QTomlHash config{{"debug", QTomlValue(false)}};
@@ -798,20 +798,20 @@ QTomlHash::iterator QTomlHash::find(const QString& key) noexcept
 
 /**
  * @brief Finds key-value pair and returns const iterator.
- * 
+ *
  * Searches for the specified key and returns a const iterator pointing to the
  * key-value pair. Returns end() if the key is not found.
- * 
+ *
  * @param key The key to search for
  * @return Const iterator to found pair, or end() if not found
- * 
+ *
  * @complexity O(1) average case, O(n) worst case
  * @exception noexcept guarantee
- * 
+ *
  * @note Marked noexcept for performance
  * @note Provides read-only access to found elements
  * @note Safe for concurrent read access
- * 
+ *
  * @example
  * @code
  * const QTomlHash config{{"version", QTomlValue("1.0")}};
@@ -830,19 +830,19 @@ QTomlHash::const_iterator QTomlHash::find(const QString& key) const noexcept
 
 /**
  * @brief Converts table to QVariantMap for Qt integration.
- * 
+ *
  * Creates a QVariantMap containing QVariant representations of all key-value
  * pairs in the table. Each QTomlValue is converted using its toVariant() method.
- * 
+ *
  * @return QVariantMap containing converted key-value pairs
- * 
+ *
  * @complexity O(n) where n is the number of key-value pairs
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note All values are converted to their QVariant equivalents
  * @note Enables integration with Qt property system and QML
  * @note Memory pre-allocation optimization where supported
- * 
+ *
  * @example
  * @code
  * QTomlHash config{{"host", QTomlValue("localhost")}, {"port", QTomlValue(8080)}};
@@ -864,26 +864,26 @@ QVariantMap QTomlHash::toVariantMap() const
 
 /**
  * @brief Creates QTomlHash from QVariantMap.
- * 
+ *
  * Converts a QVariantMap to QTomlHash by attempting to convert each QVariant
  * to a QTomlValue. Memory is pre-allocated for optimal performance.
- * 
+ *
  * @param map The QVariantMap to convert
  * @return QTomlHash containing converted key-value pairs
- * 
+ *
  * @complexity O(n) where n is the number of key-value pairs in the map
  * @exception Strong exception safety guarantee
- * 
+ *
  * @note Failed conversions may result in default QTomlValue objects
  * @note Memory is pre-allocated for optimal performance
  * @note Useful for Qt framework interoperability
- * 
+ *
  * @example
  * @code
  * QVariantMap qtMap;
  * qtMap["host"] = "localhost";
  * qtMap["port"] = 8080;
- * 
+ *
  * QTomlHash config = QTomlHash::fromVariantMap(qtMap);
  * Q_ASSERT(config.size() == 2);
  * Q_ASSERT(config["host"].toString() == "localhost");

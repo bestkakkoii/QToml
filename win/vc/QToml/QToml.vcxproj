@@ -27,39 +27,39 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="..\include\qtomlarray.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="..\include\qtomldatetime.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="..\include\qtomldocument.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="..\include\qtomlhash.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="..\include\qtomlparseerror.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="..\include\qtomlvalue.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\qtomlarray.cpp" />
-    <ClCompile Include="..\src\qtomldatetime.cpp" />
-    <ClCompile Include="..\src\qtomldocument.cpp" />
-    <ClCompile Include="..\src\qtomlhash.cpp" />
-    <ClCompile Include="..\src\qtomlparseerror.cpp" />
-    <ClCompile Include="..\src\qtomlvalue.cpp" />
+    <ClCompile Include="..\..\..\src\qtomlarray.cpp" />
+    <ClCompile Include="..\..\..\src\qtomldatetime.cpp" />
+    <ClCompile Include="..\..\..\src\qtomldocument.cpp" />
+    <ClCompile Include="..\..\..\src\qtomlhash.cpp" />
+    <ClCompile Include="..\..\..\src\qtomlparseerror.cpp" />
+    <ClCompile Include="..\..\..\src\qtomlvalue.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\qtomlarray_p.h" />
-    <ClInclude Include="..\src\qtomldatetime_p.h" />
-    <ClInclude Include="..\src\qtomldocument_p.h" />
-    <ClInclude Include="..\src\qtomlhash_p.h" />
-    <ClInclude Include="..\src\qtomlparseerror_p.h" />
-    <ClInclude Include="..\src\qtomlvalue_p.h" />
+    <QtMoc Include="..\..\..\include\QToml\qtomlarray.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\..\..\include\QToml\qtomldatetime.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\..\..\include\QToml\qtomldocument.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\..\..\include\QToml\qtomlhash.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\..\..\include\QToml\qtomlparseerror.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\..\..\include\QToml\qtomlvalue.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\qtomlarray_p.h" />
+    <ClInclude Include="..\..\..\src\qtomldatetime_p.h" />
+    <ClInclude Include="..\..\..\src\qtomldocument_p.h" />
+    <ClInclude Include="..\..\..\src\qtomlhash_p.h" />
+    <ClInclude Include="..\..\..\src\qtomlparseerror_p.h" />
+    <ClInclude Include="..\..\..\src\qtomlvalue_p.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D5CF1C1E-310D-4938-8607-5370DD4EA548}</ProjectGuid>
@@ -213,7 +213,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir);..\..\..\include\QToml;..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -222,7 +222,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='QTomlTest|Win32'">
     <ClCompile>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir);..\..\..\include\QToml;..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -239,7 +239,7 @@
       <DebugInformationFormat>None</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir);..\..\..\include\QToml;..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -257,7 +257,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir);..\..\..\include\QToml;..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -266,7 +266,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='QTomlTest|x64'">
     <ClCompile>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir);..\..\..\include\QToml;..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -284,7 +284,7 @@
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <OmitFramePointers>false</OmitFramePointers>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir);..\..\..\include\QToml;..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -292,7 +292,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>QTOML_LIB;BUILD_STATIC;TOML_ENABLE_FORMATTERS=0;TOML_ENABLE_UNRELEASED_FEATURES=0;TOML_EXCEPTIONS=1;TOML_HEADER_ONLY=1</PreprocessorDefinitions>
+      <PreprocessorDefinitions>QTOML_LIB;BUILD_STATIC;TOML_ENABLE_FORMATTERS=0;TOML_ENABLE_UNRELEASED_FEATURES=0;TOML_EXCEPTIONS=1;TOML_HEADER_ONLY=1;TOML_ENABLE_FORMATTERS=1</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
@@ -305,7 +305,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='QTomlTest|Win32'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>QTOML_LIB;BUILD_STATIC;TOML_ENABLE_FORMATTERS=0;TOML_ENABLE_UNRELEASED_FEATURES=0;TOML_EXCEPTIONS=1;TOML_HEADER_ONLY=1</PreprocessorDefinitions>
+      <PreprocessorDefinitions>QTOML_LIB;BUILD_STATIC;TOML_ENABLE_FORMATTERS=0;TOML_ENABLE_UNRELEASED_FEATURES=0;TOML_EXCEPTIONS=1;TOML_HEADER_ONLY=1;TOML_ENABLE_FORMATTERS=1</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
@@ -318,7 +318,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>QTOML_LIB;BUILD_STATIC;TOML_ENABLE_FORMATTERS=0;TOML_ENABLE_UNRELEASED_FEATURES=0;TOML_EXCEPTIONS=1;TOML_HEADER_ONLY=1</PreprocessorDefinitions>
+      <PreprocessorDefinitions>QTOML_LIB;BUILD_STATIC;TOML_ENABLE_FORMATTERS=0;TOML_ENABLE_UNRELEASED_FEATURES=0;TOML_EXCEPTIONS=1;TOML_HEADER_ONLY=1;TOML_ENABLE_FORMATTERS=1</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
@@ -335,7 +335,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>QTOML_LIB;BUILD_STATIC;TOML_ENABLE_FORMATTERS=0;TOML_ENABLE_UNRELEASED_FEATURES=0;TOML_EXCEPTIONS=1;TOML_HEADER_ONLY=1</PreprocessorDefinitions>
+      <PreprocessorDefinitions>QTOML_LIB;BUILD_STATIC;TOML_ENABLE_FORMATTERS=0;TOML_ENABLE_UNRELEASED_FEATURES=0;TOML_EXCEPTIONS=1;TOML_HEADER_ONLY=1;TOML_ENABLE_FORMATTERS=1</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
@@ -348,7 +348,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='QTomlTest|x64'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>QTOML_LIB;BUILD_STATIC;TOML_ENABLE_FORMATTERS=0;TOML_ENABLE_UNRELEASED_FEATURES=0;TOML_EXCEPTIONS=1;TOML_HEADER_ONLY=1</PreprocessorDefinitions>
+      <PreprocessorDefinitions>QTOML_LIB;BUILD_STATIC;TOML_ENABLE_FORMATTERS=0;TOML_ENABLE_UNRELEASED_FEATURES=0;TOML_EXCEPTIONS=1;TOML_HEADER_ONLY=1;TOML_ENABLE_FORMATTERS=1</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
@@ -361,7 +361,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>QTOML_LIB;BUILD_STATIC;TOML_ENABLE_FORMATTERS=0;TOML_ENABLE_UNRELEASED_FEATURES=0;TOML_EXCEPTIONS=1;TOML_HEADER_ONLY=1</PreprocessorDefinitions>
+      <PreprocessorDefinitions>QTOML_LIB;BUILD_STATIC;TOML_ENABLE_FORMATTERS=0;TOML_ENABLE_UNRELEASED_FEATURES=0;TOML_EXCEPTIONS=1;TOML_HEADER_ONLY=1;TOML_ENABLE_FORMATTERS=1</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>

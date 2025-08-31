@@ -42,91 +42,91 @@
 #include <memory>
 #include <initializer_list>
 
-/**
- * @class QTomlHash
- * @brief Encapsulates a TOML table (key-value pair collection) providing efficient hash table operations.
- *
- * QTomlHash represents a TOML table, which is an unordered collection of key-value pairs
- * according to the TOML v1.0.0 specification. It provides a Qt-style interface for
- * managing TOML table data with efficient hash-based lookups and modifications.
- *
- * The class follows Qt's container design patterns and maintains compatibility with
- * QHash while adding TOML-specific functionality. It uses the PIMPL pattern for
- * binary compatibility and efficient implementation hiding.
- *
- * Key features and capabilities:
- * - Unordered key-value storage matching TOML table semantics
- * - O(1) average-case lookup, insertion, and removal operations
- * - Support for all TOML key formats (bare, quoted, Unicode)
- * - Type-safe value storage through QTomlValue
- * - STL-style iterator interface for traversal
- * - Efficient memory management with capacity control
- * - Integration with Qt's variant system
- * - Exception-safe operations with strong guarantees
- *
- * TOML key format support:
- * - Bare keys: Letters, numbers, underscores, and hyphens
- * - Quoted keys: Any Unicode characters within quotes
- * - Dotted keys: Hierarchical key notation (handled externally)
- * - Case-sensitive key comparison as per TOML specification
- *
- * Performance characteristics:
- * - Average O(1) lookup, insertion, and removal
- * - Worst-case O(n) for hash collisions
- * - Memory usage scales linearly with element count
- * - Automatic load factor management
- * - Copy-on-write optimization for efficient copying
- *
- * Thread safety:
- * - Read operations are thread-safe when no modifications occur
- * - Write operations require external synchronization
- * - Iterator invalidation follows Qt container rules
- * - Copy construction is thread-safe with proper synchronization
- *
- * The interface design closely mirrors QJsonObject and QHash to provide
- * familiarity for Qt developers while adding TOML-specific optimizations
- * and compliance features.
- *
- * @note All keys are stored as QString objects supporting full Unicode
- * @note Values are stored as QTomlValue objects supporting all TOML types
- * @note The class maintains TOML specification compliance for key handling
- * @note Empty tables are valid TOML structures
- *
- * @example
- * @code
- * // Create and populate a TOML table
- * QTomlHash config;
- * config.insert("host", QTomlValue("localhost"));
- * config.insert("port", QTomlValue(8080));
- * config.insert("ssl", QTomlValue(true));
- *
- * // Query and modify values
- * if (config.contains("port")) {
- *     int port = config["port"].toInteger();
- *     config["port"] = QTomlValue(port + 1);
- * }
- *
- * // Iterate over key-value pairs
- * for (auto it = config.begin(); it != config.end(); ++it) {
- *     qDebug() << it.key() << "=" << it.value().toString();
- * }
- *
- * // Convert to Qt variant for integration
- * QVariantMap qtMap = config.toVariantMap();
- * @endcode
- *
- * @see QTomlValue for value type documentation
- * @see QTomlDocument for document-level operations
- * @see QTomlArray for array functionality
- * @see TOML tables specification at https://toml.io/en/v1.0.0#table
- */
+ /**
+  * @class QTomlHash
+  * @brief Encapsulates a TOML table (key-value pair collection) providing efficient hash table operations.
+  *
+  * QTomlHash represents a TOML table, which is an unordered collection of key-value pairs
+  * according to the TOML v1.0.0 specification. It provides a Qt-style interface for
+  * managing TOML table data with efficient hash-based lookups and modifications.
+  *
+  * The class follows Qt's container design patterns and maintains compatibility with
+  * QHash while adding TOML-specific functionality. It uses the PIMPL pattern for
+  * binary compatibility and efficient implementation hiding.
+  *
+  * Key features and capabilities:
+  * - Unordered key-value storage matching TOML table semantics
+  * - O(1) average-case lookup, insertion, and removal operations
+  * - Support for all TOML key formats (bare, quoted, Unicode)
+  * - Type-safe value storage through QTomlValue
+  * - STL-style iterator interface for traversal
+  * - Efficient memory management with capacity control
+  * - Integration with Qt's variant system
+  * - Exception-safe operations with strong guarantees
+  *
+  * TOML key format support:
+  * - Bare keys: Letters, numbers, underscores, and hyphens
+  * - Quoted keys: Any Unicode characters within quotes
+  * - Dotted keys: Hierarchical key notation (handled externally)
+  * - Case-sensitive key comparison as per TOML specification
+  *
+  * Performance characteristics:
+  * - Average O(1) lookup, insertion, and removal
+  * - Worst-case O(n) for hash collisions
+  * - Memory usage scales linearly with element count
+  * - Automatic load factor management
+  * - Copy-on-write optimization for efficient copying
+  *
+  * Thread safety:
+  * - Read operations are thread-safe when no modifications occur
+  * - Write operations require external synchronization
+  * - Iterator invalidation follows Qt container rules
+  * - Copy construction is thread-safe with proper synchronization
+  *
+  * The interface design closely mirrors QJsonObject and QHash to provide
+  * familiarity for Qt developers while adding TOML-specific optimizations
+  * and compliance features.
+  *
+  * @note All keys are stored as QString objects supporting full Unicode
+  * @note Values are stored as QTomlValue objects supporting all TOML types
+  * @note The class maintains TOML specification compliance for key handling
+  * @note Empty tables are valid TOML structures
+  *
+  * @example
+  * @code
+  * // Create and populate a TOML table
+  * QTomlHash config;
+  * config.insert("host", QTomlValue("localhost"));
+  * config.insert("port", QTomlValue(8080));
+  * config.insert("ssl", QTomlValue(true));
+  *
+  * // Query and modify values
+  * if (config.contains("port")) {
+  *     int port = config["port"].toInteger();
+  *     config["port"] = QTomlValue(port + 1);
+  * }
+  *
+  * // Iterate over key-value pairs
+  * for (auto it = config.begin(); it != config.end(); ++it) {
+  *     qDebug() << it.key() << "=" << it.value().toString();
+  * }
+  *
+  * // Convert to Qt variant for integration
+  * QVariantMap qtMap = config.toVariantMap();
+  * @endcode
+  *
+  * @see QTomlValue for value type documentation
+  * @see QTomlDocument for document-level operations
+  * @see QTomlArray for array functionality
+  * @see TOML tables specification at https://toml.io/en/v1.0.0#table
+  */
 class Q_CORE_EXPORT QTomlHash
 {
 	Q_GADGET
 public:
 	/**
 	 * @brief Iterator type for mutable hash traversal.
-	 * 
+	 *
 	 * Provides mutable access to key-value pairs in the hash table.
 	 * Based on QHash::iterator with the same semantics and capabilities.
 	 */
@@ -134,7 +134,7 @@ public:
 
 	/**
 	 * @brief Const iterator type for immutable hash traversal.
-	 * 
+	 *
 	 * Provides read-only access to key-value pairs in the hash table.
 	 * Based on QHash::const_iterator with the same semantics and capabilities.
 	 */
@@ -506,7 +506,7 @@ public:
 	 * QTomlValue value = config.take("temp");
 	 * Q_ASSERT(value.toInteger() == 123);
 	 * Q_ASSERT(!config.contains("temp"));
-	 * 
+	 *
 	 * QTomlValue missing = config.take("nonexistent");
 	 * Q_ASSERT(missing.isNull());
 	 * @endcode
@@ -558,7 +558,7 @@ public:
 	 * QTomlHash config{{"port", QTomlValue(8080)}};
 	 * QTomlValue port = config.value("port");
 	 * Q_ASSERT(port.toInteger() == 8080);
-	 * 
+	 *
 	 * QTomlValue missing = config.value("nonexistent");
 	 * Q_ASSERT(missing.isNull());
 	 * @endcode
@@ -584,10 +584,10 @@ public:
 	 * @example
 	 * @code
 	 * QTomlHash config{{"port", QTomlValue(8080)}};
-	 * 
+	 *
 	 * int port = config.value("port", QTomlValue(80)).toInteger();
 	 * Q_ASSERT(port == 8080);  // Key exists, returns actual value
-	 * 
+	 *
 	 * int timeout = config.value("timeout", QTomlValue(30)).toInteger();
 	 * Q_ASSERT(timeout == 30);  // Key missing, returns default
 	 * @endcode
@@ -790,7 +790,7 @@ public:
 	 * QTomlHash config;
 	 * config["host"] = QTomlValue("localhost");  // Creates key if missing
 	 * config["port"] = QTomlValue(8080);
-	 * 
+	 *
 	 * config["port"] = QTomlValue(9090);  // Modifies existing value
 	 * Q_ASSERT(config["port"].toInteger() == 9090);
 	 * @endcode

@@ -29,52 +29,52 @@
  * - Qt framework integration and wrapper implementation
  */
 
-/**
- * @file qtomldocument.h
- * @brief Declaration of QTomlDocument class providing top-level interface for TOML document operations.
- * 
- * This header defines the QTomlDocument class, which serves as the primary entry point
- * for the QToml library. It provides comprehensive functionality for parsing, manipulating,
- * and serializing TOML documents according to the TOML v1.0.0 specification.
- * 
- * The QTomlDocument class encapsulates complete TOML document structures and provides
- * standard interfaces for external data exchange. Following TOML specification requirements,
- * every TOML document must have a root table, which is represented internally using QTomlHash.
- * 
- * Key features:
- * - TOML parsing: Convert UTF-8 encoded TOML text to structured data
- * - TOML serialization: Convert structured data to TOML-compliant text
- * - Error handling: Detailed parsing error information with location data
- * - Data validation: Ensure compliance with TOML specification requirements
- * - Type conversion: Bidirectional conversion with QVariant for Qt integration
- * - Memory management: RAII principles with smart pointer resource safety
- * 
- * The implementation uses the PIMPL pattern for binary compatibility and improved
- * compilation performance. Internally, it integrates the high-performance toml++
- * parser to provide robust TOML processing capabilities.
- * 
- * Interface design follows QJsonDocument patterns for familiarity with Qt developers,
- * while being optimized and extended for TOML-specific features.
- * 
- * Design principles:
- * - **Standards Compliance**: Full adherence to TOML v1.0.0 specification
- * - **Performance**: Optimized parsing and serialization with minimal overhead
- * - **Safety**: Exception-safe operations with strong guarantees
- * - **Integration**: Seamless interoperability with Qt ecosystem
- * - **Usability**: Intuitive API following Qt conventions
- *
- * Thread safety:
- * - Parsing operations are thread-safe (static methods)
- * - Individual document objects require external synchronization
- * - Copy construction is thread-safe with proper synchronization
- * - Immutable operations can be safely called from multiple threads
- *
- * @note All TOML documents must have a root table; empty documents are represented as empty QTomlHash
- * @note Supports all TOML v1.0.0 specification features including complex nested structures
- * @note Parsing operations are thread-safe, but individual objects should not be shared between threads
- * @see QTomlHash, QTomlParseError, QTomlValue
- * @see https://toml.io/en/v1.0.0 for TOML specification details
- */
+ /**
+  * @file qtomldocument.h
+  * @brief Declaration of QTomlDocument class providing top-level interface for TOML document operations.
+  *
+  * This header defines the QTomlDocument class, which serves as the primary entry point
+  * for the QToml library. It provides comprehensive functionality for parsing, manipulating,
+  * and serializing TOML documents according to the TOML v1.0.0 specification.
+  *
+  * The QTomlDocument class encapsulates complete TOML document structures and provides
+  * standard interfaces for external data exchange. Following TOML specification requirements,
+  * every TOML document must have a root table, which is represented internally using QTomlHash.
+  *
+  * Key features:
+  * - TOML parsing: Convert UTF-8 encoded TOML text to structured data
+  * - TOML serialization: Convert structured data to TOML-compliant text
+  * - Error handling: Detailed parsing error information with location data
+  * - Data validation: Ensure compliance with TOML specification requirements
+  * - Type conversion: Bidirectional conversion with QVariant for Qt integration
+  * - Memory management: RAII principles with smart pointer resource safety
+  *
+  * The implementation uses the PIMPL pattern for binary compatibility and improved
+  * compilation performance. Internally, it integrates the high-performance toml++
+  * parser to provide robust TOML processing capabilities.
+  *
+  * Interface design follows QJsonDocument patterns for familiarity with Qt developers,
+  * while being optimized and extended for TOML-specific features.
+  *
+  * Design principles:
+  * - **Standards Compliance**: Full adherence to TOML v1.0.0 specification
+  * - **Performance**: Optimized parsing and serialization with minimal overhead
+  * - **Safety**: Exception-safe operations with strong guarantees
+  * - **Integration**: Seamless interoperability with Qt ecosystem
+  * - **Usability**: Intuitive API following Qt conventions
+  *
+  * Thread safety:
+  * - Parsing operations are thread-safe (static methods)
+  * - Individual document objects require external synchronization
+  * - Copy construction is thread-safe with proper synchronization
+  * - Immutable operations can be safely called from multiple threads
+  *
+  * @note All TOML documents must have a root table; empty documents are represented as empty QTomlHash
+  * @note Supports all TOML v1.0.0 specification features including complex nested structures
+  * @note Parsing operations are thread-safe, but individual objects should not be shared between threads
+  * @see QTomlHash, QTomlParseError, QTomlValue
+  * @see https://toml.io/en/v1.0.0 for TOML specification details
+  */
 
 #pragma once
 #pragma execution_character_set("utf-8")
@@ -128,7 +128,7 @@ class QTomlParseError;
  * - Immutable operations can be safely called from multiple threads
  *
  * @note All TOML documents must have a root table; empty documents are represented as empty QTomlHash
- * @note Supports all TOML v1.0.0 specification features including complex nested structures  
+ * @note Supports all TOML v1.0.0 specification features including complex nested structures
  * @note Parsing process is thread-safe, but individual objects should not be shared between threads
  * @see QTomlHash, QTomlParseError, QTomlValue
  *
@@ -169,12 +169,12 @@ class Q_CORE_EXPORT QTomlDocument
 	Q_GADGET
 public:
 	// ==================== Construction and Destruction ====================
-	
+
 	/**
 	 * @brief Default constructor creating an empty TOML document.
 	 *
 	 * Creates an object representing an empty TOML document. The empty document contains
-	 * an empty root table (QTomlHash) internally, with isNull() returning true and 
+	 * an empty root table (QTomlHash) internally, with isNull() returning true and
 	 * isEmpty() also returning true.
 	 *
 	 * Empty documents are valid TOML documents and can be serialized to empty strings
@@ -192,7 +192,7 @@ public:
 	 * QTomlDocument doc;                   // Empty document
 	 * Q_ASSERT(doc.isNull());             // Verify null state
 	 * Q_ASSERT(doc.isEmpty());            // Verify empty state
-	 * 
+	 *
 	 * // Document is ready for use
 	 * QTomlHash config;
 	 * config.insert("version", QTomlValue("1.0"));
@@ -229,7 +229,7 @@ public:
 	 * QTomlDocument doc(config);
 	 * Q_ASSERT(!doc.isNull());            // Not null - contains data
 	 * Q_ASSERT(doc.isHash());             // Contains valid table structure
-	 * 
+	 *
 	 * // Original hash can be modified independently
 	 * config.insert("new_key", QTomlValue("value"));
 	 * Q_ASSERT(!doc.hash().contains("new_key"));  // Document unchanged
@@ -257,12 +257,12 @@ public:
 	 * @code
 	 * QTomlDocument original = QTomlDocument::fromToml(tomlData);
 	 * QTomlDocument copy(original);
-	 * 
+	 *
 	 * // Verify independence
 	 * QTomlHash copyRoot = copy.hash();
 	 * copyRoot.insert("new_item", QTomlValue(42));
 	 * copy.setHash(copyRoot);
-	 * 
+	 *
 	 * Q_ASSERT(!original.hash().contains("new_item"));  // Original unchanged
 	 * Q_ASSERT(copy.hash().contains("new_item"));       // Copy modified
 	 * @endcode
@@ -295,7 +295,7 @@ public:
 	 *     config.insert("temp", QTomlValue("data"));
 	 *     return QTomlDocument(config);  // Move constructor called
 	 * }
-	 * 
+	 *
 	 * QTomlDocument doc = createDocument();  // Efficient transfer, no copying
 	 * Q_ASSERT(!doc.isNull());              // Document received data
 	 * @endcode
@@ -316,7 +316,7 @@ public:
 	 * @note No manual cleanup required
 	 */
 	~QTomlDocument() noexcept;
-	
+
 	// ==================== Assignment Operations ====================
 
 	/**
@@ -344,11 +344,11 @@ public:
 	 * QTomlDocument doc1 = QTomlDocument::fromToml(data1);
 	 * QTomlDocument doc2 = QTomlDocument::fromToml(data2);
 	 * QTomlDocument doc3;
-	 * 
+	 *
 	 * // Assignment chain
 	 * doc3 = doc2 = doc1;
 	 * Q_ASSERT(doc3.toToml() == doc1.toToml());
-	 * 
+	 *
 	 * // Self-assignment safety
 	 * doc1 = doc1;  // Safe, no-op due to self-assignment check
 	 * @endcode
@@ -379,12 +379,12 @@ public:
 	 * @code
 	 * QTomlDocument doc1 = QTomlDocument::fromToml(data1);
 	 * QTomlDocument doc2;
-	 * 
+	 *
 	 * // Move assignment
 	 * doc2 = std::move(doc1);
 	 * Q_ASSERT(!doc2.isNull());  // doc2 now contains the data
 	 * // doc1 is now in valid but unspecified state
-	 * 
+	 *
 	 * // Chain assignment with temporary
 	 * QTomlDocument doc3;
 	 * doc3 = QTomlDocument(someHash);  // Move assignment from temporary
@@ -414,11 +414,11 @@ public:
 	 * @code
 	 * QTomlDocument doc;
 	 * Q_ASSERT(!doc.isHash());            // Default construction is null
-	 * 
+	 *
 	 * QTomlHash emptyHash;
 	 * doc.setHash(emptyHash);
 	 * Q_ASSERT(doc.isHash());             // Now contains valid (empty) table
-	 * 
+	 *
 	 * QTomlDocument parsed = QTomlDocument::fromToml("key = 'value'");
 	 * Q_ASSERT(parsed.isHash());          // Parsed document has valid table
 	 * @endcode
@@ -445,12 +445,12 @@ public:
 	 * @code
 	 * QTomlDocument doc;
 	 * Q_ASSERT(doc.isNull());             // Default construction is null
-	 * 
+	 *
 	 * QTomlHash emptyHash;
 	 * doc.setHash(emptyHash);
 	 * Q_ASSERT(!doc.isNull());            // No longer null (has empty table)
 	 * Q_ASSERT(doc.isEmpty());            // But is empty (table has no content)
-	 * 
+	 *
 	 * QTomlParseError error;
 	 * QTomlDocument parsed = QTomlDocument::fromToml("", &error);
 	 * Q_ASSERT(!parsed.isNull());         // Successful parse is not null
@@ -478,11 +478,11 @@ public:
 	 * @code
 	 * QTomlDocument doc;
 	 * Q_ASSERT(doc.isEmpty());            // Default construction is empty
-	 * 
+	 *
 	 * QTomlHash emptyHash;
 	 * doc.setHash(emptyHash);
 	 * Q_ASSERT(doc.isEmpty());            // Empty table is still empty
-	 * 
+	 *
 	 * QTomlHash filledHash;
 	 * filledHash.insert("key", QTomlValue("value"));
 	 * doc.setHash(filledHash);
@@ -517,7 +517,7 @@ public:
 	 * // Modify content
 	 * root.insert("new_key", QTomlValue("new_value"));
 	 * doc.setHash(root);  // Apply modifications
-	 * 
+	 *
 	 * // Verify changes
 	 * Q_ASSERT(doc.hash().contains("new_key"));
 	 * @endcode
@@ -552,7 +552,7 @@ public:
 	 * doc.setHash(config);  // Set document content
 	 * Q_ASSERT(!doc.isNull());            // No longer null
 	 * Q_ASSERT(!doc.isEmpty());           // Contains data
-	 * 
+	 *
 	 * // Original hash can be modified independently
 	 * config.clear();
 	 * Q_ASSERT(!doc.isEmpty());           // Document unchanged
@@ -777,18 +777,18 @@ private:
 
 /**
  * @brief Qt Meta-Object System registration for QTomlDocument.
- * 
+ *
  * Registers QTomlDocument with Qt's type system, enabling use in QVariant
  * containers, signal/slot connections, and property systems. This registration
  * is essential for full integration with Qt's reflection and serialization systems.
- * 
+ *
  * Enables:
  * - QVariant::fromValue<QTomlDocument>() and QVariant::value<QTomlDocument>()
  * - Signal/slot parameters using QTomlDocument
  * - Q_PROPERTY declarations with QTomlDocument
  * - Integration with Qt's debugging and logging systems
  * - Serialization through Qt's property system
- * 
+ *
  * @note Registration occurs automatically during static initialization
  * @note Required for full Qt integration and QVariant support
  * @see QMetaType for more information about Qt's type system
