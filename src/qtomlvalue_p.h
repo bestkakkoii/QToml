@@ -95,7 +95,7 @@
    * - QString: TOML string values (UTF-8 encoded)
    * - QTomlDateTime: TOML date-time values (RFC 3339)
    * - QTomlArray: TOML array values (heterogeneous)
-   * - QTomlObject: TOML table/hash values (key-value pairs)
+   * - QTomlObject: TOML table/object values (key-value pairs)
    *
    * Exception safety:
    * - Strong exception safety guarantee for all operations

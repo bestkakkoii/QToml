@@ -465,7 +465,7 @@ QTomlValue::QTomlValue(QTomlArray&& a) noexcept
  * @brief QTomlObject constructor with copy semantics.
  *
  * Creates a QTomlValue containing a QTomlObject using copy semantics.
- * The hash table content is deep-copied, ensuring complete independence
+ * The object table content is deep-copied, ensuring complete independence
  * between the source table and the stored table.
  *
  * @param h The QTomlObject object to copy
@@ -496,7 +496,7 @@ QTomlValue::QTomlValue(const QTomlObject& h)
  * @brief QTomlObject constructor with move semantics optimization.
  *
  * Creates a QTomlValue containing a QTomlObject using move semantics
- * to avoid deep copying. The source hash becomes empty but remains
+ * to avoid deep copying. The source object becomes empty but remains
  * in a valid state after the move.
  *
  * @param h The QTomlObject object to move (rvalue reference)
@@ -506,7 +506,7 @@ QTomlValue::QTomlValue(const QTomlObject& h)
  *
  * @note Marked noexcept for optimal move semantics
  * @note High performance through resource transfer
- * @note Source hash becomes empty after move
+ * @note Source object becomes empty after move
  *
  * @example
  * @code
@@ -677,7 +677,7 @@ bool QTomlValue::isInteger() const noexcept { return d_ptr->type_ == Integer; }
 bool QTomlValue::isNull() const noexcept { return d_ptr->type_ == Null; }
 
 /**
- * @brief Checks if value is of hash type.
+ * @brief Checks if value is of object type.
  * @return true if type is Hash, false otherwise
  * @note Marked noexcept for performance
  */
@@ -869,9 +869,9 @@ qint64 QTomlValue::toInteger(qint64 defaultValue) const noexcept
  * Returns the contained QTomlObject if the value is of Hash type,
  * otherwise returns an empty QTomlObject.
  *
- * @return QTomlObject content or empty hash if wrong type
+ * @return QTomlObject content or empty object if wrong type
  *
- * @complexity O(1) for type checking, O(n) for hash copying
+ * @complexity O(1) for type checking, O(n) for object copying
  * @exception Strong exception safety guarantee
  *
  * @note Returns copy for safety
@@ -880,19 +880,19 @@ qint64 QTomlValue::toInteger(qint64 defaultValue) const noexcept
  * @example
  * @code
  * QTomlValue hashValue(QTomlObject{{"key", QTomlValue(42)}});
- * QTomlObject hash = hashValue.toObject();
- * Q_ASSERT(hash.size() == 1);
+ * QTomlObject object = hashValue.toObject();
+ * Q_ASSERT(object.size() == 1);
  *
- * QTomlValue stringValue("not a hash");
+ * QTomlValue stringValue("not a object");
  * QTomlObject empty = stringValue.toObject();
  * Q_ASSERT(empty.isEmpty());
  * @endcode
  */
 QTomlObject QTomlValue::toObject() const
 {
-	if (const auto* hash = std::get_if<QTomlObject>(&d_ptr->value_))
+	if (const auto* object = std::get_if<QTomlObject>(&d_ptr->value_))
 	{
-		return *hash;
+		return *object;
 	}
 	return QTomlObject();
 }

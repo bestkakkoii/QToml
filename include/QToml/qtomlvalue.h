@@ -402,7 +402,7 @@ public:
 	bool isNull() const noexcept;
 
 	/**
-	 * @brief Checks if the value is of hash/table type.
+	 * @brief Checks if the value is of object/table type.
 	 *
 	 * @return true if the value type is Hash, false otherwise
 	 * @note Marked as noexcept, time complexity is O(1)

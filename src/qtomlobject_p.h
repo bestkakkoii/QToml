@@ -39,7 +39,7 @@
   *
   * The private implementation is designed to be efficient and thread-safe for
   * read operations while maintaining compatibility with TOML specification
-  * requirements for hash tables (which are unordered key-value containers).
+  * requirements for object tables (which are unordered key-value containers).
   *
   * @note This file should only be included by QTomlObject implementation files
   * @note Binary compatibility is maintained by keeping all implementation details private
@@ -114,11 +114,11 @@ class QTomlObjectPrivate
 {
 public:
 	/**
-	 * @brief Default constructor creating an empty hash table.
+	 * @brief Default constructor creating an empty object table.
 	 *
 	 * Initializes an empty QTomlObjectPrivate instance with no key-value pairs.
 	 * The underlying QHash container is default-constructed, which creates
-	 * an empty hash table ready for insertions.
+	 * an empty object table ready for insertions.
 	 *
 	 * This constructor is marked as default to ensure optimal performance
 	 * and to maintain consistency with Qt's container initialization patterns.
@@ -131,7 +131,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlObjectPrivate privateImpl;  // Empty hash table
+	 * QTomlObjectPrivate privateImpl;  // Empty object table
 	 * Q_ASSERT(privateImpl.values_.isEmpty());
 	 * Q_ASSERT(privateImpl.values_.size() == 0);
 	 * @endcode
@@ -139,7 +139,7 @@ public:
 	QTomlObjectPrivate() = default;
 
 	/**
-	 * @brief Copy constructor performing deep copy of hash table contents.
+	 * @brief Copy constructor performing deep copy of object table contents.
 	 *
 	 * Creates a new QTomlObjectPrivate instance by copying all key-value pairs
 	 * from the source instance. This operation performs a deep copy of the
@@ -147,7 +147,7 @@ public:
 	 * instance do not affect the other.
 	 *
 	 * The copy operation preserves all key-value mappings and maintains
-	 * the same hash table structure and performance characteristics as
+	 * the same object table structure and performance characteristics as
 	 * the source instance.
 	 *
 	 * QHash's copy-on-write optimization ensures that the actual copying
@@ -207,7 +207,7 @@ public:
 	 * - Booleans (true, false)
 	 * - Date and time values (RFC 3339 format)
 	 * - Arrays (ordered lists of values)
-	 * - Nested tables (hash tables)
+	 * - Nested tables (object tables)
 	 *
 	 * Performance considerations:
 	 * - Hash function optimized for QString keys

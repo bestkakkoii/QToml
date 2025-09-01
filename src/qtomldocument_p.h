@@ -116,7 +116,7 @@ public:
 	 * @brief Default constructor initializing document to null state.
 	 *
 	 * Creates a QTomlDocumentPrivate instance representing a null (uninitialized)
-	 * document state. The root hash is default-constructed (empty), and the null
+	 * document state. The root object is default-constructed (empty), and the null
 	 * flag is set to true to indicate that no content has been assigned.
 	 *
 	 * This constructor establishes the foundation for all QTomlDocument objects,
@@ -140,7 +140,7 @@ public:
 	 * @code
 	 * QTomlDocumentPrivate impl;          // Null state
 	 * Q_ASSERT(impl.is_null_ == true);    // Uninitialized
-	 * Q_ASSERT(impl.root_hash_.isEmpty()); // Empty hash
+	 * Q_ASSERT(impl.root_hash_.isEmpty()); // Empty object
 	 *
 	 * // State change through content assignment
 	 * impl.is_null_ = false;
@@ -163,7 +163,7 @@ public:
 	 * Copy behavior:
 	 * - is_null_ flag is copied exactly
 	 * - root_hash_ is deep-copied through QTomlObject copy constructor
-	 * - All nested content within the hash is recursively copied
+	 * - All nested content within the object is recursively copied
 	 * - Result is completely independent of the source object
 	 *
 	 * Performance characteristics:
@@ -215,11 +215,11 @@ public:
 	 * State semantics:
 	 * - When is_null_ is true: content is ignored (document is uninitialized)
 	 * - When is_null_ is false: content represents the actual document data
-	 * - Empty hash with is_null_ = false represents valid empty document
-	 * - Non-empty hash with is_null_ = false represents populated document
+	 * - Empty object with is_null_ = false represents valid empty document
+	 * - Non-empty object with is_null_ = false represents populated document
 	 *
 	 * Performance considerations:
-	 * - QTomlObject uses Qt's efficient hash table implementation
+	 * - QTomlObject uses Qt's efficient object table implementation
 	 * - Supports fast key lookups and iteration
 	 * - May use copy-on-write optimization for efficient copying
 	 * - Memory usage scales with document content size

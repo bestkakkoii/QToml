@@ -34,12 +34,12 @@
   * @brief Implementation of QTomlObject class providing efficient TOML table operations.
   *
   * This file contains the complete implementation of the QTomlObject class, which represents
-  * TOML tables (key-value pair collections) with hash table efficiency. The implementation
+  * TOML tables (key-value pair collections) with object table efficiency. The implementation
   * uses the PIMPL pattern with QHash as the underlying container to provide optimal
   * performance for table operations while maintaining Qt framework integration.
   *
   * Key implementation features:
-  * - High-performance hash table operations using QHash<QString, QTomlValue>
+  * - High-performance object table operations using QHash<QString, QTomlValue>
   * - PIMPL pattern for binary compatibility and implementation hiding
   * - Full STL-compatible iterator interface for traversal and algorithms
   * - Capacity management with memory pre-allocation support
@@ -49,7 +49,7 @@
   *
   * Performance characteristics:
   * - Average O(1) lookup, insertion, and removal operations
-  * - O(n) worst-case for hash collisions (rare with QString hash function)
+  * - O(n) worst-case for object collisions (rare with QString object function)
   * - Memory usage scales linearly with number of key-value pairs
   * - Automatic load factor management for consistent performance
   * - Copy-on-write optimization where applicable through Qt containers
@@ -119,7 +119,7 @@ namespace
  * table ready for immediate use.
  *
  * Construction characteristics:
- * - Creates empty hash table with zero elements
+ * - Creates empty object table with zero elements
  * - No memory allocation for key-value storage
  * - Minimal overhead through PIMPL smart pointer allocation
  * - Exception-safe construction through Qt container guarantees
@@ -160,7 +160,7 @@ QTomlObject::QTomlObject() noexcept
  * - Memory pre-allocation avoids multiple reallocations
  * - Direct insertion to underlying QHash for efficiency
  * - Move semantics where applicable for large values
- * - Optimal hash table load factor management
+ * - Optimal object table load factor management
  *
  * @param args Initializer list of QString-QTomlValue pairs
  *
@@ -287,7 +287,7 @@ QTomlObject& QTomlObject::operator=(QTomlObject&& other) noexcept = default;
 /**
  * @brief Reserves memory capacity for future key-value pairs.
  *
- * Pre-allocates internal hash table capacity to hold at least the specified
+ * Pre-allocates internal object table capacity to hold at least the specified
  * number of key-value pairs without triggering reallocations. This optimization
  * is valuable when the approximate final size is known in advance.
  *
@@ -328,7 +328,7 @@ void QTomlObject::reserve(qsizetype size)
  * allocated memory before reallocation becomes necessary. Always greater
  * than or equal to size().
  *
- * @return Current capacity of the underlying hash table
+ * @return Current capacity of the underlying object table
  *
  * @complexity O(1) - Constant time complexity
  * @exception noexcept guarantee
@@ -368,7 +368,7 @@ qsizetype QTomlObject::capacity() const noexcept
  *
  * @note Key and value are copied into the table
  * @note Existing key values are replaced
- * @note May trigger hash table expansion for optimal load factor
+ * @note May trigger object table expansion for optimal load factor
  *
  * @example
  * @code
@@ -602,14 +602,14 @@ QTomlValue QTomlObject::value(const QString& key, const QTomlValue& defaultValue
  * @brief Returns list of all keys in the table.
  *
  * Creates and returns a QStringList containing all keys currently in the table.
- * Key order is not guaranteed due to hash table nature.
+ * Key order is not guaranteed due to object table nature.
  *
  * @return QStringList containing all keys
  *
  * @complexity O(n) where n is the number of key-value pairs
  * @exception Strong exception safety guarantee
  *
- * @note Key order is not guaranteed (hash table semantics)
+ * @note Key order is not guaranteed (object table semantics)
  * @note Creates new list; modifications don't affect original table
  * @note Useful for iteration when key names are needed
  *
@@ -721,7 +721,7 @@ QTomlValue& QTomlObject::operator[](const QString& key)
 /**
  * @brief Returns mutable iterator to beginning of table.
  * @return Mutable iterator to first key-value pair
- * @note Order is not guaranteed due to hash table nature
+ * @note Order is not guaranteed due to object table nature
  * @note Marked noexcept for performance
  */
 QTomlObject::iterator QTomlObject::begin() noexcept { return d_ptr->values_.begin(); }
@@ -891,12 +891,12 @@ QVariantMap QTomlObject::toVariantMap() const
  */
 QTomlObject QTomlObject::fromVariantMap(const QVariantMap& map)
 {
-	QTomlObject hash;
+	QTomlObject object;
 	// Optimization: Pre-allocate space
-	hash.reserve(map.size());
+	object.reserve(map.size());
 	for (auto it = map.constBegin(); it != map.constEnd(); ++it)
 	{
-		hash.insert(it.key(), it.value().value<QTomlValue>());
+		object.insert(it.key(), it.value().value<QTomlValue>());
 	}
-	return hash;
+	return object;
 }

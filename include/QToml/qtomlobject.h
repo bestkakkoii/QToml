@@ -44,11 +44,11 @@
 
  /**
   * @class QTomlObject
-  * @brief Encapsulates a TOML table (key-value pair collection) providing efficient hash table operations.
+  * @brief Encapsulates a TOML table (key-value pair collection) providing efficient object table operations.
   *
   * QTomlObject represents a TOML table, which is an unordered collection of key-value pairs
   * according to the TOML v1.0.0 specification. It provides a Qt-style interface for
-  * managing TOML table data with efficient hash-based lookups and modifications.
+  * managing TOML table data with efficient object-based lookups and modifications.
   *
   * The class follows Qt's container design patterns and maintains compatibility with
   * QHash while adding TOML-specific functionality. It uses the PIMPL pattern for
@@ -72,7 +72,7 @@
   *
   * Performance characteristics:
   * - Average O(1) lookup, insertion, and removal
-  * - Worst-case O(n) for hash collisions
+  * - Worst-case O(n) for object collisions
   * - Memory usage scales linearly with element count
   * - Automatic load factor management
   * - Copy-on-write optimization for efficient copying
@@ -125,17 +125,17 @@ class Q_CORE_EXPORT QTomlObject
 	Q_GADGET
 public:
 	/**
-	 * @brief Iterator type for mutable hash traversal.
+	 * @brief Iterator type for mutable object traversal.
 	 *
-	 * Provides mutable access to key-value pairs in the hash table.
+	 * Provides mutable access to key-value pairs in the object table.
 	 * Based on QHash::iterator with the same semantics and capabilities.
 	 */
 	using iterator = QHash<QString, QTomlValue>::iterator;
 
 	/**
-	 * @brief Const iterator type for immutable hash traversal.
+	 * @brief Const iterator type for immutable object traversal.
 	 *
-	 * Provides read-only access to key-value pairs in the hash table.
+	 * Provides read-only access to key-value pairs in the object table.
 	 * Based on QHash::const_iterator with the same semantics and capabilities.
 	 */
 	using const_iterator = QHash<QString, QTomlValue>::const_iterator;
@@ -617,7 +617,7 @@ public:
 	 * Q_ASSERT(keys.size() == 2);
 	 * @endcode
 	 *
-	 * @note Order of keys is not guaranteed due to hash table nature
+	 * @note Order of keys is not guaranteed due to object table nature
 	 * @note Useful for iteration when key names are needed
 	 */
 	QStringList keys() const;
@@ -808,7 +808,7 @@ public:
 	 *
 	 * Provides a mutable iterator pointing to the first key-value pair in the table.
 	 * If the table is empty, this iterator equals end(). The order of iteration
-	 * is not guaranteed due to the hash table nature.
+	 * is not guaranteed due to the object table nature.
 	 *
 	 * @return Mutable iterator to the first key-value pair
 	 *

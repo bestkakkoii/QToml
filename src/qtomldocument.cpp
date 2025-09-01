@@ -132,16 +132,16 @@ namespace
 	 */
 	QTomlObject convert_table_to_hash(const toml::table& table)
 	{
-		QTomlObject hash;
+		QTomlObject object;
 		// Note: QTomlObject may not support reserve, so reserve call is omitted
 
 		for (const auto& [key, val] : table)
 		{
 			// Optimization: Avoid unnecessary std::string intermediate object creation
-			hash.insert(QString::fromUtf8(key.data(), static_cast<qsizetype>(key.length())),
+			object.insert(QString::fromUtf8(key.data(), static_cast<qsizetype>(key.length())),
 				convert_node_to_value(val));
 		}
-		return hash;
+		return object;
 	}
 
 	/**
@@ -288,7 +288,7 @@ namespace
 	// --- Serialization (To TOML) Helper Functions ---
 
 	// Forward declarations for recursive serialization
-	toml::table convert_hash_to_table(const QTomlObject& hash);
+	toml::table convert_hash_to_table(const QTomlObject& object);
 	toml::array convert_array_to_toml_array(const QTomlArray& array);
 
 	/**
@@ -541,7 +541,7 @@ namespace
 	 * - Direct iteration using Qt container iterators
 	 * - Efficient delegation to specialized conversion functions
 	 *
-	 * @param hash The QTomlObject object to convert
+	 * @param object The QTomlObject object to convert
 	 * @return Converted toml::table ready for serialization
 	 *
 	 * @complexity O(n) where n is the number of valid key-value pairs
@@ -550,17 +550,17 @@ namespace
 	 * @note Null and undefined values are filtered out per TOML specification
 	 * @note Move semantics reduce string copying overhead
 	 * @note Recursive conversion handles nested table structures
-	 * @note Empty hash results in empty toml::table
+	 * @note Empty object results in empty toml::table
 	 *
 	 * @see convert_value_to_toml() for value conversion details
 	 * @see QTomlObject iteration for container interface
 	 */
-	toml::table convert_hash_to_table(const QTomlObject& hash)
+	toml::table convert_hash_to_table(const QTomlObject& object)
 	{
 		toml::table table;
 		// Note: toml::table may not support reserve, so reserve call is omitted
 
-		for (auto it = hash.constBegin(); it != hash.constEnd(); ++it)
+		for (auto it = object.constBegin(); it != object.constEnd(); ++it)
 		{
 			// TOML doesn't support null values, so skip serialization of such values
 			if (!it.value().isNull() && !it.value().isUndefined())
@@ -643,18 +643,18 @@ QTomlDocument::QTomlDocument() noexcept
 /**
  * @brief Constructs TOML document from QTomlObject.
  *
- * Creates a QTomlDocument with the specified hash as the root table.
+ * Creates a QTomlDocument with the specified object as the root table.
  * The document immediately becomes valid and serializable.
  *
- * @param hash The QTomlObject to use as the document's root table
+ * @param object The QTomlObject to use as the document's root table
  * @note Document becomes non-null and ready for serialization
  * @note Hash content is copied for independence
  */
-QTomlDocument::QTomlDocument(const QTomlObject& hash)
+QTomlDocument::QTomlDocument(const QTomlObject& object)
 	: d_ptr(std::make_unique<QTomlDocumentPrivate>())
 {
 	d_ptr->is_null_ = false;
-	d_ptr->root_hash_ = hash;
+	d_ptr->root_hash_ = object;
 }
 
 /**
@@ -753,9 +753,9 @@ bool QTomlDocument::isEmpty() const noexcept
  * @brief Retrieves copy of the document's root table.
  * @return Copy of the root QTomlObject
  * @note Returns copy for safety; modifications don't affect original
- * @note Empty document returns empty hash
+ * @note Empty document returns empty object
  */
-QTomlObject QTomlDocument::hash() const
+QTomlObject QTomlDocument::object() const
 {
 	return d_ptr->root_hash_;
 }
@@ -766,14 +766,14 @@ QTomlObject QTomlDocument::hash() const
  * Replaces the document's root table and marks it as non-null.
  * The document becomes valid and serializable after this operation.
  *
- * @param hash The new root table content
+ * @param object The new root table content
  * @note Document becomes non-null after setting
  * @note Hash content is copied for independence
  */
-void QTomlDocument::setHash(const QTomlObject& hash)
+void QTomlDocument::setHash(const QTomlObject& object)
 {
 	d_ptr->is_null_ = false;
-	d_ptr->root_hash_ = hash;
+	d_ptr->root_hash_ = object;
 }
 
 /**

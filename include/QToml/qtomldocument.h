@@ -150,7 +150,7 @@ class QTomlParseError;
  * }
  *
  * // Access data
- * QTomlObject root = doc.hash();
+ * QTomlObject root = doc.object();
  * QTomlObject database = root["database"].toObject();
  * QString host = database["host"].toString();
  * int port = database["port"].toInteger();
@@ -208,16 +208,16 @@ public:
 	 * Creates a TOML document using the given QTomlObject as the root table.
 	 * This is the standard method for creating documents with initial content.
 	 *
-	 * The input hash is copied into the document, so the original object
+	 * The input object is copied into the document, so the original object
 	 * remains unchanged and can be safely modified after construction.
 	 *
-	 * @param hash The QTomlObject object to use as the document's root table
+	 * @param object The QTomlObject object to use as the document's root table
 	 *
-	 * @complexity O(n) where n is the number of elements in the hash
+	 * @complexity O(n) where n is the number of elements in the object
 	 * @exception Strong exception safety guarantee
 	 *
-	 * @note Input hash is copied; original object remains unchanged
-	 * @note If hash is empty, created document isEmpty() returns true but isNull() returns false
+	 * @note Input object is copied; original object remains unchanged
+	 * @note If object is empty, created document isEmpty() returns true but isNull() returns false
 	 * @note All nested structures are deep-copied for independence
 	 *
 	 * @example
@@ -230,12 +230,12 @@ public:
 	 * Q_ASSERT(!doc.isNull());            // Not null - contains data
 	 * Q_ASSERT(doc.isObject());             // Contains valid table structure
 	 *
-	 * // Original hash can be modified independently
+	 * // Original object can be modified independently
 	 * config.insert("new_key", QTomlValue("value"));
-	 * Q_ASSERT(!doc.hash().contains("new_key"));  // Document unchanged
+	 * Q_ASSERT(!doc.object().contains("new_key"));  // Document unchanged
 	 * @endcode
 	 */
-	explicit QTomlDocument(const QTomlObject& hash);
+	explicit QTomlDocument(const QTomlObject& object);
 
 	/**
 	 * @brief Copy constructor creating deep copy of another document.
@@ -259,12 +259,12 @@ public:
 	 * QTomlDocument copy(original);
 	 *
 	 * // Verify independence
-	 * QTomlObject copyRoot = copy.hash();
+	 * QTomlObject copyRoot = copy.object();
 	 * copyRoot.insert("new_item", QTomlValue(42));
 	 * copy.setHash(copyRoot);
 	 *
-	 * Q_ASSERT(!original.hash().contains("new_item"));  // Original unchanged
-	 * Q_ASSERT(copy.hash().contains("new_item"));       // Copy modified
+	 * Q_ASSERT(!original.object().contains("new_item"));  // Original unchanged
+	 * Q_ASSERT(copy.object().contains("new_item"));       // Copy modified
 	 * @endcode
 	 */
 	QTomlDocument(const QTomlDocument& other);
@@ -512,17 +512,17 @@ public:
 	 * @example
 	 * @code
 	 * QTomlDocument doc = QTomlDocument::fromToml(tomlData);
-	 * QTomlObject root = doc.hash();
+	 * QTomlObject root = doc.object();
 	 *
 	 * // Modify content
 	 * root.insert("new_key", QTomlValue("new_value"));
 	 * doc.setHash(root);  // Apply modifications
 	 *
 	 * // Verify changes
-	 * Q_ASSERT(doc.hash().contains("new_key"));
+	 * Q_ASSERT(doc.object().contains("new_key"));
 	 * @endcode
 	 */
-	QTomlObject hash() const;
+	QTomlObject object() const;
 
 	/**
 	 * @brief Sets the document's root table.
@@ -530,18 +530,18 @@ public:
 	 * Sets the specified QTomlObject as the document's root table, replacing
 	 * existing content. This is the standard method for modifying document content.
 	 *
-	 * The input hash is copied into the document, so the original object
+	 * The input object is copied into the document, so the original object
 	 * remains unchanged and can be safely modified after this operation.
 	 *
-	 * @param hash The new root table to set
+	 * @param object The new root table to set
 	 *
-	 * @complexity O(n) where n is the number of elements in the hash
+	 * @complexity O(n) where n is the number of elements in the object
 	 * @exception Strong exception safety guarantee
 	 *
-	 * @note Input hash is copied; original object remains unchanged
+	 * @note Input object is copied; original object remains unchanged
 	 * @note After setting, document becomes non-null (isNull() returns false)
 	 * @note If empty table is passed, document becomes isEmpty() = true but still valid
-	 * @see hash()
+	 * @see object()
 	 *
 	 * @example
 	 * @code
@@ -553,12 +553,12 @@ public:
 	 * Q_ASSERT(!doc.isNull());            // No longer null
 	 * Q_ASSERT(!doc.isEmpty());           // Contains data
 	 *
-	 * // Original hash can be modified independently
+	 * // Original object can be modified independently
 	 * config.clear();
 	 * Q_ASSERT(!doc.isEmpty());           // Document unchanged
 	 * @endcode
 	 */
-	void setHash(const QTomlObject& hash);
+	void setHash(const QTomlObject& object);
 
 	// ==================== TOML Parsing and Serialization ====================
 

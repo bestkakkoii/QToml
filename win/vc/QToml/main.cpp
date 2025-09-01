@@ -501,7 +501,7 @@ void testQTomlHashEnhanced(TestResults& results)
 {
 	TEST_START("QTomlObject Enhanced Functionality");
 
-	// Test large hash operations
+	// Test large object operations
 	QTomlObject largeHash;
 	const int hashSize = 1000;
 
@@ -514,7 +514,7 @@ void testQTomlHashEnhanced(TestResults& results)
 	qint64 insertTime = insertTimer.elapsed();
 	qDebug().noquote() << QString("Hash insert %1 elements: %2ms").arg(hashSize).arg(insertTime);
 
-	TEST_ASSERT_EQUAL(largeHash.size(), hashSize, "large hash size correct");
+	TEST_ASSERT_EQUAL(largeHash.size(), hashSize, "large object size correct");
 
 	// Test lookup performance
 	QElapsedTimer lookupTimer;
@@ -526,7 +526,7 @@ void testQTomlHashEnhanced(TestResults& results)
 	qint64 lookupTime = lookupTimer.elapsed();
 	qDebug().noquote() << QString("Hash lookup %1 elements: %2ms").arg(hashSize).arg(lookupTime);
 
-	TEST_ASSERT_EQUAL(sum, (hashSize - 1) * hashSize / 2, "hash sum calculation correct");
+	TEST_ASSERT_EQUAL(sum, (hashSize - 1) * hashSize / 2, "object sum calculation correct");
 
 	// Test key iteration performance
 	QElapsedTimer keyIterTimer;
@@ -560,7 +560,7 @@ void testQTomlHashEnhanced(TestResults& results)
 	qint64 removeTime = removeTimer.elapsed();
 	qDebug().noquote() << QString("Hash remove %1 elements: %2ms").arg(hashSize / 2).arg(removeTime);
 
-	TEST_ASSERT_EQUAL(largeHash.size(), hashSize / 2, "hash size after removal");
+	TEST_ASSERT_EQUAL(largeHash.size(), hashSize / 2, "object size after removal");
 
 	TEST_END(results);
 }
@@ -637,7 +637,7 @@ void testComprehensiveParsing(TestResults& results)
 	TEST_ASSERT(!error.hasError(), "comprehensive parsing successful");
 	TEST_ASSERT(!doc.isNull(), "comprehensive document not null");
 
-	QTomlObject root = doc.hash();
+	QTomlObject root = doc.object();
 
 	// Test unicode support
 	TEST_ASSERT(root.contains("unicode_test"), "unicode field exists");
@@ -752,14 +752,14 @@ void runPerformanceBenchmarks(TestResults& results)
 			QElapsedTimer timer;
 			timer.start();
 
-			QTomlObject hash;
+			QTomlObject object;
 			for (int i = 0; i < hashSize; ++i) {
-				hash.insert(QString("key_%1").arg(i), QTomlValue(i));
+				object.insert(QString("key_%1").arg(i), QTomlValue(i));
 			}
 
 			// Lookups
 			for (int i = 0; i < hashSize; ++i) {
-				hash.value(QString("key_%1").arg(i));
+				object.value(QString("key_%1").arg(i));
 			}
 
 			metrics.addMeasurement(timer.elapsed());
@@ -900,7 +900,7 @@ void runPerformanceBenchmarks(TestResults& results)
 		}
 
 		if (benchmark.testName.contains("Hash") && benchmark.getAverageTime() > 200) {  // 從 300 調整為 200
-			qWarning().noquote() << "  Hash operations seem slow - verify hash function efficiency";
+			qWarning().noquote() << "  Hash operations seem slow - verify object function efficiency";
 		}
 		else if (benchmark.testName.contains("Hash")) {
 			qInfo().noquote() << "Hash operations performance is good!";
@@ -1077,7 +1077,7 @@ void testFileOperationsEnhanced(TestResults& results)
 	TEST_ASSERT(!error.hasError(), "large file parsing successful");
 	TEST_ASSERT(!doc.isNull(), "large document not null");
 
-	QTomlObject root = doc.hash();
+	QTomlObject root = doc.object();
 	TEST_ASSERT(root.size() > 500, "large file structure preserved");
 
 	// Calculate throughput
