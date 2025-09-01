@@ -34,7 +34,7 @@
 
 #include "qtomlvalue.h"
 #include "qtomlarray.h"
-#include "qtomlhash.h"
+#include "qtomlobject.h"
 #include "qtomldatetime.h"
 
 #include <QString>
@@ -95,7 +95,7 @@
    * - QString: TOML string values (UTF-8 encoded)
    * - QTomlDateTime: TOML date-time values (RFC 3339)
    * - QTomlArray: TOML array values (heterogeneous)
-   * - QTomlHash: TOML table/hash values (key-value pairs)
+   * - QTomlObject: TOML table/hash values (key-value pairs)
    *
    * Exception safety:
    * - Strong exception safety guarantee for all operations
@@ -160,7 +160,7 @@ public:
 	 * - QString: Qt's Unicode string class for TOML string values
 	 * - QTomlDateTime: Custom date-time type for TOML temporal values
 	 * - QTomlArray: Container for TOML array values (heterogeneous)
-	 * - QTomlHash: Container for TOML table/object values
+	 * - QTomlObject: Container for TOML table/object values
 	 *
 	 * Storage considerations:
 	 * - Variant size equals the largest contained type plus discriminator
@@ -206,7 +206,7 @@ public:
 		QString,        // TOML string values: UTF-8 encoded text
 		QTomlDateTime,  // TOML date-time values: RFC 3339 compliant timestamps
 		QTomlArray,     // TOML array values: ordered, heterogeneous collections
-		QTomlHash       // TOML table values: unordered key-value mappings
+		QTomlObject       // TOML table values: unordered key-value mappings
 	>;
 
 	/**
@@ -264,7 +264,7 @@ public:
 	 * - QString: Deep copy with copy-on-write optimization
 	 * - QTomlDateTime: Value type copy
 	 * - QTomlArray: Deep copy of all elements
-	 * - QTomlHash: Deep copy of all key-value pairs
+	 * - QTomlObject: Deep copy of all key-value pairs
 	 *
 	 * @param other The QTomlValuePrivate instance to copy from
 	 *

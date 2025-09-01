@@ -50,7 +50,7 @@
 #include "qtomldocument.h"
 #include "qtomlparseerror.h"
 #include "qtomlarray.h"
-#include "qtomlhash.h"
+#include "qtomlobject.h"
 #include "qtomlvalue.h"
 #include "qtomldatetime.h"
 #include <iostream>
@@ -495,14 +495,14 @@ void testQTomlArrayEnhanced(TestResults& results)
 }
 
 /**
- * @brief Enhanced QTomlHash tests with performance focus
+ * @brief Enhanced QTomlObject tests with performance focus
  */
 void testQTomlHashEnhanced(TestResults& results)
 {
-	TEST_START("QTomlHash Enhanced Functionality");
+	TEST_START("QTomlObject Enhanced Functionality");
 
 	// Test large hash operations
-	QTomlHash largeHash;
+	QTomlObject largeHash;
 	const int hashSize = 1000;
 
 	// Measure insertion performance
@@ -634,10 +634,10 @@ void testComprehensiveParsing(TestResults& results)
 	qDebug().noquote() << QString("Comprehensive TOML parsing time: %1ms (size: %2 bytes)")
 		.arg(parseTime).arg(comprehensiveToml.toUtf8().size());
 
-	TEST_ASSERT(error.errorString().contains("No error"), "comprehensive parsing successful");
+	TEST_ASSERT(!error.hasError(), "comprehensive parsing successful");
 	TEST_ASSERT(!doc.isNull(), "comprehensive document not null");
 
-	QTomlHash root = doc.hash();
+	QTomlObject root = doc.hash();
 
 	// Test unicode support
 	TEST_ASSERT(root.contains("unicode_test"), "unicode field exists");
@@ -671,11 +671,11 @@ void testComprehensiveParsing(TestResults& results)
 
 	// Test deep nesting
 	if (root.contains("level1")) {
-		QTomlHash level1 = root["level1"].toHash();
+		QTomlObject level1 = root["level1"].toHash();
 		if (level1.contains("level2")) {
-			QTomlHash level2 = level1["level2"].toHash();
+			QTomlObject level2 = level1["level2"].toHash();
 			if (level2.contains("level3")) {
-				QTomlHash level3 = level2["level3"].toHash();
+				QTomlObject level3 = level2["level3"].toHash();
 				TEST_ASSERT_EQUAL(level3["deep_value"].toString(), QString("found me!"), "deep nesting access");
 			}
 		}
@@ -745,14 +745,14 @@ void runPerformanceBenchmarks(TestResults& results)
 	// 3. Hash Operations Performance
 	{
 		PerformanceMetrics metrics;
-		metrics.testName = "QTomlHash Operations";
+		metrics.testName = "QTomlObject Operations";
 
 		const int hashSize = 2000;
 		for (int run = 0; run < 5; ++run) {
 			QElapsedTimer timer;
 			timer.start();
 
-			QTomlHash hash;
+			QTomlObject hash;
 			for (int i = 0; i < hashSize; ++i) {
 				hash.insert(QString("key_%1").arg(i), QTomlValue(i));
 			}
@@ -795,9 +795,9 @@ void runPerformanceBenchmarks(TestResults& results)
 		metrics.testName = "Document Serialization";
 
 		// Create a complex document
-		QTomlHash root;
+		QTomlObject root;
 		for (int i = 0; i < 100; ++i) {
-			QTomlHash section;
+			QTomlObject section;
 			section.insert("id", QTomlValue(i));
 			section.insert("name", QTomlValue(QString("Section_%1").arg(i)));
 			section.insert("active", QTomlValue(i % 2 == 0));
@@ -834,7 +834,7 @@ void runPerformanceBenchmarks(TestResults& results)
 			QElapsedTimer timer;
 			timer.start();
 
-			QTomlHash largeHash;
+			QTomlObject largeHash;
 			for (int i = 0; i < 10000; ++i) {
 				QTomlArray largeArray;
 				for (int j = 0; j < 100; ++j) {
@@ -956,7 +956,7 @@ void testErrorHandlingEnhanced(TestResults& results)
 		QTomlParseError error;
 		QTomlDocument doc = QTomlDocument::fromToml(malformedInputs[i].toUtf8(), &error);
 
-		if (doc.isNull() && !error.errorString().contains("No error")) {
+		if (doc.isNull() && error.hasError()) {
 			errorTestsPassed++;
 			qDebug().noquote() << QString("Error correctly detected for input %1").arg(i + 1);
 		}
@@ -1074,10 +1074,10 @@ void testFileOperationsEnhanced(TestResults& results)
 
 	qDebug().noquote() << QString("Large file read: %1ms, parse: %2ms").arg(readTime).arg(parseTime);
 
-	TEST_ASSERT(error.errorString().contains("No error"), "large file parsing successful");
+	TEST_ASSERT(!error.hasError(), "large file parsing successful");
 	TEST_ASSERT(!doc.isNull(), "large document not null");
 
-	QTomlHash root = doc.hash();
+	QTomlObject root = doc.hash();
 	TEST_ASSERT(root.size() > 500, "large file structure preserved");
 
 	// Calculate throughput

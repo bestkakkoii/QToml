@@ -43,10 +43,10 @@
 #include <initializer_list>
 
  /**
-  * @class QTomlHash
+  * @class QTomlObject
   * @brief Encapsulates a TOML table (key-value pair collection) providing efficient hash table operations.
   *
-  * QTomlHash represents a TOML table, which is an unordered collection of key-value pairs
+  * QTomlObject represents a TOML table, which is an unordered collection of key-value pairs
   * according to the TOML v1.0.0 specification. It provides a Qt-style interface for
   * managing TOML table data with efficient hash-based lookups and modifications.
   *
@@ -95,7 +95,7 @@
   * @example
   * @code
   * // Create and populate a TOML table
-  * QTomlHash config;
+  * QTomlObject config;
   * config.insert("host", QTomlValue("localhost"));
   * config.insert("port", QTomlValue(8080));
   * config.insert("ssl", QTomlValue(true));
@@ -120,7 +120,7 @@
   * @see QTomlArray for array functionality
   * @see TOML tables specification at https://toml.io/en/v1.0.0#table
   */
-class Q_CORE_EXPORT QTomlHash
+class Q_CORE_EXPORT QTomlObject
 {
 	Q_GADGET
 public:
@@ -143,7 +143,7 @@ public:
 	/**
 	 * @brief Default constructor creating an empty TOML table.
 	 *
-	 * Creates a QTomlHash instance with no key-value pairs. The table is ready
+	 * Creates a QTomlObject instance with no key-value pairs. The table is ready
 	 * for immediate use and can have elements added via insert() or operator[].
 	 *
 	 * This constructor is marked noexcept to guarantee no exceptions will be
@@ -155,17 +155,17 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash table;
+	 * QTomlObject table;
 	 * Q_ASSERT(table.isEmpty());
 	 * Q_ASSERT(table.size() == 0);
 	 * @endcode
 	 */
-	QTomlHash() noexcept;
+	QTomlObject() noexcept;
 
 	/**
 	 * @brief Initializer list constructor for convenient table creation.
 	 *
-	 * Creates a QTomlHash instance initialized with the provided key-value pairs.
+	 * Creates a QTomlObject instance initialized with the provided key-value pairs.
 	 * This constructor enables brace-initialization syntax for creating tables
 	 * with known content at compile time.
 	 *
@@ -180,7 +180,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config{
+	 * QTomlObject config{
 	 *     {"host", QTomlValue("localhost")},
 	 *     {"port", QTomlValue(8080)},
 	 *     {"ssl", QTomlValue(true)}
@@ -192,63 +192,63 @@ public:
 	 * @note Pairs are copied into the table; original objects remain unchanged
 	 * @note Duplicate keys result in last-value-wins behavior
 	 */
-	QTomlHash(std::initializer_list<std::pair<QString, QTomlValue>> args);
+	QTomlObject(std::initializer_list<std::pair<QString, QTomlValue>> args);
 
 	/**
 	 * @brief Copy constructor creating a deep copy of another table.
 	 *
-	 * Creates a new QTomlHash instance that is an independent copy of the
+	 * Creates a new QTomlObject instance that is an independent copy of the
 	 * provided table. All key-value pairs are deep-copied, ensuring modifications
 	 * to either table do not affect the other.
 	 *
 	 * Uses the PIMPL pattern's copy semantics to ensure proper resource
 	 * management and deep copying of all contained values.
 	 *
-	 * @param other The QTomlHash instance to copy
+	 * @param other The QTomlObject instance to copy
 	 *
 	 * @complexity O(n) where n is the number of key-value pairs in the source table
 	 * @threadsafety Thread-safe for construction; the source table should not be modified during copying
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash original{{"key1", QTomlValue(42)}, {"key2", QTomlValue("hello")}};
-	 * QTomlHash copy(original);
+	 * QTomlObject original{{"key1", QTomlValue(42)}, {"key2", QTomlValue("hello")}};
+	 * QTomlObject copy(original);
 	 *
 	 * copy.insert("key3", QTomlValue(true));
 	 * Q_ASSERT(original.size() == 2);  // Original unchanged
 	 * Q_ASSERT(copy.size() == 3);      // Copy has new element
 	 * @endcode
 	 */
-	QTomlHash(const QTomlHash& other);
+	QTomlObject(const QTomlObject& other);
 
 	/**
 	 * @brief Move constructor for efficient resource transfer.
 	 *
-	 * Creates a new QTomlHash instance by transferring ownership of resources
+	 * Creates a new QTomlObject instance by transferring ownership of resources
 	 * from the source table. The source table becomes empty but remains in a
 	 * valid state after the move.
 	 *
 	 * This constructor provides optimal performance for temporary tables and
 	 * return value optimization scenarios.
 	 *
-	 * @param other Rvalue reference to the QTomlHash instance to move from
+	 * @param other Rvalue reference to the QTomlObject instance to move from
 	 *
 	 * @complexity O(1) - Constant time complexity
 	 * @threadsafety Thread-safe for construction only
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash createConfig() {
-	 *     QTomlHash temp{{"version", QTomlValue("1.0")}, {"debug", QTomlValue(false)}};
+	 * QTomlObject createConfig() {
+	 *     QTomlObject temp{{"version", QTomlValue("1.0")}, {"debug", QTomlValue(false)}};
 	 *     return temp;  // Move constructor called automatically
 	 * }
 	 *
-	 * QTomlHash config = createConfig();  // Efficient transfer
+	 * QTomlObject config = createConfig();  // Efficient transfer
 	 * @endcode
 	 *
 	 * @note Marked noexcept for optimal move semantics and exception safety
 	 */
-	QTomlHash(QTomlHash&& other) noexcept;
+	QTomlObject(QTomlObject&& other) noexcept;
 
 	/**
 	 * @brief Destructor ensuring proper cleanup of resources.
@@ -263,7 +263,7 @@ public:
 	 * @note Marked noexcept to guarantee no exceptions during destruction
 	 * @note Uses RAII principles for automatic resource management
 	 */
-	~QTomlHash() noexcept;
+	~QTomlObject() noexcept;
 
 	/**
 	 * @brief Copy assignment operator for table replacement.
@@ -275,7 +275,7 @@ public:
 	 * All existing key-value pairs in this table are replaced with copies
 	 * of pairs from the source table. The operation is exception-safe.
 	 *
-	 * @param other The QTomlHash instance to copy from
+	 * @param other The QTomlObject instance to copy from
 	 * @return Reference to this table for chaining operations
 	 *
 	 * @complexity O(n + m) where n is current size and m is source size
@@ -283,8 +283,8 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash table1{{"key1", QTomlValue(1)}};
-	 * QTomlHash table2{{"key2", QTomlValue(2)}, {"key3", QTomlValue(3)}};
+	 * QTomlObject table1{{"key1", QTomlValue(1)}};
+	 * QTomlObject table2{{"key2", QTomlValue(2)}, {"key3", QTomlValue(3)}};
 	 *
 	 * table1 = table2;  // table1 now contains [key2=2, key3=3]
 	 * Q_ASSERT(table1.size() == 2);
@@ -292,7 +292,7 @@ public:
 	 *
 	 * @note Self-assignment (table = table) is handled safely
 	 */
-	QTomlHash& operator=(const QTomlHash& other);
+	QTomlObject& operator=(const QTomlObject& other);
 
 	/**
 	 * @brief Move assignment operator for efficient resource transfer.
@@ -303,7 +303,7 @@ public:
 	 * This operation is highly efficient as it transfers resources rather
 	 * than copying data, making it ideal for performance-critical scenarios.
 	 *
-	 * @param other Rvalue reference to the QTomlHash instance to move from
+	 * @param other Rvalue reference to the QTomlObject instance to move from
 	 * @return Reference to this table for chaining operations
 	 *
 	 * @complexity O(1) - Constant time complexity
@@ -311,8 +311,8 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash table1{{"key1", QTomlValue(1)}};
-	 * QTomlHash table2{{"key2", QTomlValue(2)}, {"key3", QTomlValue(3)}};
+	 * QTomlObject table1{{"key1", QTomlValue(1)}};
+	 * QTomlObject table2{{"key2", QTomlValue(2)}, {"key3", QTomlValue(3)}};
 	 *
 	 * table1 = std::move(table2);  // Efficient transfer
 	 * Q_ASSERT(table1.size() == 2);
@@ -321,7 +321,7 @@ public:
 	 *
 	 * @note Marked noexcept for optimal performance and exception safety
 	 */
-	QTomlHash& operator=(QTomlHash&& other) noexcept;
+	QTomlObject& operator=(QTomlObject&& other) noexcept;
 
 	// ==================== Capacity Management ====================
 
@@ -342,7 +342,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config;
+	 * QTomlObject config;
 	 * config.reserve(1000);  // Pre-allocate for 1000 pairs
 	 *
 	 * // Now adding pairs will be efficient
@@ -373,7 +373,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash table;
+	 * QTomlObject table;
 	 * qDebug() << "Initial capacity:" << table.capacity();
 	 *
 	 * table.reserve(100);
@@ -404,7 +404,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config;
+	 * QTomlObject config;
 	 * auto it = config.insert("database_host", QTomlValue("localhost"));
 	 * Q_ASSERT(it.key() == "database_host");
 	 * Q_ASSERT(it.value().toString() == "localhost");
@@ -430,7 +430,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config;
+	 * QTomlObject config;
 	 * config.insert("temp_data", QTomlValue(generateLargeArray()));  // Move from temporary
 	 * @endcode
 	 *
@@ -454,7 +454,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config;
+	 * QTomlObject config;
 	 * QString dynamicKey = generateKey();
 	 * config.insert(std::move(dynamicKey), QTomlValue(42));  // Move both
 	 * @endcode
@@ -476,7 +476,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config{{"temp", QTomlValue(123)}, {"keep", QTomlValue(456)}};
+	 * QTomlObject config{{"temp", QTomlValue(123)}, {"keep", QTomlValue(456)}};
 	 * config.remove("temp");
 	 * Q_ASSERT(!config.contains("temp"));
 	 * Q_ASSERT(config.contains("keep"));
@@ -502,7 +502,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config{{"temp", QTomlValue(123)}};
+	 * QTomlObject config{{"temp", QTomlValue(123)}};
 	 * QTomlValue value = config.take("temp");
 	 * Q_ASSERT(value.toInteger() == 123);
 	 * Q_ASSERT(!config.contains("temp"));
@@ -531,7 +531,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config{{"debug", QTomlValue(true)}};
+	 * QTomlObject config{{"debug", QTomlValue(true)}};
 	 * if (config.contains("debug")) {
 	 *     bool debugMode = config["debug"].toBool();
 	 * }
@@ -555,7 +555,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config{{"port", QTomlValue(8080)}};
+	 * QTomlObject config{{"port", QTomlValue(8080)}};
 	 * QTomlValue port = config.value("port");
 	 * Q_ASSERT(port.toInteger() == 8080);
 	 *
@@ -583,7 +583,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config{{"port", QTomlValue(8080)}};
+	 * QTomlObject config{{"port", QTomlValue(8080)}};
 	 *
 	 * int port = config.value("port", QTomlValue(80)).toInteger();
 	 * Q_ASSERT(port == 8080);  // Key exists, returns actual value
@@ -610,7 +610,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config{{"host", QTomlValue("localhost")}, {"port", QTomlValue(8080)}};
+	 * QTomlObject config{{"host", QTomlValue("localhost")}, {"port", QTomlValue(8080)}};
 	 * QStringList keys = config.keys();
 	 * Q_ASSERT(keys.contains("host"));
 	 * Q_ASSERT(keys.contains("port"));
@@ -638,7 +638,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config{{"debug", QTomlValue(false)}};
+	 * QTomlObject config{{"debug", QTomlValue(false)}};
 	 * auto it = config.find("debug");
 	 * if (it != config.end()) {
 	 *     it.value() = QTomlValue(true);  // Modify through iterator
@@ -664,7 +664,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * const QTomlHash config{{"version", QTomlValue("1.0")}};
+	 * const QTomlObject config{{"version", QTomlValue("1.0")}};
 	 * auto it = config.find("version");
 	 * if (it != config.end()) {
 	 *     QString version = it.value().toString();
@@ -692,7 +692,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config{{"key1", QTomlValue(1)}, {"key2", QTomlValue(2)}};
+	 * QTomlObject config{{"key1", QTomlValue(1)}, {"key2", QTomlValue(2)}};
 	 * Q_ASSERT(config.size() == 2);
 	 *
 	 * config.insert("key3", QTomlValue(3));
@@ -733,7 +733,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash table;
+	 * QTomlObject table;
 	 * Q_ASSERT(table.isEmpty());
 	 *
 	 * table.insert("key", QTomlValue(42));
@@ -762,7 +762,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * const QTomlHash config{{"port", QTomlValue(8080)}};
+	 * const QTomlObject config{{"port", QTomlValue(8080)}};
 	 * int port = config["port"].toInteger();  // Safe read-only access
 	 * QTomlValue missing = config["nonexistent"];  // Returns Null value
 	 * @endcode
@@ -787,7 +787,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config;
+	 * QTomlObject config;
 	 * config["host"] = QTomlValue("localhost");  // Creates key if missing
 	 * config["port"] = QTomlValue(8080);
 	 *
@@ -817,7 +817,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config{{"key1", QTomlValue(1)}, {"key2", QTomlValue(2)}};
+	 * QTomlObject config{{"key1", QTomlValue(1)}, {"key2", QTomlValue(2)}};
 	 *
 	 * for (auto it = config.begin(); it != config.end(); ++it) {
 	 *     // Modify values through iterator
@@ -842,7 +842,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * const QTomlHash config{{"key1", QTomlValue(1)}, {"key2", QTomlValue(2)}};
+	 * const QTomlObject config{{"key1", QTomlValue(1)}, {"key2", QTomlValue(2)}};
 	 *
 	 * for (auto it = config.begin(); it != config.end(); ++it) {
 	 *     qDebug() << it.key() << "=" << it.value().toInteger();
@@ -882,7 +882,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config{{"key1", QTomlValue(1)}, {"key2", QTomlValue(2)}};
+	 * QTomlObject config{{"key1", QTomlValue(1)}, {"key2", QTomlValue(2)}};
 	 *
 	 * // Standard iteration pattern
 	 * for (auto it = config.begin(); it != config.end(); ++it) {
@@ -944,7 +944,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config{{"host", QTomlValue("localhost")}, {"port", QTomlValue(8080)}, {"ssl", QTomlValue(true)}};
+	 * QTomlObject config{{"host", QTomlValue("localhost")}, {"port", QTomlValue(8080)}, {"ssl", QTomlValue(true)}};
 	 * QVariantMap variants = config.toVariantMap();
 	 *
 	 * Q_ASSERT(variants.size() == 3);
@@ -959,9 +959,9 @@ public:
 	QVariantMap toVariantMap() const;
 
 	/**
-	 * @brief Creates a QTomlHash from a QVariantMap.
+	 * @brief Creates a QTomlObject from a QVariantMap.
 	 *
-	 * Converts a QVariantMap to a QTomlHash by attempting to convert each
+	 * Converts a QVariantMap to a QTomlObject by attempting to convert each
 	 * QVariant to a QTomlValue. This is useful for integrating with Qt APIs
 	 * that provide data as QVariant containers.
 	 *
@@ -970,7 +970,7 @@ public:
 	 * default-constructed QTomlValue (Null) may be used.
 	 *
 	 * @param map The QVariantMap to convert
-	 * @return QTomlHash containing the converted key-value pairs
+	 * @return QTomlObject containing the converted key-value pairs
 	 *
 	 * @complexity O(n) where n is the number of key-value pairs in the map
 	 * @threadsafety Thread-safe (creates new instance)
@@ -982,7 +982,7 @@ public:
 	 * qtMap["port"] = 8080;
 	 * qtMap["ssl"] = true;
 	 *
-	 * QTomlHash config = QTomlHash::fromVariantMap(qtMap);
+	 * QTomlObject config = QTomlObject::fromVariantMap(qtMap);
 	 * Q_ASSERT(config.size() == 3);
 	 * Q_ASSERT(config["host"].toString() == "localhost");
 	 * @endcode
@@ -991,7 +991,7 @@ public:
 	 * @note Not all QVariant types may be representable in TOML
 	 * @see toVariantMap(), QTomlValue conversion constructors
 	 */
-	static QTomlHash fromVariantMap(const QVariantMap& map);
+	static QTomlObject fromVariantMap(const QVariantMap& map);
 
 private:
 	/**
@@ -1008,7 +1008,7 @@ private:
 	 * - Capacity management data
 	 * - Performance optimization structures
 	 */
-	std::unique_ptr<class QTomlHashPrivate> d_ptr;
+	std::unique_ptr<class QTomlObjectPrivate> d_ptr;
 };
 
-Q_DECLARE_METATYPE(QTomlHash)
+Q_DECLARE_METATYPE(QTomlObject)

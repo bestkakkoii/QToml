@@ -24,7 +24,7 @@
     <ClCompile Include="..\..\..\src\qtomldocument.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\qtomlhash.cpp">
+    <ClCompile Include="..\..\..\src\qtomlobject.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\qtomlparseerror.cpp">
@@ -44,7 +44,7 @@
     <QtMoc Include="..\..\..\include\QToml\qtomldocument.h">
       <Filter>include</Filter>
     </QtMoc>
-    <QtMoc Include="..\..\..\include\QToml\qtomlhash.h">
+    <QtMoc Include="..\..\..\include\QToml\qtomlobject.h">
       <Filter>include</Filter>
     </QtMoc>
     <QtMoc Include="..\..\..\include\QToml\qtomlparseerror.h">
@@ -64,7 +64,7 @@
     <ClInclude Include="..\..\..\src\qtomldocument_p.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\qtomlhash_p.h">
+    <ClInclude Include="..\..\..\src\qtomlobject_p.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\qtomlparseerror_p.h">

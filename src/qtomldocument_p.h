@@ -60,7 +60,7 @@
 #pragma once
 #pragma execution_character_set("utf-8")
 
-#include "qtomlhash.h"
+#include "qtomlobject.h"
 
   /**
    * @class QTomlDocumentPrivate
@@ -88,7 +88,7 @@
    *
    * Data layout strategy:
    * The class stores minimal state information:
-   * - Root table data (QTomlHash) for actual document content
+   * - Root table data (QTomlObject) for actual document content
    * - Null flag (bool) for initialization state tracking
    *
    * This approach minimizes memory overhead while providing all necessary
@@ -106,7 +106,7 @@
    * @note The class is designed for use only within QTomlDocument implementation
    *
    * @see QTomlDocument for the public interface
-   * @see QTomlHash for root table storage
+   * @see QTomlObject for root table storage
    * @see PIMPL pattern documentation for design rationale
    */
 class QTomlDocumentPrivate
@@ -125,12 +125,12 @@ public:
 	 *
 	 * Initial state characteristics:
 	 * - is_null_ is set to true indicating uninitialized state
-	 * - root_hash_ is default-constructed (empty but valid QTomlHash)
+	 * - root_hash_ is default-constructed (empty but valid QTomlObject)
 	 * - Document cannot be serialized until is_null_ becomes false
 	 * - State can be changed through QTomlDocument::setHash() or parsing operations
 	 *
 	 * @complexity O(1) - Constant time construction
-	 * @exception Strong exception safety through QTomlHash default constructor
+	 * @exception Strong exception safety through QTomlObject default constructor
 	 *
 	 * @note Uses member initializer list for optimal performance
 	 * @note Null state is distinct from empty document state
@@ -162,23 +162,23 @@ public:
 	 *
 	 * Copy behavior:
 	 * - is_null_ flag is copied exactly
-	 * - root_hash_ is deep-copied through QTomlHash copy constructor
+	 * - root_hash_ is deep-copied through QTomlObject copy constructor
 	 * - All nested content within the hash is recursively copied
 	 * - Result is completely independent of the source object
 	 *
 	 * Performance characteristics:
 	 * - Time complexity depends on root_hash_ content size
-	 * - QTomlHash uses Qt's implicit sharing for efficiency where possible
+	 * - QTomlObject uses Qt's implicit sharing for efficiency where possible
 	 * - State copying is O(1), content copying is O(n) where n is element count
 	 *
 	 * @param other The QTomlDocumentPrivate instance to copy from
 	 *
 	 * @complexity O(n) where n is the number of elements in root_hash_
-	 * @exception Strong exception safety through QTomlHash copy constructor
+	 * @exception Strong exception safety through QTomlObject copy constructor
 	 *
 	 * @note Compiler-generated version is explicitly declared for clarity
 	 * @note Creates completely independent copy suitable for separate modification
-	 * @note QTomlHash copy constructor handles all nested data copying
+	 * @note QTomlObject copy constructor handles all nested data copying
 	 *
 	 * @example Internal copy semantics:
 	 * @code
@@ -202,7 +202,7 @@ public:
 	/**
 	 * @brief The root table containing all document data.
 	 *
-	 * This QTomlHash contains the complete hierarchical structure of the TOML
+	 * This QTomlObject contains the complete hierarchical structure of the TOML
 	 * document's root table. According to TOML specification, every document
 	 * must have a root table, which this member represents.
 	 *
@@ -219,7 +219,7 @@ public:
 	 * - Non-empty hash with is_null_ = false represents populated document
 	 *
 	 * Performance considerations:
-	 * - QTomlHash uses Qt's efficient hash table implementation
+	 * - QTomlObject uses Qt's efficient hash table implementation
 	 * - Supports fast key lookups and iteration
 	 * - May use copy-on-write optimization for efficient copying
 	 * - Memory usage scales with document content size
@@ -244,17 +244,17 @@ public:
 	 * impl.root_hash_.insert("version", QTomlValue("1.0.0"));
 	 *
 	 * // Accessing nested structures
-	 * QTomlHash database;
+	 * QTomlObject database;
 	 * database.insert("host", QTomlValue("localhost"));
 	 * impl.root_hash_.insert("database", QTomlValue(database));
 	 *
 	 * // Content is now fully accessible through root_hash_
 	 * @endcode
 	 *
-	 * @see QTomlHash for table implementation details
+	 * @see QTomlObject for table implementation details
 	 * @see is_null_ for state management information
 	 */
-	QTomlHash root_hash_;
+	QTomlObject root_hash_;
 
 	/**
 	 * @brief Flag indicating whether the document is in null (uninitialized) state.

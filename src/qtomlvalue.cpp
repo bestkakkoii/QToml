@@ -56,7 +56,7 @@
   * - **String**: QString for UTF-8 text with Unicode support
   * - **DateTime**: QTomlDateTime for RFC 3339 compliant timestamps
   * - **Array**: QTomlArray for ordered, heterogeneous collections
-  * - **Hash**: QTomlHash for unordered key-value mappings
+  * - **Hash**: QTomlObject for unordered key-value mappings
   *
   * Performance characteristics:
   * - Storage size equals largest contained type plus discriminator
@@ -92,7 +92,7 @@
 #include "qtomlvalue.h"
 #include "qtomlvalue_p.h"
 #include "qtomlarray.h"
-#include "qtomlhash.h"
+#include "qtomlobject.h"
 #include "qtomldatetime.h"
 
 #include <QMetaType>
@@ -142,7 +142,7 @@ namespace
  * - **String**: Empty QString (no text content)
  * - **DateTime**: Empty QTomlDateTime (invalid date-time)
  * - **Array**: Empty QTomlArray (no elements)
- * - **Hash**: Empty QTomlHash (no key-value pairs)
+ * - **Hash**: Empty QTomlObject (no key-value pairs)
  *
  * @param type The QTomlValue::Type to create, defaults to Null
  *
@@ -177,7 +177,7 @@ QTomlValue::QTomlValue(Type type) noexcept
 	case String:   d_ptr->value_.emplace<QString>();          break;
 	case DateTime: d_ptr->value_.emplace<QTomlDateTime>();    break;
 	case Array:    d_ptr->value_.emplace<QTomlArray>();       break;
-	case Hash:     d_ptr->value_.emplace<QTomlHash>();        break;
+	case Hash:     d_ptr->value_.emplace<QTomlObject>();        break;
 	case Null:
 	case Undefined:
 	default:       d_ptr->value_.emplace<std::monostate>();   break;
@@ -462,13 +462,13 @@ QTomlValue::QTomlValue(QTomlArray&& a) noexcept
 }
 
 /**
- * @brief QTomlHash constructor with copy semantics.
+ * @brief QTomlObject constructor with copy semantics.
  *
- * Creates a QTomlValue containing a QTomlHash using copy semantics.
+ * Creates a QTomlValue containing a QTomlObject using copy semantics.
  * The hash table content is deep-copied, ensuring complete independence
  * between the source table and the stored table.
  *
- * @param h The QTomlHash object to copy
+ * @param h The QTomlObject object to copy
  *
  * @complexity O(n) where n is the number of key-value pairs
  * @exception Strong exception safety guarantee
@@ -479,13 +479,13 @@ QTomlValue::QTomlValue(QTomlArray&& a) noexcept
  *
  * @example
  * @code
- * QTomlHash original{{"key1", QTomlValue(42)}};
+ * QTomlObject original{{"key1", QTomlValue(42)}};
  * QTomlValue value(original);
  * original.insert("key2", QTomlValue(24)); // Safe to modify original
  * Q_ASSERT(value.toHash().size() == 1);
  * @endcode
  */
-QTomlValue::QTomlValue(const QTomlHash& h)
+QTomlValue::QTomlValue(const QTomlObject& h)
 	: d_ptr(std::make_unique<QTomlValuePrivate>())
 {
 	d_ptr->type_ = Hash;
@@ -493,13 +493,13 @@ QTomlValue::QTomlValue(const QTomlHash& h)
 }
 
 /**
- * @brief QTomlHash constructor with move semantics optimization.
+ * @brief QTomlObject constructor with move semantics optimization.
  *
- * Creates a QTomlValue containing a QTomlHash using move semantics
+ * Creates a QTomlValue containing a QTomlObject using move semantics
  * to avoid deep copying. The source hash becomes empty but remains
  * in a valid state after the move.
  *
- * @param h The QTomlHash object to move (rvalue reference)
+ * @param h The QTomlObject object to move (rvalue reference)
  *
  * @complexity O(1) - Constant time
  * @exception Strong exception safety guarantee
@@ -510,13 +510,13 @@ QTomlValue::QTomlValue(const QTomlHash& h)
  *
  * @example
  * @code
- * QTomlHash temp = generateLargeHash();
+ * QTomlObject temp = generateLargeHash();
  * QTomlValue value(std::move(temp));      // Efficient move
  * // temp is now empty but valid
  * Q_ASSERT(temp.isEmpty());
  * @endcode
  */
-QTomlValue::QTomlValue(QTomlHash&& h) noexcept
+QTomlValue::QTomlValue(QTomlObject&& h) noexcept
 	: d_ptr(std::make_unique<QTomlValuePrivate>())
 {
 	d_ptr->type_ = Hash;
@@ -864,12 +864,12 @@ qint64 QTomlValue::toInteger(qint64 defaultValue) const noexcept
 }
 
 /**
- * @brief Converts value to QTomlHash with type safety.
+ * @brief Converts value to QTomlObject with type safety.
  *
- * Returns the contained QTomlHash if the value is of Hash type,
- * otherwise returns an empty QTomlHash.
+ * Returns the contained QTomlObject if the value is of Hash type,
+ * otherwise returns an empty QTomlObject.
  *
- * @return QTomlHash content or empty hash if wrong type
+ * @return QTomlObject content or empty hash if wrong type
  *
  * @complexity O(1) for type checking, O(n) for hash copying
  * @exception Strong exception safety guarantee
@@ -879,22 +879,22 @@ qint64 QTomlValue::toInteger(qint64 defaultValue) const noexcept
  *
  * @example
  * @code
- * QTomlValue hashValue(QTomlHash{{"key", QTomlValue(42)}});
- * QTomlHash hash = hashValue.toHash();
+ * QTomlValue hashValue(QTomlObject{{"key", QTomlValue(42)}});
+ * QTomlObject hash = hashValue.toHash();
  * Q_ASSERT(hash.size() == 1);
  *
  * QTomlValue stringValue("not a hash");
- * QTomlHash empty = stringValue.toHash();
+ * QTomlObject empty = stringValue.toHash();
  * Q_ASSERT(empty.isEmpty());
  * @endcode
  */
-QTomlHash QTomlValue::toHash() const
+QTomlObject QTomlValue::toHash() const
 {
-	if (const auto* hash = std::get_if<QTomlHash>(&d_ptr->value_))
+	if (const auto* hash = std::get_if<QTomlObject>(&d_ptr->value_))
 	{
 		return *hash;
 	}
-	return QTomlHash();
+	return QTomlObject();
 }
 
 /**

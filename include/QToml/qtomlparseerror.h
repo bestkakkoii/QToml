@@ -108,7 +108,7 @@
    * QTomlParseError error;
    * QTomlDocument doc = QTomlDocument::fromToml(tomlData, &error);
    *
-   * if (!error.errorString().contains("No error")) {
+   * if (error.hasError()) {
    *     qWarning() << "TOML parsing failed:" << error.errorString();
    *     qWarning() << "Error location: line" << error.line
    *                << "column" << error.column;
@@ -121,7 +121,7 @@
    * QTomlParseError error;
    * QTomlDocument doc = QTomlDocument::fromToml(problemData, &error);
    *
-   * if (!error.errorString().contains("No error")) {
+   * if (error.hasError()) {
    *     // Extract the problematic line for highlighting
    *     QStringList lines = QString::fromUtf8(problemData).split('\n');
    *     if (error.line <= lines.size()) {
@@ -168,7 +168,7 @@ public:
 	 * @example
 	 * @code
 	 * QTomlParseError error;  // No error state
-	 * Q_ASSERT(error.errorString().contains("No error"));
+	 * Q_ASSERT(!error.hasError());
 	 * Q_ASSERT(error.offset >= 0);
 	 * Q_ASSERT(error.line >= 1);
 	 * Q_ASSERT(error.column >= 1);
@@ -312,6 +312,8 @@ public:
 	 */
 	QString errorString() const noexcept;
 
+	bool hasError() const noexcept { return errorString().isEmpty(); }
+
 	// ==================== Public Position Information ====================
 
 	/**
@@ -344,7 +346,7 @@ public:
 	 * QTomlParseError error;
 	 * QTomlDocument::fromToml(data, &error);
 	 *
-	 * if (!error.errorString().contains("No error")) {
+	 * if (error.hasError()) {
 	 *     // Extract 10 characters around the error for context
 	 *     int start = qMax(0, error.offset - 5);
 	 *     int length = qMin(10, data.size() - start);
@@ -384,7 +386,7 @@ public:
 	 * QTomlParseError error;
 	 * QTomlDocument::fromToml(multilineData, &error);
 	 *
-	 * if (!error.errorString().contains("No error")) {
+	 * if (error.hasError()) {
 	 *     qWarning() << QString("Error at line %1, column %2: %3")
 	 *                   .arg(error.line)
 	 *                   .arg(error.column)
@@ -425,7 +427,7 @@ public:
 	 * QTomlParseError error;
 	 * QTomlDocument::fromToml(tomlLine.toUtf8(), &error);
 	 *
-	 * if (!error.errorString().contains("No error")) {
+	 * if (error.hasError()) {
 	 *     // Create visual pointer to error location
 	 *     QString pointer = QString(error.column - 1, ' ') + "^";
 	 *     qDebug() << tomlLine;

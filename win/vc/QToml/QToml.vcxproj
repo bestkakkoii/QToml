@@ -30,7 +30,7 @@
     <ClCompile Include="..\..\..\src\qtomlarray.cpp" />
     <ClCompile Include="..\..\..\src\qtomldatetime.cpp" />
     <ClCompile Include="..\..\..\src\qtomldocument.cpp" />
-    <ClCompile Include="..\..\..\src\qtomlhash.cpp" />
+    <ClCompile Include="..\..\..\src\qtomlobject.cpp" />
     <ClCompile Include="..\..\..\src\qtomlparseerror.cpp" />
     <ClCompile Include="..\..\..\src\qtomlvalue.cpp" />
     <ClCompile Include="main.cpp" />
@@ -45,7 +45,7 @@
     <QtMoc Include="..\..\..\include\QToml\qtomldocument.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="..\..\..\include\QToml\qtomlhash.h" />
+    <QtMoc Include="..\..\..\include\QToml\qtomlobject.h" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="..\..\..\include\QToml\qtomlparseerror.h" />
@@ -57,7 +57,7 @@
     <ClInclude Include="..\..\..\src\qtomlarray_p.h" />
     <ClInclude Include="..\..\..\src\qtomldatetime_p.h" />
     <ClInclude Include="..\..\..\src\qtomldocument_p.h" />
-    <ClInclude Include="..\..\..\src\qtomlhash_p.h" />
+    <ClInclude Include="..\..\..\src\qtomlobject_p.h" />
     <ClInclude Include="..\..\..\src\qtomlparseerror_p.h" />
     <ClInclude Include="..\..\..\src\qtomlvalue_p.h" />
   </ItemGroup>

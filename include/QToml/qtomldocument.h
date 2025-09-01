@@ -39,7 +39,7 @@
   *
   * The QTomlDocument class encapsulates complete TOML document structures and provides
   * standard interfaces for external data exchange. Following TOML specification requirements,
-  * every TOML document must have a root table, which is represented internally using QTomlHash.
+  * every TOML document must have a root table, which is represented internally using QTomlObject.
   *
   * Key features:
   * - TOML parsing: Convert UTF-8 encoded TOML text to structured data
@@ -69,10 +69,10 @@
   * - Copy construction is thread-safe with proper synchronization
   * - Immutable operations can be safely called from multiple threads
   *
-  * @note All TOML documents must have a root table; empty documents are represented as empty QTomlHash
+  * @note All TOML documents must have a root table; empty documents are represented as empty QTomlObject
   * @note Supports all TOML v1.0.0 specification features including complex nested structures
   * @note Parsing operations are thread-safe, but individual objects should not be shared between threads
-  * @see QTomlHash, QTomlParseError, QTomlValue
+  * @see QTomlObject, QTomlParseError, QTomlValue
   * @see https://toml.io/en/v1.0.0 for TOML specification details
   */
 
@@ -85,7 +85,7 @@
 #include <QVariant>
 #include <memory>
 
-class QTomlHash;
+class QTomlObject;
 class QTomlParseError;
 
 /**
@@ -97,7 +97,7 @@ class QTomlParseError;
  * provides standard interfaces for external data exchange.
  *
  * According to TOML specification, every TOML document's root element must be a table,
- * therefore QTomlDocument uses QTomlHash internally to represent the document's root structure.
+ * therefore QTomlDocument uses QTomlObject internally to represent the document's root structure.
  * This design ensures complete compatibility with TOML specification requirements.
  *
  * Main feature set:
@@ -127,10 +127,10 @@ class QTomlParseError;
  * - Copy construction is thread-safe with proper synchronization
  * - Immutable operations can be safely called from multiple threads
  *
- * @note All TOML documents must have a root table; empty documents are represented as empty QTomlHash
+ * @note All TOML documents must have a root table; empty documents are represented as empty QTomlObject
  * @note Supports all TOML v1.0.0 specification features including complex nested structures
  * @note Parsing process is thread-safe, but individual objects should not be shared between threads
- * @see QTomlHash, QTomlParseError, QTomlValue
+ * @see QTomlObject, QTomlParseError, QTomlValue
  *
  * @example Basic usage:
  * @code
@@ -144,14 +144,14 @@ class QTomlParseError;
  *
  * QTomlParseError error;
  * QTomlDocument doc = QTomlDocument::fromToml(tomlData, &error);
- * if (!error.errorString().contains("No error")) {
+ * if (error.hasError()) {
  *     qWarning() << "Parse error:" << error.errorString();
  *     return;
  * }
  *
  * // Access data
- * QTomlHash root = doc.hash();
- * QTomlHash database = root["database"].toHash();
+ * QTomlObject root = doc.hash();
+ * QTomlObject database = root["database"].toHash();
  * QString host = database["host"].toString();
  * int port = database["port"].toInteger();
  *
@@ -174,7 +174,7 @@ public:
 	 * @brief Default constructor creating an empty TOML document.
 	 *
 	 * Creates an object representing an empty TOML document. The empty document contains
-	 * an empty root table (QTomlHash) internally, with isNull() returning true and
+	 * an empty root table (QTomlObject) internally, with isNull() returning true and
 	 * isEmpty() also returning true.
 	 *
 	 * Empty documents are valid TOML documents and can be serialized to empty strings
@@ -194,7 +194,7 @@ public:
 	 * Q_ASSERT(doc.isEmpty());            // Verify empty state
 	 *
 	 * // Document is ready for use
-	 * QTomlHash config;
+	 * QTomlObject config;
 	 * config.insert("version", QTomlValue("1.0"));
 	 * doc.setHash(config);                // Now populated
 	 * Q_ASSERT(!doc.isNull());            // No longer null
@@ -203,15 +203,15 @@ public:
 	QTomlDocument() noexcept;
 
 	/**
-	 * @brief Constructs TOML document from QTomlHash.
+	 * @brief Constructs TOML document from QTomlObject.
 	 *
-	 * Creates a TOML document using the given QTomlHash as the root table.
+	 * Creates a TOML document using the given QTomlObject as the root table.
 	 * This is the standard method for creating documents with initial content.
 	 *
 	 * The input hash is copied into the document, so the original object
 	 * remains unchanged and can be safely modified after construction.
 	 *
-	 * @param hash The QTomlHash object to use as the document's root table
+	 * @param hash The QTomlObject object to use as the document's root table
 	 *
 	 * @complexity O(n) where n is the number of elements in the hash
 	 * @exception Strong exception safety guarantee
@@ -222,7 +222,7 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config;
+	 * QTomlObject config;
 	 * config.insert("version", QTomlValue("1.0.0"));
 	 * config.insert("debug", QTomlValue(false));
 	 *
@@ -235,7 +235,7 @@ public:
 	 * Q_ASSERT(!doc.hash().contains("new_key"));  // Document unchanged
 	 * @endcode
 	 */
-	explicit QTomlDocument(const QTomlHash& hash);
+	explicit QTomlDocument(const QTomlObject& hash);
 
 	/**
 	 * @brief Copy constructor creating deep copy of another document.
@@ -259,7 +259,7 @@ public:
 	 * QTomlDocument copy(original);
 	 *
 	 * // Verify independence
-	 * QTomlHash copyRoot = copy.hash();
+	 * QTomlObject copyRoot = copy.hash();
 	 * copyRoot.insert("new_item", QTomlValue(42));
 	 * copy.setHash(copyRoot);
 	 *
@@ -291,7 +291,7 @@ public:
 	 * @example
 	 * @code
 	 * QTomlDocument createDocument() {
-	 *     QTomlHash config;
+	 *     QTomlObject config;
 	 *     config.insert("temp", QTomlValue("data"));
 	 *     return QTomlDocument(config);  // Move constructor called
 	 * }
@@ -415,7 +415,7 @@ public:
 	 * QTomlDocument doc;
 	 * Q_ASSERT(!doc.isHash());            // Default construction is null
 	 *
-	 * QTomlHash emptyHash;
+	 * QTomlObject emptyHash;
 	 * doc.setHash(emptyHash);
 	 * Q_ASSERT(doc.isHash());             // Now contains valid (empty) table
 	 *
@@ -446,7 +446,7 @@ public:
 	 * QTomlDocument doc;
 	 * Q_ASSERT(doc.isNull());             // Default construction is null
 	 *
-	 * QTomlHash emptyHash;
+	 * QTomlObject emptyHash;
 	 * doc.setHash(emptyHash);
 	 * Q_ASSERT(!doc.isNull());            // No longer null (has empty table)
 	 * Q_ASSERT(doc.isEmpty());            // But is empty (table has no content)
@@ -479,11 +479,11 @@ public:
 	 * QTomlDocument doc;
 	 * Q_ASSERT(doc.isEmpty());            // Default construction is empty
 	 *
-	 * QTomlHash emptyHash;
+	 * QTomlObject emptyHash;
 	 * doc.setHash(emptyHash);
 	 * Q_ASSERT(doc.isEmpty());            // Empty table is still empty
 	 *
-	 * QTomlHash filledHash;
+	 * QTomlObject filledHash;
 	 * filledHash.insert("key", QTomlValue("value"));
 	 * doc.setHash(filledHash);
 	 * Q_ASSERT(!doc.isEmpty());           // Now contains data
@@ -500,7 +500,7 @@ public:
 	 * top-level key-value pairs and serves as the primary entry point for
 	 * accessing and modifying document content.
 	 *
-	 * @return Copy of document's root table as QTomlHash, or empty table if document is empty
+	 * @return Copy of document's root table as QTomlObject, or empty table if document is empty
 	 *
 	 * @complexity O(n) where n is the number of elements in the root table
 	 * @exception Strong exception safety guarantee
@@ -512,7 +512,7 @@ public:
 	 * @example
 	 * @code
 	 * QTomlDocument doc = QTomlDocument::fromToml(tomlData);
-	 * QTomlHash root = doc.hash();
+	 * QTomlObject root = doc.hash();
 	 *
 	 * // Modify content
 	 * root.insert("new_key", QTomlValue("new_value"));
@@ -522,12 +522,12 @@ public:
 	 * Q_ASSERT(doc.hash().contains("new_key"));
 	 * @endcode
 	 */
-	QTomlHash hash() const;
+	QTomlObject hash() const;
 
 	/**
 	 * @brief Sets the document's root table.
 	 *
-	 * Sets the specified QTomlHash as the document's root table, replacing
+	 * Sets the specified QTomlObject as the document's root table, replacing
 	 * existing content. This is the standard method for modifying document content.
 	 *
 	 * The input hash is copied into the document, so the original object
@@ -546,7 +546,7 @@ public:
 	 * @example
 	 * @code
 	 * QTomlDocument doc;
-	 * QTomlHash config;
+	 * QTomlObject config;
 	 * config.insert("app_name", QTomlValue("MyApp"));
 	 *
 	 * doc.setHash(config);  // Set document content
@@ -558,7 +558,7 @@ public:
 	 * Q_ASSERT(!doc.isEmpty());           // Document unchanged
 	 * @endcode
 	 */
-	void setHash(const QTomlHash& hash);
+	void setHash(const QTomlObject& hash);
 
 	// ==================== TOML Parsing and Serialization ====================
 
@@ -609,7 +609,7 @@ public:
 	 * QTomlParseError error;
 	 * QTomlDocument doc = QTomlDocument::fromToml(tomlData, &error);
 	 *
-	 * if (error.errorString().contains("No error")) {
+	 * if (!error.hasError()) {
 	 *     qDebug() << "Parsing successful";
 	 *     // Use document data...
 	 * } else {
@@ -646,11 +646,11 @@ public:
 	 *
 	 * @example
 	 * @code
-	 * QTomlHash config;
+	 * QTomlObject config;
 	 * config.insert("app_name", QTomlValue("My App"));
 	 * config.insert("debug", QTomlValue(true));
 	 *
-	 * QTomlHash database;
+	 * QTomlObject database;
 	 * database.insert("host", QTomlValue("localhost"));
 	 * database.insert("port", QTomlValue(5432));
 	 * config.insert("database", QTomlValue(database));
@@ -679,7 +679,7 @@ public:
 	 *
 	 * Attempts to convert a QVariant object to QTomlDocument. Supports the following conversions:
 	 * - QVariant containing QTomlDocument: Direct extraction
-	 * - QVariant containing QVariantMap: Convert to QTomlHash then create document
+	 * - QVariant containing QVariantMap: Convert to QTomlObject then create document
 	 * - Other types: Return empty document
 	 *
 	 * This method facilitates data exchange with other Qt components, particularly
@@ -765,7 +765,7 @@ private:
 	 *
 	 * Private implementation contains:
 	 * - Document state flags (null status, validity flags)
-	 * - Root table data (QTomlHash)
+	 * - Root table data (QTomlObject)
 	 * - Internal caching and optimization data structures
 	 *
 	 * @note Uses std::unique_ptr for automatic memory management

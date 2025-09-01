@@ -72,7 +72,7 @@
 
 #include "qtomldocument.h"
 #include "qtomldocument_p.h"
-#include "qtomlhash.h"
+#include "qtomlobject.h"
 #include "qtomlarray.h"
 #include "qtomldatetime.h"
 #include "qtomlparseerror.h"
@@ -98,42 +98,42 @@ namespace
 	QTomlValue convert_node_to_value(const toml::node& node);
 
 	/**
-	 * @brief Converts toml::table to QTomlHash with performance optimizations.
+	 * @brief Converts toml::table to QTomlObject with performance optimizations.
 	 *
-	 * This function efficiently converts a toml++ table object to a QTomlHash,
+	 * This function efficiently converts a toml++ table object to a QTomlObject,
 	 * using optimized string conversion techniques to minimize memory allocations
 	 * and copying operations.
 	 *
 	 * The conversion process:
-	 * 1. Creates an empty QTomlHash container
+	 * 1. Creates an empty QTomlObject container
 	 * 2. Iterates through all key-value pairs in the toml::table
 	 * 3. Converts keys directly from string_view to QString (zero-copy when possible)
 	 * 4. Recursively converts values using convert_node_to_value()
-	 * 5. Inserts converted pairs into the QTomlHash
+	 * 5. Inserts converted pairs into the QTomlObject
 	 *
 	 * Performance optimizations:
 	 * - Direct string_view to QString conversion avoids intermediate std::string objects
 	 * - Uses structured bindings for efficient iteration
-	 * - Leverages QTomlHash's efficient insertion methods
+	 * - Leverages QTomlObject's efficient insertion methods
 	 * - No unnecessary memory pre-allocation (let QHash manage capacity)
 	 *
 	 * @param table The toml++ table object to convert
-	 * @return Converted QTomlHash containing all key-value pairs
+	 * @return Converted QTomlObject containing all key-value pairs
 	 *
 	 * @complexity O(n) where n is the number of key-value pairs in the table
 	 * @exception Strong exception safety guarantee through Qt container behavior
 	 *
 	 * @note Key conversion preserves UTF-8 encoding and Unicode characters
 	 * @note Nested tables and arrays are recursively converted
-	 * @note Empty tables result in empty QTomlHash objects
+	 * @note Empty tables result in empty QTomlObject objects
 	 *
 	 * @see convert_node_to_value() for value conversion details
-	 * @see QTomlHash::insert() for insertion behavior
+	 * @see QTomlObject::insert() for insertion behavior
 	 */
-	QTomlHash convert_table_to_hash(const toml::table& table)
+	QTomlObject convert_table_to_hash(const toml::table& table)
 	{
-		QTomlHash hash;
-		// Note: QTomlHash may not support reserve, so reserve call is omitted
+		QTomlObject hash;
+		// Note: QTomlObject may not support reserve, so reserve call is omitted
 
 		for (const auto& [key, val] : table)
 		{
@@ -197,7 +197,7 @@ namespace
 	 * error handling for unsupported or invalid node types.
 	 *
 	 * Supported node type conversions:
-	 * - **toml::table**: Converted to QTomlValue containing QTomlHash
+	 * - **toml::table**: Converted to QTomlValue containing QTomlObject
 	 * - **toml::array**: Converted to QTomlValue containing QTomlArray
 	 * - **toml::string**: Converted to QTomlValue containing QString (UTF-8)
 	 * - **toml::integer**: Converted to QTomlValue containing qint64
@@ -288,7 +288,7 @@ namespace
 	// --- Serialization (To TOML) Helper Functions ---
 
 	// Forward declarations for recursive serialization
-	toml::table convert_hash_to_table(const QTomlHash& hash);
+	toml::table convert_hash_to_table(const QTomlObject& hash);
 	toml::array convert_array_to_toml_array(const QTomlArray& array);
 
 	/**
@@ -522,15 +522,15 @@ namespace
 	}
 
 	/**
-	 * @brief Converts QTomlHash to toml::table with move semantics optimization.
+	 * @brief Converts QTomlObject to toml::table with move semantics optimization.
 	 *
-	 * This function converts a QTomlHash to a toml::table for serialization,
+	 * This function converts a QTomlObject to a toml::table for serialization,
 	 * using move semantics where possible to optimize performance. It handles
 	 * null value filtering as required by TOML specification.
 	 *
 	 * The conversion process:
 	 * 1. Creates an empty toml::table
-	 * 2. Iterates through all key-value pairs in the QTomlHash
+	 * 2. Iterates through all key-value pairs in the QTomlObject
 	 * 3. Filters out null and undefined values (not supported by TOML)
 	 * 4. Converts keys to std::string using move semantics
 	 * 5. Recursively converts values using convert_value_to_toml()
@@ -541,7 +541,7 @@ namespace
 	 * - Direct iteration using Qt container iterators
 	 * - Efficient delegation to specialized conversion functions
 	 *
-	 * @param hash The QTomlHash object to convert
+	 * @param hash The QTomlObject object to convert
 	 * @return Converted toml::table ready for serialization
 	 *
 	 * @complexity O(n) where n is the number of valid key-value pairs
@@ -553,9 +553,9 @@ namespace
 	 * @note Empty hash results in empty toml::table
 	 *
 	 * @see convert_value_to_toml() for value conversion details
-	 * @see QTomlHash iteration for container interface
+	 * @see QTomlObject iteration for container interface
 	 */
-	toml::table convert_hash_to_table(const QTomlHash& hash)
+	toml::table convert_hash_to_table(const QTomlObject& hash)
 	{
 		toml::table table;
 		// Note: toml::table may not support reserve, so reserve call is omitted
@@ -641,16 +641,16 @@ QTomlDocument::QTomlDocument() noexcept
 }
 
 /**
- * @brief Constructs TOML document from QTomlHash.
+ * @brief Constructs TOML document from QTomlObject.
  *
  * Creates a QTomlDocument with the specified hash as the root table.
  * The document immediately becomes valid and serializable.
  *
- * @param hash The QTomlHash to use as the document's root table
+ * @param hash The QTomlObject to use as the document's root table
  * @note Document becomes non-null and ready for serialization
  * @note Hash content is copied for independence
  */
-QTomlDocument::QTomlDocument(const QTomlHash& hash)
+QTomlDocument::QTomlDocument(const QTomlObject& hash)
 	: d_ptr(std::make_unique<QTomlDocumentPrivate>())
 {
 	d_ptr->is_null_ = false;
@@ -751,11 +751,11 @@ bool QTomlDocument::isEmpty() const noexcept
 
 /**
  * @brief Retrieves copy of the document's root table.
- * @return Copy of the root QTomlHash
+ * @return Copy of the root QTomlObject
  * @note Returns copy for safety; modifications don't affect original
  * @note Empty document returns empty hash
  */
-QTomlHash QTomlDocument::hash() const
+QTomlObject QTomlDocument::hash() const
 {
 	return d_ptr->root_hash_;
 }
@@ -770,7 +770,7 @@ QTomlHash QTomlDocument::hash() const
  * @note Document becomes non-null after setting
  * @note Hash content is copied for independence
  */
-void QTomlDocument::setHash(const QTomlHash& hash)
+void QTomlDocument::setHash(const QTomlObject& hash)
 {
 	d_ptr->is_null_ = false;
 	d_ptr->root_hash_ = hash;
@@ -785,7 +785,7 @@ void QTomlDocument::setHash(const QTomlHash& hash)
  * The parsing process:
  * 1. Creates string_view from QByteArray for zero-copy access
  * 2. Uses toml++ parser with full TOML v1.0.0 support
- * 3. Converts parsed toml::table to QTomlHash
+ * 3. Converts parsed toml::table to QTomlObject
  * 4. Returns populated document or null document on error
  *
  * @param toml UTF-8 encoded TOML text as QByteArray
@@ -833,7 +833,7 @@ QTomlDocument QTomlDocument::fromToml(const QByteArray& toml, QTomlParseError* e
  *
  * The serialization process:
  * 1. Checks if document is null (returns empty array if so)
- * 2. Converts QTomlHash to toml::table recursively
+ * 2. Converts QTomlObject to toml::table recursively
  * 3. Uses toml++ formatter for proper TOML formatting
  * 4. Converts output to UTF-8 QByteArray
  * 5. Handles any serialization errors gracefully
@@ -854,7 +854,7 @@ QByteArray QTomlDocument::toToml() const
 
 	try
 	{
-		// 1. Convert QTomlHash to toml::table
+		// 1. Convert QTomlObject to toml::table
 		toml::table root_table = convert_hash_to_table(d_ptr->root_hash_);
 
 		// 2. Use toml++ formatter to serialize table to string
@@ -899,7 +899,7 @@ QTomlDocument QTomlDocument::fromVariant(const QVariant& variant)
 	}
 	if (variant.canConvert<QVariantMap>())
 	{
-		return QTomlDocument(QTomlHash::fromVariantMap(variant.toMap()));
+		return QTomlDocument(QTomlObject::fromVariantMap(variant.toMap()));
 	}
 	return QTomlDocument();
 }

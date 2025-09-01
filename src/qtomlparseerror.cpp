@@ -120,7 +120,7 @@
 	* QTomlDocument doc = QTomlDocument::fromToml(data, &error);
 	*
 	* // Check for parsing success
-	* if (error.errorString().contains("No error")) {
+	* if (!error.hasError()) {
 	*     // Parsing succeeded, doc contains valid data
 	*     qDebug() << "TOML parsing successful";
 	* }
@@ -135,8 +135,6 @@ QTomlParseError::QTomlParseError() noexcept
 	, line(0)
 	, column(0)
 {
-	// Initialize with success message indicating no error occurred
-	d_ptr->formatted_error_string_ = QString(u"No error occurred");
 }
 
 /**

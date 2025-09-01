@@ -40,7 +40,7 @@
 
  // Forward declarations
 class QTomlArray;
-class QTomlHash;
+class QTomlObject;
 class QTomlDateTime;
 
 /**
@@ -71,7 +71,7 @@ class QTomlDateTime;
  *
  * @note All type checking and conversions are runtime-safe and will not produce undefined behavior
  * @note Supports implicit type conversion (such as Integer to Double), but preserves original type information
- * @see QTomlArray, QTomlHash, QTomlDateTime, QTomlDocument
+ * @see QTomlArray, QTomlObject, QTomlDateTime, QTomlDocument
  *
  * @example
  * @code
@@ -82,7 +82,7 @@ class QTomlDateTime;
  * QTomlValue doubleVal(3.14);                  // Double
  * QTomlValue stringVal("Hello, TOML!");        // String
  * QTomlValue arrayVal(QTomlArray{...});        // Array
- * QTomlValue hashVal(QTomlHash{...});          // Hash
+ * QTomlValue hashVal(QTomlObject{...});          // Hash
  *
  * // Type checking and safe conversion
  * if (intVal.isInteger()) {
@@ -260,28 +260,28 @@ public:
 	QTomlValue(QTomlArray&& a) noexcept;
 
 	/**
-	 * @brief QTomlHash constructor (copy version).
+	 * @brief QTomlObject constructor (copy version).
 	 *
-	 * Creates a QTomlValue from a QTomlHash object, performing a deep copy of the table content.
+	 * Creates a QTomlValue from a QTomlObject object, performing a deep copy of the table content.
 	 * The created QTomlValue type is Hash.
 	 *
-	 * @param h The QTomlHash object to copy
+	 * @param h The QTomlObject object to copy
 	 *
 	 * @note Time complexity is O(n), where n is the number of key-value pairs in the table
 	 */
-	QTomlValue(const QTomlHash& h);
+	QTomlValue(const QTomlObject& h);
 
 	/**
-	 * @brief QTomlHash constructor (move version).
+	 * @brief QTomlObject constructor (move version).
 	 *
-	 * Creates a QTomlValue from a QTomlHash using move semantics, avoiding deep copying.
+	 * Creates a QTomlValue from a QTomlObject using move semantics, avoiding deep copying.
 	 * The source table object becomes an empty table after the move but remains valid.
 	 *
-	 * @param h The QTomlHash object to move (rvalue reference)
+	 * @param h The QTomlObject object to move (rvalue reference)
 	 *
 	 * @note Marked as noexcept, time complexity is O(1), high performance
 	 */
-	QTomlValue(QTomlHash&& h) noexcept;
+	QTomlValue(QTomlObject&& h) noexcept;
 
 	/**
 	 * @brief QTomlDateTime constructor.
@@ -502,18 +502,18 @@ public:
 	qint64 toInteger(qint64 defaultValue = 0) const noexcept;
 
 	/**
-	 * @brief Converts the value to QTomlHash.
+	 * @brief Converts the value to QTomlObject.
 	 *
 	 * If the current value is of Hash type, returns its table content;
-	 * otherwise returns an empty QTomlHash object.
+	 * otherwise returns an empty QTomlObject object.
 	 *
-	 * @return QTomlHash object, empty table if type mismatch
+	 * @return QTomlObject object, empty table if type mismatch
 	 *
 	 * @note Only returns valid content when isHash() returns true
 	 * @note Returns a copy, modifications will not affect the original object
 	 * @see isHash()
 	 */
-	QTomlHash toHash() const;
+	QTomlObject toHash() const;
 
 	/**
 	 * @brief Converts the value to QTomlDateTime.
@@ -554,7 +554,7 @@ public:
 	 * - String → QVariant(QString)
 	 * - DateTime → QVariant::fromValue(QTomlDateTime)
 	 * - Array → QVariant::fromValue(QTomlArray)
-	 * - Hash → QVariant::fromValue(QTomlHash)
+	 * - Hash → QVariant::fromValue(QTomlObject)
 	 *
 	 * @return Corresponding QVariant object
 	 *
@@ -638,12 +638,12 @@ private:
 	friend class QTomlArray;
 
 	/**
-	 * @brief QTomlHash friend class allowing table operations on QTomlValue.
+	 * @brief QTomlObject friend class allowing table operations on QTomlValue.
 	 *
-	 * Enables QTomlHash to efficiently manage its values,
+	 * Enables QTomlObject to efficiently manage its values,
 	 * avoiding performance overhead through public interfaces.
 	 */
-	friend class QTomlHash;
+	friend class QTomlObject;
 
 	/**
 	 * @brief PIMPL pattern private implementation pointer.

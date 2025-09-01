@@ -30,10 +30,10 @@
  */
 
  /**
-  * @file qtomlhash.cpp
-  * @brief Implementation of QTomlHash class providing efficient TOML table operations.
+  * @file qtomlobject.cpp
+  * @brief Implementation of QTomlObject class providing efficient TOML table operations.
   *
-  * This file contains the complete implementation of the QTomlHash class, which represents
+  * This file contains the complete implementation of the QTomlObject class, which represents
   * TOML tables (key-value pair collections) with hash table efficiency. The implementation
   * uses the PIMPL pattern with QHash as the underlying container to provide optimal
   * performance for table operations while maintaining Qt framework integration.
@@ -73,14 +73,14 @@
   * @note This file only includes necessary headers to minimize compilation dependencies
   * @note All operations maintain TOML specification compliance for table behavior
   * @note Iterator invalidation follows Qt container rules
-  * @see qtomlhash.h for the public interface
+  * @see qtomlobject.h for the public interface
   * @see qtomlhash_p.h for private implementation details
   */
 
 #pragma execution_character_set("utf-8")
 
-#include "qtomlhash.h"
-#include "qtomlhash_p.h"
+#include "qtomlobject.h"
+#include "qtomlobject_p.h"
 #include "qtomlvalue.h"
 
 #include <QMetaType>
@@ -90,9 +90,9 @@
 namespace
 {
 	/**
-	 * @brief Global meta-type registration for QTomlHash.
+	 * @brief Global meta-type registration for QTomlObject.
 	 *
-	 * Ensures that QTomlHash is registered with Qt's meta-object system during
+	 * Ensures that QTomlObject is registered with Qt's meta-object system during
 	 * static initialization. This registration enables:
 	 * - Use in QVariant containers
 	 * - Signal and slot parameter passing
@@ -108,13 +108,13 @@ namespace
 	 * @note Enables type-safe QVariant operations
 	 * @see Q_DECLARE_METATYPE for type registration requirements
 	 */
-	const int q_toml_hash_metatype_id = qRegisterMetaType<QTomlHash>();
+	const int q_toml_hash_metatype_id = qRegisterMetaType<QTomlObject>();
 }
 
 /**
  * @brief Default constructor creating an empty TOML table.
  *
- * Initializes a QTomlHash with no key-value pairs using the PIMPL pattern.
+ * Initializes a QTomlObject with no key-value pairs using the PIMPL pattern.
  * The underlying QHash container is default-constructed, providing an empty
  * table ready for immediate use.
  *
@@ -133,20 +133,20 @@ namespace
  *
  * @example
  * @code
- * QTomlHash table;                    // Empty table
+ * QTomlObject table;                    // Empty table
  * Q_ASSERT(table.isEmpty());          // Verify empty state
  * table.insert("key", QTomlValue(42)); // Ready for use
  * @endcode
  */
-QTomlHash::QTomlHash() noexcept
-	: d_ptr(std::make_unique<QTomlHashPrivate>())
+QTomlObject::QTomlObject() noexcept
+	: d_ptr(std::make_unique<QTomlObjectPrivate>())
 {
 }
 
 /**
  * @brief Initializer list constructor for convenient table creation.
  *
- * Creates a QTomlHash with the provided key-value pairs using brace initialization
+ * Creates a QTomlObject with the provided key-value pairs using brace initialization
  * syntax. This constructor enables compile-time table creation with known content
  * and provides optimal performance through memory pre-allocation.
  *
@@ -173,7 +173,7 @@ QTomlHash::QTomlHash() noexcept
  *
  * @example
  * @code
- * QTomlHash config{
+ * QTomlObject config{
  *     {"host", QTomlValue("localhost")},
  *     {"port", QTomlValue(8080)},
  *     {"ssl", QTomlValue(true)}
@@ -181,8 +181,8 @@ QTomlHash::QTomlHash() noexcept
  * Q_ASSERT(config.size() == 3);
  * @endcode
  */
-QTomlHash::QTomlHash(std::initializer_list<std::pair<QString, QTomlValue>> args)
-	: d_ptr(std::make_unique<QTomlHashPrivate>())
+QTomlObject::QTomlObject(std::initializer_list<std::pair<QString, QTomlValue>> args)
+	: d_ptr(std::make_unique<QTomlObjectPrivate>())
 {
 	// Optimization: Pre-allocate space
 	d_ptr->values_.reserve(static_cast<qsizetype>(args.size()));
@@ -195,7 +195,7 @@ QTomlHash::QTomlHash(std::initializer_list<std::pair<QString, QTomlValue>> args)
 /**
  * @brief Copy constructor creating deep copy of another table.
  *
- * Creates a new QTomlHash instance that is an independent copy of the source
+ * Creates a new QTomlObject instance that is an independent copy of the source
  * table. Uses PIMPL pattern copy semantics to ensure complete data independence
  * while leveraging Qt's copy-on-write optimization where applicable.
  *
@@ -205,7 +205,7 @@ QTomlHash::QTomlHash(std::initializer_list<std::pair<QString, QTomlValue>> args)
  * - Qt's copy-on-write optimization for efficiency
  * - Exception-safe copying through Qt container guarantees
  *
- * @param other The QTomlHash instance to copy from
+ * @param other The QTomlObject instance to copy from
  *
  * @complexity O(1) due to copy-on-write, O(n) when actual copying occurs
  * @exception Strong exception safety guarantee
@@ -216,31 +216,31 @@ QTomlHash::QTomlHash(std::initializer_list<std::pair<QString, QTomlValue>> args)
  *
  * @example
  * @code
- * QTomlHash original{{"key1", QTomlValue(42)}};
- * QTomlHash copy(original);            // Efficient copy
+ * QTomlObject original{{"key1", QTomlValue(42)}};
+ * QTomlObject copy(original);            // Efficient copy
  * copy.insert("key2", QTomlValue(24)); // Independent modification
  * Q_ASSERT(original.size() == 1);      // Original unchanged
  * @endcode
  */
-QTomlHash::QTomlHash(const QTomlHash& other)
-	: d_ptr(std::make_unique<QTomlHashPrivate>(*other.d_ptr))
+QTomlObject::QTomlObject(const QTomlObject& other)
+	: d_ptr(std::make_unique<QTomlObjectPrivate>(*other.d_ptr))
 {
 }
 
 /**
  * @brief Move constructor for efficient resource transfer.
- * @param other Rvalue reference to source QTomlHash
+ * @param other Rvalue reference to source QTomlObject
  * @note Marked noexcept for optimal move semantics
  * @note Uses compiler-generated move for PIMPL smart pointer
  */
-QTomlHash::QTomlHash(QTomlHash&& other) noexcept = default;
+QTomlObject::QTomlObject(QTomlObject&& other) noexcept = default;
 
 /**
  * @brief Destructor ensuring proper resource cleanup.
  * @note Marked noexcept to guarantee no exceptions during destruction
  * @note Uses RAII principles through PIMPL smart pointer
  */
-QTomlHash::~QTomlHash() noexcept = default;
+QTomlObject::~QTomlObject() noexcept = default;
 
 /**
  * @brief Copy assignment operator with self-assignment protection.
@@ -248,7 +248,7 @@ QTomlHash::~QTomlHash() noexcept = default;
  * Replaces current table content with copy of source table data.
  * Includes self-assignment checking for safety and efficiency.
  *
- * @param other The QTomlHash instance to copy from
+ * @param other The QTomlObject instance to copy from
  * @return Reference to this table for chaining assignments
  *
  * @complexity O(n) where n is the number of pairs in source table
@@ -259,12 +259,12 @@ QTomlHash::~QTomlHash() noexcept = default;
  *
  * @example
  * @code
- * QTomlHash table1, table2{{"key", QTomlValue(42)}};
+ * QTomlObject table1, table2{{"key", QTomlValue(42)}};
  * table1 = table2;                     // Copy assignment
  * Q_ASSERT(table1.size() == 1);
  * @endcode
  */
-QTomlHash& QTomlHash::operator=(const QTomlHash& other)
+QTomlObject& QTomlObject::operator=(const QTomlObject& other)
 {
 	if (this != &other)
 	{
@@ -275,12 +275,12 @@ QTomlHash& QTomlHash::operator=(const QTomlHash& other)
 
 /**
  * @brief Move assignment operator for efficient resource transfer.
- * @param other Rvalue reference to source QTomlHash
+ * @param other Rvalue reference to source QTomlObject
  * @return Reference to this table for chaining assignments
  * @note Marked noexcept for optimal performance
  * @note Uses compiler-generated move for PIMPL
  */
-QTomlHash& QTomlHash::operator=(QTomlHash&& other) noexcept = default;
+QTomlObject& QTomlObject::operator=(QTomlObject&& other) noexcept = default;
 
 // ==================== Capacity Management ====================
 
@@ -308,7 +308,7 @@ QTomlHash& QTomlHash::operator=(QTomlHash&& other) noexcept = default;
  *
  * @example
  * @code
- * QTomlHash config;
+ * QTomlObject config;
  * config.reserve(100);                 // Pre-allocate for 100 entries
  *
  * for (int i = 0; i < 100; ++i) {     // Efficient bulk insertion
@@ -316,7 +316,7 @@ QTomlHash& QTomlHash::operator=(QTomlHash&& other) noexcept = default;
  * }
  * @endcode
  */
-void QTomlHash::reserve(qsizetype size)
+void QTomlObject::reserve(qsizetype size)
 {
 	d_ptr->values_.reserve(size);
 }
@@ -339,13 +339,13 @@ void QTomlHash::reserve(qsizetype size)
  *
  * @example
  * @code
- * QTomlHash table;
+ * QTomlObject table;
  * qDebug() << "Initial capacity:" << table.capacity();
  * table.reserve(50);
  * Q_ASSERT(table.capacity() >= 50);    // Capacity increased
  * @endcode
  */
-qsizetype QTomlHash::capacity() const noexcept
+qsizetype QTomlObject::capacity() const noexcept
 {
 	return d_ptr->values_.capacity();
 }
@@ -372,13 +372,13 @@ qsizetype QTomlHash::capacity() const noexcept
  *
  * @example
  * @code
- * QTomlHash config;
+ * QTomlObject config;
  * auto it = config.insert("host", QTomlValue("localhost"));
  * Q_ASSERT(it.key() == "host");
  * Q_ASSERT(it.value().toString() == "localhost");
  * @endcode
  */
-QTomlHash::iterator QTomlHash::insert(const QString& key, const QTomlValue& value)
+QTomlObject::iterator QTomlObject::insert(const QString& key, const QTomlValue& value)
 {
 	return d_ptr->values_.insert(key, value);
 }
@@ -402,11 +402,11 @@ QTomlHash::iterator QTomlHash::insert(const QString& key, const QTomlValue& valu
  *
  * @example
  * @code
- * QTomlHash config;
+ * QTomlObject config;
  * config.insert("data", QTomlValue(generateLargeArray())); // Move from temporary
  * @endcode
  */
-QTomlHash::iterator QTomlHash::insert(const QString& key, QTomlValue&& value)
+QTomlObject::iterator QTomlObject::insert(const QString& key, QTomlValue&& value)
 {
 	return d_ptr->values_.insert(key, std::move(value));
 }
@@ -429,12 +429,12 @@ QTomlHash::iterator QTomlHash::insert(const QString& key, QTomlValue&& value)
  *
  * @example
  * @code
- * QTomlHash config;
+ * QTomlObject config;
  * QString dynamicKey = generateKey();
  * config.insert(std::move(dynamicKey), QTomlValue(data)); // Move both
  * @endcode
  */
-QTomlHash::iterator QTomlHash::insert(QString&& key, QTomlValue&& value)
+QTomlObject::iterator QTomlObject::insert(QString&& key, QTomlValue&& value)
 {
 	return d_ptr->values_.insert(std::move(key), std::move(value));
 }
@@ -455,12 +455,12 @@ QTomlHash::iterator QTomlHash::insert(QString&& key, QTomlValue&& value)
  *
  * @example
  * @code
- * QTomlHash config{{"temp", QTomlValue(123)}};
+ * QTomlObject config{{"temp", QTomlValue(123)}};
  * config.remove("temp");               // Remove entry
  * Q_ASSERT(!config.contains("temp"));  // Verify removal
  * @endcode
  */
-void QTomlHash::remove(const QString& key)
+void QTomlObject::remove(const QString& key)
 {
 	d_ptr->values_.remove(key);
 }
@@ -482,13 +482,13 @@ void QTomlHash::remove(const QString& key)
  *
  * @example
  * @code
- * QTomlHash config{{"temp", QTomlValue(123)}};
+ * QTomlObject config{{"temp", QTomlValue(123)}};
  * QTomlValue value = config.take("temp");
  * Q_ASSERT(value.toInteger() == 123);
  * Q_ASSERT(!config.contains("temp"));
  * @endcode
  */
-QTomlValue QTomlHash::take(const QString& key)
+QTomlValue QTomlObject::take(const QString& key)
 {
 	return d_ptr->values_.take(key);
 }
@@ -512,13 +512,13 @@ QTomlValue QTomlHash::take(const QString& key)
  *
  * @example
  * @code
- * QTomlHash config{{"debug", QTomlValue(true)}};
+ * QTomlObject config{{"debug", QTomlValue(true)}};
  * if (config.contains("debug")) {
  *     bool debugMode = config["debug"].toBool();
  * }
  * @endcode
  */
-bool QTomlHash::contains(const QString& key) const
+bool QTomlObject::contains(const QString& key) const
 {
 	return d_ptr->values_.contains(key);
 }
@@ -541,7 +541,7 @@ bool QTomlHash::contains(const QString& key) const
  *
  * @example
  * @code
- * QTomlHash config{{"port", QTomlValue(8080)}};
+ * QTomlObject config{{"port", QTomlValue(8080)}};
  * QTomlValue port = config.value("port");
  * Q_ASSERT(port.toInteger() == 8080);
  *
@@ -549,7 +549,7 @@ bool QTomlHash::contains(const QString& key) const
  * Q_ASSERT(missing.isUndefined());
  * @endcode
  */
-QTomlValue QTomlHash::value(const QString& key) const
+QTomlValue QTomlObject::value(const QString& key) const
 {
 	// Optimization: Use find to reduce double lookup
 	auto it = d_ptr->values_.find(key);
@@ -579,7 +579,7 @@ QTomlValue QTomlHash::value(const QString& key) const
  *
  * @example
  * @code
- * QTomlHash config{{"port", QTomlValue(8080)}};
+ * QTomlObject config{{"port", QTomlValue(8080)}};
  *
  * int port = config.value("port", QTomlValue(80)).toInteger();
  * Q_ASSERT(port == 8080);              // Key exists
@@ -588,7 +588,7 @@ QTomlValue QTomlHash::value(const QString& key) const
  * Q_ASSERT(timeout == 30);             // Key missing, default used
  * @endcode
  */
-QTomlValue QTomlHash::value(const QString& key, const QTomlValue& defaultValue) const
+QTomlValue QTomlObject::value(const QString& key, const QTomlValue& defaultValue) const
 {
 	auto it = d_ptr->values_.find(key);
 	if (it != d_ptr->values_.end())
@@ -615,13 +615,13 @@ QTomlValue QTomlHash::value(const QString& key, const QTomlValue& defaultValue) 
  *
  * @example
  * @code
- * QTomlHash config{{"host", QTomlValue("localhost")}, {"port", QTomlValue(8080)}};
+ * QTomlObject config{{"host", QTomlValue("localhost")}, {"port", QTomlValue(8080)}};
  * QStringList keys = config.keys();
  * Q_ASSERT(keys.contains("host"));
  * Q_ASSERT(keys.contains("port"));
  * @endcode
  */
-QStringList QTomlHash::keys() const
+QStringList QTomlObject::keys() const
 {
 	return d_ptr->values_.keys();
 }
@@ -634,7 +634,7 @@ QStringList QTomlHash::keys() const
  * @note Marked noexcept for performance
  * @note O(1) constant time operation
  */
-qsizetype QTomlHash::size() const noexcept { return d_ptr->values_.size(); }
+qsizetype QTomlObject::size() const noexcept { return d_ptr->values_.size(); }
 
 /**
  * @brief Returns number of key-value pairs (alias for size).
@@ -642,7 +642,7 @@ qsizetype QTomlHash::size() const noexcept { return d_ptr->values_.size(); }
  * @note Alias for size() for Qt container consistency
  * @note Marked noexcept for performance
  */
-qsizetype QTomlHash::count() const noexcept { return d_ptr->values_.size(); }
+qsizetype QTomlObject::count() const noexcept { return d_ptr->values_.size(); }
 
 /**
  * @brief Checks if table contains no key-value pairs.
@@ -650,7 +650,7 @@ qsizetype QTomlHash::count() const noexcept { return d_ptr->values_.size(); }
  * @note Marked noexcept for performance
  * @note More expressive than checking size() == 0
  */
-bool QTomlHash::isEmpty() const noexcept { return d_ptr->values_.isEmpty(); }
+bool QTomlObject::isEmpty() const noexcept { return d_ptr->values_.isEmpty(); }
 
 // ==================== Subscript Operators ====================
 
@@ -673,12 +673,12 @@ bool QTomlHash::isEmpty() const noexcept { return d_ptr->values_.isEmpty(); }
  *
  * @example
  * @code
- * const QTomlHash config{{"port", QTomlValue(8080)}};
+ * const QTomlObject config{{"port", QTomlValue(8080)}};
  * int port = config["port"].toInteger();     // Safe access
  * QTomlValue missing = config["invalid"];    // Returns Undefined
  * @endcode
  */
-QTomlValue QTomlHash::operator[](const QString& key) const
+QTomlValue QTomlObject::operator[](const QString& key) const
 {
 	return value(key);
 }
@@ -702,7 +702,7 @@ QTomlValue QTomlHash::operator[](const QString& key) const
  *
  * @example
  * @code
- * QTomlHash config;
+ * QTomlObject config;
  * config["host"] = QTomlValue("localhost");  // Creates key
  * config["port"] = QTomlValue(8080);         // Creates key
  *
@@ -710,7 +710,7 @@ QTomlValue QTomlHash::operator[](const QString& key) const
  * Q_ASSERT(config["port"].toInteger() == 9090);
  * @endcode
  */
-QTomlValue& QTomlHash::operator[](const QString& key)
+QTomlValue& QTomlObject::operator[](const QString& key)
 {
 	// QHash::operator[] creates default-constructed QTomlValue (Null type) if key doesn't exist
 	return d_ptr->values_[key];
@@ -724,7 +724,7 @@ QTomlValue& QTomlHash::operator[](const QString& key)
  * @note Order is not guaranteed due to hash table nature
  * @note Marked noexcept for performance
  */
-QTomlHash::iterator QTomlHash::begin() noexcept { return d_ptr->values_.begin(); }
+QTomlObject::iterator QTomlObject::begin() noexcept { return d_ptr->values_.begin(); }
 
 /**
  * @brief Returns const iterator to beginning of table.
@@ -732,7 +732,7 @@ QTomlHash::iterator QTomlHash::begin() noexcept { return d_ptr->values_.begin();
  * @note Provides read-only access to elements
  * @note Marked noexcept for performance
  */
-QTomlHash::const_iterator QTomlHash::begin() const noexcept { return d_ptr->values_.begin(); }
+QTomlObject::const_iterator QTomlObject::begin() const noexcept { return d_ptr->values_.begin(); }
 
 /**
  * @brief Returns const iterator to beginning (explicit const).
@@ -740,7 +740,7 @@ QTomlHash::const_iterator QTomlHash::begin() const noexcept { return d_ptr->valu
  * @note Explicitly const for clarity
  * @note Marked noexcept for performance
  */
-QTomlHash::const_iterator QTomlHash::constBegin() const noexcept { return d_ptr->values_.constBegin(); }
+QTomlObject::const_iterator QTomlObject::constBegin() const noexcept { return d_ptr->values_.constBegin(); }
 
 /**
  * @brief Returns mutable iterator to end of table.
@@ -748,7 +748,7 @@ QTomlHash::const_iterator QTomlHash::constBegin() const noexcept { return d_ptr-
  * @note Should not be dereferenced
  * @note Marked noexcept for performance
  */
-QTomlHash::iterator QTomlHash::end() noexcept { return d_ptr->values_.end(); }
+QTomlObject::iterator QTomlObject::end() noexcept { return d_ptr->values_.end(); }
 
 /**
  * @brief Returns const iterator to end of table.
@@ -756,7 +756,7 @@ QTomlHash::iterator QTomlHash::end() noexcept { return d_ptr->values_.end(); }
  * @note Should not be dereferenced
  * @note Marked noexcept for performance
  */
-QTomlHash::const_iterator QTomlHash::end() const noexcept { return d_ptr->values_.end(); }
+QTomlObject::const_iterator QTomlObject::end() const noexcept { return d_ptr->values_.end(); }
 
 /**
  * @brief Returns const iterator to end (explicit const).
@@ -764,7 +764,7 @@ QTomlHash::const_iterator QTomlHash::end() const noexcept { return d_ptr->values
  * @note Explicitly const for clarity
  * @note Marked noexcept for performance
  */
-QTomlHash::const_iterator QTomlHash::constEnd() const noexcept { return d_ptr->values_.constEnd(); }
+QTomlObject::const_iterator QTomlObject::constEnd() const noexcept { return d_ptr->values_.constEnd(); }
 
 /**
  * @brief Finds key-value pair and returns mutable iterator.
@@ -784,14 +784,14 @@ QTomlHash::const_iterator QTomlHash::constEnd() const noexcept { return d_ptr->v
  *
  * @example
  * @code
- * QTomlHash config{{"debug", QTomlValue(false)}};
+ * QTomlObject config{{"debug", QTomlValue(false)}};
  * auto it = config.find("debug");
  * if (it != config.end()) {
  *     it.value() = QTomlValue(true);    // Modify through iterator
  * }
  * @endcode
  */
-QTomlHash::iterator QTomlHash::find(const QString& key) noexcept
+QTomlObject::iterator QTomlObject::find(const QString& key) noexcept
 {
 	return d_ptr->values_.find(key);
 }
@@ -814,14 +814,14 @@ QTomlHash::iterator QTomlHash::find(const QString& key) noexcept
  *
  * @example
  * @code
- * const QTomlHash config{{"version", QTomlValue("1.0")}};
+ * const QTomlObject config{{"version", QTomlValue("1.0")}};
  * auto it = config.find("version");
  * if (it != config.end()) {
  *     QString version = it.value().toString();
  * }
  * @endcode
  */
-QTomlHash::const_iterator QTomlHash::find(const QString& key) const noexcept
+QTomlObject::const_iterator QTomlObject::find(const QString& key) const noexcept
 {
 	return d_ptr->values_.find(key);
 }
@@ -845,13 +845,13 @@ QTomlHash::const_iterator QTomlHash::find(const QString& key) const noexcept
  *
  * @example
  * @code
- * QTomlHash config{{"host", QTomlValue("localhost")}, {"port", QTomlValue(8080)}};
+ * QTomlObject config{{"host", QTomlValue("localhost")}, {"port", QTomlValue(8080)}};
  * QVariantMap variants = config.toVariantMap();
  * Q_ASSERT(variants["host"].toString() == "localhost");
  * Q_ASSERT(variants["port"].toInt() == 8080);
  * @endcode
  */
-QVariantMap QTomlHash::toVariantMap() const
+QVariantMap QTomlObject::toVariantMap() const
 {
 	QVariantMap map;
 	// Optimization: Pre-allocate space (if QVariantMap supports it)
@@ -863,13 +863,13 @@ QVariantMap QTomlHash::toVariantMap() const
 }
 
 /**
- * @brief Creates QTomlHash from QVariantMap.
+ * @brief Creates QTomlObject from QVariantMap.
  *
- * Converts a QVariantMap to QTomlHash by attempting to convert each QVariant
+ * Converts a QVariantMap to QTomlObject by attempting to convert each QVariant
  * to a QTomlValue. Memory is pre-allocated for optimal performance.
  *
  * @param map The QVariantMap to convert
- * @return QTomlHash containing converted key-value pairs
+ * @return QTomlObject containing converted key-value pairs
  *
  * @complexity O(n) where n is the number of key-value pairs in the map
  * @exception Strong exception safety guarantee
@@ -884,14 +884,14 @@ QVariantMap QTomlHash::toVariantMap() const
  * qtMap["host"] = "localhost";
  * qtMap["port"] = 8080;
  *
- * QTomlHash config = QTomlHash::fromVariantMap(qtMap);
+ * QTomlObject config = QTomlObject::fromVariantMap(qtMap);
  * Q_ASSERT(config.size() == 2);
  * Q_ASSERT(config["host"].toString() == "localhost");
  * @endcode
  */
-QTomlHash QTomlHash::fromVariantMap(const QVariantMap& map)
+QTomlObject QTomlObject::fromVariantMap(const QVariantMap& map)
 {
-	QTomlHash hash;
+	QTomlObject hash;
 	// Optimization: Pre-allocate space
 	hash.reserve(map.size());
 	for (auto it = map.constBegin(); it != map.constEnd(); ++it)

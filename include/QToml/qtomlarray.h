@@ -62,7 +62,7 @@
   * @note All index operations use 0-based indexing
   * @note Debug builds include bounds checking with assertions
   * @see QTomlValue for element type information
-  * @see QTomlHash for table/object containers
+  * @see QTomlObject for table/object containers
   * @see QTomlDocument for complete document handling
   */
 
@@ -172,7 +172,7 @@
    * @endcode
    *
    * @see QTomlValue for element value representation
-   * @see QTomlHash for table/object containers
+   * @see QTomlObject for table/object containers
    * @see QTomlDocument for complete document handling
    * @see QJsonArray for similar JSON array functionality
    */
@@ -711,6 +711,9 @@ public:
 	 * @endcode
 	 */
 	QTomlValue at(qsizetype i) const;
+	QTomlValue value(qsizetype i, const QTomlValue& defaultValue = QTomlValue()) const;
+	QTomlValue& operator[](qsizetype i);
+	QTomlValue operator[](qsizetype i) const;
 
 	/**
 	 * @brief Returns a const reference to the element at the specified index (unsafe).
@@ -1056,6 +1059,10 @@ public:
 	 * @see toVariantList() for reverse conversion
 	 */
 	static QTomlArray fromVariantList(const QVariantList& list);
+
+	static QTomlArray fromStringList(const QStringList& list);
+
+	QStringList toStringList() const;
 
 private:
 	/**

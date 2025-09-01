@@ -689,9 +689,28 @@ QTomlValue QTomlArray::at(qsizetype i) const
 	// Optimization: Branch prediction hint for valid indices
 	if (Q_LIKELY(i >= 0 && i < d_ptr->values_.size()))
 	{
-		return d_ptr->values_.at(i);
+		return d_ptr->values_.value(i);
 	}
 	return QTomlValue(QTomlValue::Undefined);
+}
+
+QTomlValue QTomlArray::value(qsizetype i, const QTomlValue& defaultValue) const
+{
+	if (Q_LIKELY(i >= 0 && i < d_ptr->values_.size()))
+	{
+		return d_ptr->values_.value(i, defaultValue);
+	}
+	return defaultValue;
+}
+
+QTomlValue& QTomlArray::operator[](qsizetype i)
+{
+	return d_ptr->values_[i];
+}
+
+QTomlValue QTomlArray::operator[](qsizetype i) const
+{
+	return d_ptr->values_[i];
 }
 
 /**
@@ -1101,4 +1120,29 @@ QTomlArray QTomlArray::fromVariantList(const QVariantList& list)
 		array.append(variant.value<QTomlValue>());
 	}
 	return array;
+}
+
+QTomlArray QTomlArray::fromStringList(const QStringList& list)
+{
+	QTomlArray array;
+	// Optimization: Pre-allocate memory to avoid reallocations
+	array.reserve(list.size());
+	for (const auto& str : list)
+	{
+		array.append(QTomlValue(str));
+	}
+	return array;
+}
+
+QStringList QTomlArray::toStringList() const
+{
+	QStringList list;
+	// Optimization: Pre-allocate memory to avoid reallocations
+	list.reserve(d_ptr->values_.size());
+	for (const auto& value : d_ptr->values_)
+	{
+		list.append(value.toString());
+	}
+
+	return list;
 }
