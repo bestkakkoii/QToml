@@ -177,7 +177,7 @@ public:
 	 * Content examples:
 	 * - "Invalid escape sequence in string\n(error occurred at line 5, column 12)"
 	 * - "Unexpected token ']'\n(error occurred at line 3, column 8)"
-	 * - "No error occurred" (for success states)
+	 * - "" (for success states)
 	 *
 	 * Performance benefits:
 	 * - No runtime formatting overhead during error string access

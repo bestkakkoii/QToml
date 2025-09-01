@@ -135,6 +135,7 @@ QTomlParseError::QTomlParseError() noexcept
 	, line(0)
 	, column(0)
 {
+	d_ptr->formatted_error_string_.clear();
 }
 
 /**
@@ -217,6 +218,8 @@ QTomlParseError::QTomlParseError(const void* toml_parse_error_ptr)
 		.arg(QString::fromUtf8(description_view.data(), static_cast<qsizetype>(description_view.length())))
 		.arg(this->line)
 		.arg(this->column);
+
+	d_ptr->formatted_error_string_.shrink_to_fit(); // Minimize memory usage after construction
 }
 
 /**
@@ -463,7 +466,7 @@ QTomlParseError& QTomlParseError::operator=(QTomlParseError&& other) noexcept = 
  * Error message examples:
  * - "Invalid value format\n(error occurred at line 5, column 12)"
  * - "Unexpected end of input\n(error occurred at line 1, column 23)"
- * - "No error occurred" (for success cases)
+ * - "" (for success cases)
  *
  * @return QString containing the complete error message or success indication
  *
@@ -480,8 +483,7 @@ QTomlParseError& QTomlParseError::operator=(QTomlParseError&& other) noexcept = 
  * QTomlParseError error;
  * QTomlDocument doc = QTomlDocument::fromToml(invalidData, &error);
  *
- * QString message = error.errorString();
- * if (!message.contains("No error")) {
+ * if (error.hasError()) {
  *     // Parse the error message for logging
  *     QStringList lines = message.split('\n');
  *     QString description = lines.first();

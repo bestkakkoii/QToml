@@ -301,8 +301,7 @@ public:
 	 * QTomlParseError error;
 	 * QTomlDocument doc = QTomlDocument::fromToml("invalid=[", &error);
 	 *
-	 * QString message = error.errorString();
-	 * if (!message.contains("No error")) {
+	 * if (error.hasError()) {
 	 *     qWarning() << "Parsing failed:" << message;
 	 *     // Might output: "Expected closing bracket ']' at line 1"
 	 * }
@@ -312,7 +311,7 @@ public:
 	 */
 	QString errorString() const noexcept;
 
-	bool hasError() const noexcept { return errorString().isEmpty(); }
+	bool hasError() const noexcept { return !errorString().isEmpty(); }
 
 	// ==================== Public Position Information ====================
 

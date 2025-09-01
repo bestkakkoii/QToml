@@ -971,7 +971,7 @@ void testErrorHandlingEnhanced(TestResults& results)
 		QTomlParseError unicodeError;
 		QString invalidUnicode = "key = \"\\uZZZZ\""; // Invalid unicode escape
 		QTomlDocument unicodeDoc = QTomlDocument::fromToml(invalidUnicode.toUtf8(), &unicodeError);
-		if (unicodeDoc.isNull() && !unicodeError.errorString().contains("No error")) {
+		if (unicodeDoc.isNull() && unicodeError.hasError()) {
 			errorTestsPassed++;
 			qDebug().noquote() << "Invalid unicode escape detected";
 		}
@@ -986,7 +986,7 @@ void testErrorHandlingEnhanced(TestResults& results)
 		QTomlParseError keyError;
 		QString invalidKey = "[123invalid]\nkey = \"value\""; // Invalid section name
 		QTomlDocument keyDoc = QTomlDocument::fromToml(invalidKey.toUtf8(), &keyError);
-		if (keyDoc.isNull() && !keyError.errorString().contains("No error")) {
+		if (keyDoc.isNull() && keyError.hasError()) {
 			errorTestsPassed++;
 			qDebug().noquote() << "Invalid section name detected";
 		}
