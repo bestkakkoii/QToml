@@ -406,9 +406,9 @@ public:
 	 *
 	 * @return true if the value type is Hash, false otherwise
 	 * @note Marked as noexcept, time complexity is O(1)
-	 * @see toHash()
+	 * @see toObject()
 	 */
-	bool isHash() const noexcept;
+	bool isObject() const noexcept;
 
 	/**
 	 * @brief Checks if the value is of string type.
@@ -509,11 +509,11 @@ public:
 	 *
 	 * @return QTomlObject object, empty table if type mismatch
 	 *
-	 * @note Only returns valid content when isHash() returns true
+	 * @note Only returns valid content when isObject() returns true
 	 * @note Returns a copy, modifications will not affect the original object
-	 * @see isHash()
+	 * @see isObject()
 	 */
-	QTomlObject toHash() const;
+	QTomlObject toObject() const;
 
 	/**
 	 * @brief Converts the value to QTomlDateTime.

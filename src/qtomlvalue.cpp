@@ -482,7 +482,7 @@ QTomlValue::QTomlValue(QTomlArray&& a) noexcept
  * QTomlObject original{{"key1", QTomlValue(42)}};
  * QTomlValue value(original);
  * original.insert("key2", QTomlValue(24)); // Safe to modify original
- * Q_ASSERT(value.toHash().size() == 1);
+ * Q_ASSERT(value.toObject().size() == 1);
  * @endcode
  */
 QTomlValue::QTomlValue(const QTomlObject& h)
@@ -681,7 +681,7 @@ bool QTomlValue::isNull() const noexcept { return d_ptr->type_ == Null; }
  * @return true if type is Hash, false otherwise
  * @note Marked noexcept for performance
  */
-bool QTomlValue::isHash() const noexcept { return d_ptr->type_ == Hash; }
+bool QTomlValue::isObject() const noexcept { return d_ptr->type_ == Hash; }
 
 /**
  * @brief Checks if value is of string type.
@@ -880,15 +880,15 @@ qint64 QTomlValue::toInteger(qint64 defaultValue) const noexcept
  * @example
  * @code
  * QTomlValue hashValue(QTomlObject{{"key", QTomlValue(42)}});
- * QTomlObject hash = hashValue.toHash();
+ * QTomlObject hash = hashValue.toObject();
  * Q_ASSERT(hash.size() == 1);
  *
  * QTomlValue stringValue("not a hash");
- * QTomlObject empty = stringValue.toHash();
+ * QTomlObject empty = stringValue.toObject();
  * Q_ASSERT(empty.isEmpty());
  * @endcode
  */
-QTomlObject QTomlValue::toHash() const
+QTomlObject QTomlValue::toObject() const
 {
 	if (const auto* hash = std::get_if<QTomlObject>(&d_ptr->value_))
 	{

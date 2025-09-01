@@ -671,11 +671,11 @@ void testComprehensiveParsing(TestResults& results)
 
 	// Test deep nesting
 	if (root.contains("level1")) {
-		QTomlObject level1 = root["level1"].toHash();
+		QTomlObject level1 = root["level1"].toObject();
 		if (level1.contains("level2")) {
-			QTomlObject level2 = level1["level2"].toHash();
+			QTomlObject level2 = level1["level2"].toObject();
 			if (level2.contains("level3")) {
-				QTomlObject level3 = level2["level3"].toHash();
+				QTomlObject level3 = level2["level3"].toObject();
 				TEST_ASSERT_EQUAL(level3["deep_value"].toString(), QString("found me!"), "deep nesting access");
 			}
 		}

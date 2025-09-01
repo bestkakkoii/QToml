@@ -151,7 +151,7 @@ class QTomlParseError;
  *
  * // Access data
  * QTomlObject root = doc.hash();
- * QTomlObject database = root["database"].toHash();
+ * QTomlObject database = root["database"].toObject();
  * QString host = database["host"].toString();
  * int port = database["port"].toInteger();
  *
@@ -228,7 +228,7 @@ public:
 	 *
 	 * QTomlDocument doc(config);
 	 * Q_ASSERT(!doc.isNull());            // Not null - contains data
-	 * Q_ASSERT(doc.isHash());             // Contains valid table structure
+	 * Q_ASSERT(doc.isObject());             // Contains valid table structure
 	 *
 	 * // Original hash can be modified independently
 	 * config.insert("new_key", QTomlValue("value"));
@@ -413,17 +413,17 @@ public:
 	 * @example
 	 * @code
 	 * QTomlDocument doc;
-	 * Q_ASSERT(!doc.isHash());            // Default construction is null
+	 * Q_ASSERT(!doc.isObject());            // Default construction is null
 	 *
 	 * QTomlObject emptyHash;
 	 * doc.setHash(emptyHash);
-	 * Q_ASSERT(doc.isHash());             // Now contains valid (empty) table
+	 * Q_ASSERT(doc.isObject());             // Now contains valid (empty) table
 	 *
 	 * QTomlDocument parsed = QTomlDocument::fromToml("key = 'value'");
-	 * Q_ASSERT(parsed.isHash());          // Parsed document has valid table
+	 * Q_ASSERT(parsed.isObject());          // Parsed document has valid table
 	 * @endcode
 	 */
-	bool isHash() const noexcept;
+	bool isObject() const noexcept;
 
 	/**
 	 * @brief Checks if document is empty (uninitialized state).
@@ -439,7 +439,7 @@ public:
 	 *
 	 * @note Empty document is different from document containing empty table
 	 * @note Null documents require setHash() call before serialization
-	 * @see isEmpty(), isHash()
+	 * @see isEmpty(), isObject()
 	 *
 	 * @example
 	 * @code
@@ -472,7 +472,7 @@ public:
 	 *
 	 * @note Empty documents can be serialized to empty TOML strings
 	 * @note Combines null state and content emptiness checking
-	 * @see isNull(), isHash()
+	 * @see isNull(), isObject()
 	 *
 	 * @example
 	 * @code

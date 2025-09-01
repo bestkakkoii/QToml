@@ -334,7 +334,7 @@ namespace
 		switch (value.type())
 		{
 		case QTomlValue::Hash:
-			table.insert_or_assign(key, convert_hash_to_table(value.toHash()));
+			table.insert_or_assign(key, convert_hash_to_table(value.toObject()));
 			break;
 
 		case QTomlValue::Array:
@@ -448,7 +448,7 @@ namespace
 		switch (value.type())
 		{
 		case QTomlValue::Hash:
-			array.push_back(convert_hash_to_table(value.toHash()));
+			array.push_back(convert_hash_to_table(value.toObject()));
 			break;
 
 		case QTomlValue::Array:
@@ -722,7 +722,7 @@ QTomlDocument& QTomlDocument::operator=(QTomlDocument&& other) noexcept = defaul
  * @note Equivalent to !isNull() for TOML documents
  * @note Marked noexcept for performance
  */
-bool QTomlDocument::isHash() const noexcept
+bool QTomlDocument::isObject() const noexcept
 {
 	return !d_ptr->is_null_;
 }
