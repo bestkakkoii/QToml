@@ -60,3 +60,5 @@ compile_commands.json
 /win/vc/build/QToml/Debug
 /win/vc/build/QToml/Release
 /win/vc/deploy/bin
+/CLAUDE.md
+/INFO.MD
