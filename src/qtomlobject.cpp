@@ -85,6 +85,7 @@
 
 #include <QMetaType>
 #include <QVariant>
+#include <QVariantHash>
 #include <utility>
 
 namespace
@@ -897,6 +898,170 @@ QTomlObject QTomlObject::fromVariantMap(const QVariantMap& map)
 	for (auto it = map.constBegin(); it != map.constEnd(); ++it)
 	{
 		object.insert(it.key(), it.value().value<QTomlValue>());
+	}
+	return object;
+}
+
+// ==================== Qt JSON API Compatibility Method Implementations ====================
+
+// String view overloads for contains()
+bool QTomlObject::contains(QLatin1StringView key) const
+{
+	return contains(QString(key));
+}
+
+bool QTomlObject::contains(QStringView key) const
+{
+	return contains(key.toString());
+}
+
+// String view overloads for remove()
+void QTomlObject::remove(QLatin1StringView key)
+{
+	remove(QString(key));
+}
+
+void QTomlObject::remove(QStringView key)
+{
+	remove(key.toString());
+}
+
+// String view overloads for take()
+QTomlValue QTomlObject::take(QLatin1StringView key)
+{
+	return take(QString(key));
+}
+
+QTomlValue QTomlObject::take(QStringView key)
+{
+	return take(key.toString());
+}
+
+// String view overloads for value()
+QTomlValue QTomlObject::value(QLatin1StringView key) const
+{
+	return value(QString(key));
+}
+
+QTomlValue QTomlObject::value(QStringView key) const
+{
+	return value(key.toString());
+}
+
+QTomlValue QTomlObject::value(QLatin1StringView key, const QTomlValue& defaultValue) const
+{
+	return value(QString(key), defaultValue);
+}
+
+QTomlValue QTomlObject::value(QStringView key, const QTomlValue& defaultValue) const
+{
+	return value(key.toString(), defaultValue);
+}
+
+// String view overloads for find()
+QTomlObject::iterator QTomlObject::find(QLatin1StringView key) noexcept
+{
+	return find(QString(key));
+}
+
+QTomlObject::iterator QTomlObject::find(QStringView key) noexcept
+{
+	return find(key.toString());
+}
+
+QTomlObject::const_iterator QTomlObject::find(QLatin1StringView key) const noexcept
+{
+	return find(QString(key));
+}
+
+QTomlObject::const_iterator QTomlObject::find(QStringView key) const noexcept
+{
+	return find(key.toString());
+}
+
+// Const find methods
+QTomlObject::const_iterator QTomlObject::constFind(const QString& key) const noexcept
+{
+	return find(key);
+}
+
+QTomlObject::const_iterator QTomlObject::constFind(QLatin1StringView key) const noexcept
+{
+	return find(QString(key));
+}
+
+QTomlObject::const_iterator QTomlObject::constFind(QStringView key) const noexcept
+{
+	return find(key.toString());
+}
+
+// String view overloads for subscript operators
+QTomlValue QTomlObject::operator[](QLatin1StringView key) const
+{
+	return operator[](QString(key));
+}
+
+QTomlValue QTomlObject::operator[](QStringView key) const
+{
+	return operator[](key.toString());
+}
+
+QTomlValue& QTomlObject::operator[](QLatin1StringView key)
+{
+	return operator[](QString(key));
+}
+
+QTomlValue& QTomlObject::operator[](QStringView key)
+{
+	return operator[](key.toString());
+}
+
+// Additional methods for Qt JSON compatibility
+bool QTomlObject::empty() const noexcept
+{
+	return isEmpty();
+}
+
+qsizetype QTomlObject::length() const noexcept
+{
+	return count();
+}
+
+QTomlObject::iterator QTomlObject::erase(iterator it)
+{
+	if (it == end()) {
+		return end();
+	}
+	
+	// Remove the element pointed to by iterator
+	QString key = it.key();
+	++it; // Advance iterator before removal
+	remove(key);
+	return it;
+}
+
+bool QTomlObject::isValid() const noexcept
+{
+	return true; // Objects are always valid once constructed
+}
+
+// QVariantHash support
+QVariantHash QTomlObject::toVariantHash() const
+{
+	QVariantHash hash;
+	hash.reserve(size());
+	for (auto it = constBegin(); it != constEnd(); ++it) {
+		hash.insert(it.key(), it.value().toVariant());
+	}
+	return hash;
+}
+
+QTomlObject QTomlObject::fromVariantHash(const QVariantHash& hash)
+{
+	QTomlObject object;
+	object.reserve(hash.size());
+	for (auto it = hash.constBegin(); it != hash.constEnd(); ++it) {
+		object.insert(it.key(), QTomlValue::fromVariant(it.value()));
 	}
 	return object;
 }

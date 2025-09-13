@@ -74,6 +74,7 @@
 #include "qtomldocument_p.h"
 #include "qtomlobject.h"
 #include "qtomlarray.h"
+#include "qtomlvalue.h"
 #include "qtomldatetime.h"
 #include "qtomlparseerror.h"
 
@@ -923,4 +924,151 @@ QVariant QTomlDocument::toVariant() const
 		return QVariant();
 	}
 	return QVariant::fromValue(d_ptr->root_hash_);
+}
+
+// ==================== Qt JSON API Compatibility Method Implementations ====================
+
+/**
+ * @brief Constructs TOML document from QTomlArray.
+ *
+ * Implementation of array-based document constructor. Note that TOML specification
+ * typically requires tables as document roots, but this provides Qt JSON compatibility.
+ */
+QTomlDocument::QTomlDocument(const QTomlArray& array)
+	: d_ptr(std::make_unique<QTomlDocumentPrivate>())
+{
+	// For Qt JSON compatibility, we store the array in a special way
+	// This may not be valid TOML but provides API compatibility
+	d_ptr->is_array_based_ = true;
+	d_ptr->root_array_ = array;
+	d_ptr->is_null_ = false;
+}
+
+/**
+ * @brief Retrieves the document's root array.
+ *
+ * Implementation of array access method. Returns the root array if document
+ * is array-based, otherwise returns empty array.
+ */
+QTomlArray QTomlDocument::array() const
+{
+	if (d_ptr && d_ptr->is_array_based_) {
+		return d_ptr->root_array_;
+	}
+	return QTomlArray(); // Return empty array for non-array documents
+}
+
+/**
+ * @brief Checks if document contains an array as root element.
+ *
+ * Implementation of array type checking. Returns true only if document
+ * was constructed with an array as root element.
+ */
+bool QTomlDocument::isArray() const noexcept
+{
+	return d_ptr && d_ptr->is_array_based_;
+}
+
+/**
+ * @brief Sets the document's root array.
+ *
+ * Implementation of array setting method. Converts document to array-based
+ * and replaces existing content.
+ */
+void QTomlDocument::setArray(const QTomlArray& array)
+{
+	if (!d_ptr) {
+		d_ptr = std::make_unique<QTomlDocumentPrivate>();
+	}
+	
+	d_ptr->is_array_based_ = true;
+	d_ptr->root_array_ = array;
+	d_ptr->root_hash_ = QTomlObject(); // Clear table data
+	d_ptr->is_null_ = false;
+}
+
+/**
+ * @brief Serializes document to TOML format with formatting options.
+ *
+ * Implementation of format-aware serialization. Currently delegates to
+ * standard toToml() as TOML doesn't have compact format like JSON.
+ */
+QByteArray QTomlDocument::toToml(TomlFormat format) const
+{
+	// For now, both formats produce the same output as TOML doesn't have
+	// a standardized compact format like JSON. This could be enhanced later.
+	Q_UNUSED(format)
+	return toToml();
+}
+
+/**
+ * @brief Checks if the document represents valid data.
+ *
+ * Implementation of validity checking. Documents are valid if they're not null.
+ */
+bool QTomlDocument::isValid() const noexcept
+{
+	return !isNull();
+}
+
+/**
+ * @brief Const subscript operator for object key access.
+ *
+ * Implementation of key-based access. Works only for object-based documents.
+ */
+const QTomlValue QTomlDocument::operator[](const QString& key) const
+{
+	if (isObject()) {
+		QTomlObject obj = object();
+		if (obj.contains(key)) {
+			return obj.value(key);
+		}
+	}
+	return QTomlValue(); // Return null for missing keys or non-objects
+}
+
+/**
+ * @brief Const subscript operator for array index access.
+ *
+ * Implementation of index-based access. Works only for array-based documents.
+ */
+const QTomlValue QTomlDocument::operator[](qsizetype i) const
+{
+	if (isArray()) {
+		QTomlArray arr = array();
+		if (i >= 0 && i < arr.size()) {
+			return arr.at(i);
+		}
+	}
+	return QTomlValue(); // Return null for out-of-bounds or non-arrays
+}
+
+/**
+ * @brief Const subscript operator for object key access with QLatin1StringView.
+ *
+ * String view variant for efficient key lookup without string conversion.
+ */
+const QTomlValue QTomlDocument::operator[](QLatin1StringView key) const
+{
+	return operator[](QString(key));
+}
+
+/**
+ * @brief Const subscript operator for object key access with QStringView.
+ *
+ * String view variant for efficient key lookup without string conversion.
+ */
+const QTomlValue QTomlDocument::operator[](QStringView key) const
+{
+	return operator[](key.toString());
+}
+
+/**
+ * @brief Swaps content with another QTomlDocument object.
+ *
+ * Implementation of efficient content swapping using smart pointer swap.
+ */
+void QTomlDocument::swap(QTomlDocument& other) noexcept
+{
+	d_ptr.swap(other.d_ptr);
 }

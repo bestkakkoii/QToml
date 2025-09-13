@@ -83,10 +83,17 @@
 #include <QtGlobal>
 #include <QByteArray>
 #include <QVariant>
+#include <QLatin1StringView>
+#include <QStringView>
 #include <memory>
 
+// Forward declarations
 class QTomlObject;
+class QTomlArray;
 class QTomlParseError;
+
+// Must include full definition for return values
+#include "qtomlvalue.h"
 
 /**
  * @class QTomlDocument
@@ -752,6 +759,170 @@ public:
 	 * @endcode
 	 */
 	QVariant toVariant() const;
+
+	// ==================== Qt JSON API Compatibility Extensions ====================
+
+	/**
+	 * @brief TOML formatting options for serialization.
+	 *
+	 * Defines formatting styles for TOML output, similar to QJsonDocument::JsonFormat.
+	 * Controls the formatting and spacing of the generated TOML text.
+	 */
+	enum TomlFormat {
+		Indented,  ///< Human-readable format with proper indentation and spacing
+		Compact    ///< Compact format with minimal whitespace
+	};
+
+	/**
+	 * @brief Constructs TOML document from QTomlArray.
+	 *
+	 * Creates a TOML document with an array as the root element. While TOML
+	 * specification normally requires tables as document roots, this constructor
+	 * provides Qt JSON API compatibility for array-based documents.
+	 *
+	 * @param array The QTomlArray to use as the document's root element
+	 *
+	 * @note Provides Qt JSON API compatibility
+	 * @note May not be valid according to strict TOML specification
+	 * @see QTomlDocument(const QTomlObject&)
+	 */
+	explicit QTomlDocument(const QTomlArray& array);
+
+	/**
+	 * @brief Retrieves the document's root array.
+	 *
+	 * Returns the root array if the document contains an array, or an empty
+	 * array if the document contains a table or is empty. This method provides
+	 * Qt JSON API compatibility.
+	 *
+	 * @return Copy of document's root array, or empty array if not array-based
+	 *
+	 * @note Provides Qt JSON API compatibility
+	 * @note Returns empty array for table-based documents
+	 * @see setArray(), isArray()
+	 */
+	QTomlArray array() const;
+
+	/**
+	 * @brief Checks if document contains an array as root element.
+	 *
+	 * Returns true if the document's root element is an array, false if it's
+	 * a table or the document is empty. This method provides Qt JSON API compatibility.
+	 *
+	 * @return true if document contains root array, false otherwise
+	 *
+	 * @note Provides Qt JSON API compatibility
+	 * @note Complements isObject() for complete type checking
+	 * @see isObject(), array()
+	 */
+	bool isArray() const noexcept;
+
+	/**
+	 * @brief Sets the document's root array.
+	 *
+	 * Sets the specified QTomlArray as the document's root element, replacing
+	 * existing content. This method provides Qt JSON API compatibility.
+	 *
+	 * @param array The new root array to set
+	 *
+	 * @note Provides Qt JSON API compatibility
+	 * @note After setting, document becomes non-null
+	 * @note May not produce valid TOML according to strict specification
+	 * @see array(), setHash()
+	 */
+	void setArray(const QTomlArray& array);
+
+	/**
+	 * @brief Serializes document to TOML format with formatting options.
+	 *
+	 * Enhanced version of toToml() that accepts formatting options to control
+	 * the output style. This method provides Qt JSON API compatibility.
+	 *
+	 * @param format The formatting style to use (Indented or Compact)
+	 * @return UTF-8 encoded byte array containing formatted TOML text
+	 *
+	 * @note Provides Qt JSON API compatibility
+	 * @note Default toToml() method uses Indented format
+	 * @see toToml()
+	 */
+	QByteArray toToml(TomlFormat format) const;
+
+	/**
+	 * @brief Checks if the document represents valid data.
+	 *
+	 * Returns true if the document contains valid data (either table or array),
+	 * false if the document is in an undefined or invalid state.
+	 *
+	 * @return true if document is valid, false otherwise
+	 *
+	 * @note Qt class API consistency method
+	 * @note Equivalent to !isNull() for documents
+	 * @see isNull(), isEmpty()
+	 */
+	bool isValid() const noexcept;
+
+	/**
+	 * @brief Const subscript operator for object key access.
+	 *
+	 * If this document contains an object, returns the value associated with the key.
+	 * If the key doesn't exist or this document is not an object, returns a null QTomlValue.
+	 *
+	 * @param key The key to look up in the object
+	 * @return QTomlValue associated with the key, or null if not found or not an object
+	 *
+	 * @note Provides Qt JSON API compatibility
+	 * @note Safe to use on array-based documents (returns null)
+	 * @see isObject()
+	 */
+	const QTomlValue operator[](const QString& key) const;
+
+	/**
+	 * @brief Const subscript operator for array index access.
+	 *
+	 * If this document contains an array, returns the value at the specified index.
+	 * If the index is out of bounds or this document is not an array, returns a null QTomlValue.
+	 *
+	 * @param i The index to access in the array
+	 * @return QTomlValue at the specified index, or null if invalid index or not an array
+	 *
+	 * @note Provides Qt JSON API compatibility
+	 * @note Safe to use on object-based documents (returns null)
+	 * @see isArray()
+	 */
+	const QTomlValue operator[](qsizetype i) const;
+
+	/**
+	 * @brief Const subscript operator for object key access with QLatin1StringView.
+	 *
+	 * String view variant of operator[] for efficient key lookup without string conversion.
+	 *
+	 * @param key The key to look up (QLatin1StringView)
+	 * @return QTomlValue associated with the key, or null if not found
+	 */
+	const QTomlValue operator[](QLatin1StringView key) const;
+
+	/**
+	 * @brief Const subscript operator for object key access with QStringView.
+	 *
+	 * String view variant of operator[] for efficient key lookup without string conversion.
+	 *
+	 * @param key The key to look up (QStringView)
+	 * @return QTomlValue associated with the key, or null if not found
+	 */
+	const QTomlValue operator[](QStringView key) const;
+
+	/**
+	 * @brief Swaps content with another QTomlDocument object.
+	 *
+	 * Efficiently swaps the content of two QTomlDocument objects without copying.
+	 * Uses smart pointer swap for optimal performance.
+	 *
+	 * @param other The other document to swap content with
+	 *
+	 * @note Marked noexcept for optimal performance
+	 * @note Time complexity is O(1)
+	 */
+	void swap(QTomlDocument& other) noexcept;
 
 private:
 	/**

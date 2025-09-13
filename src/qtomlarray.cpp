@@ -1146,3 +1146,210 @@ QStringList QTomlArray::toStringList() const
 
 	return list;
 }
+
+// ==================== Qt JSON API Compatibility Method Implementations ====================
+
+/**
+ * @brief Checks if the array contains no elements (STL compatibility).
+ *
+ * Implementation of STL-style empty() method. Returns true if the array
+ * has zero elements, providing compatibility with STL container interfaces.
+ */
+bool QTomlArray::empty() const noexcept
+{
+	return isEmpty();  // Delegate to existing implementation
+}
+
+/**
+ * @brief Removes the last element from the array.
+ *
+ * Implementation of STL-style pop_back() method. Safely removes the last
+ * element if present, with no effect on empty arrays.
+ */
+void QTomlArray::pop_back()
+{
+	if (!isEmpty()) {
+		removeAt(size() - 1);  // Remove last element directly
+	}
+}
+
+/**
+ * @brief Removes the first element from the array.
+ *
+ * Implementation of STL-style pop_front() method. Safely removes the first
+ * element if present, with no effect on empty arrays.
+ */
+void QTomlArray::pop_front()
+{
+	if (!isEmpty()) {
+		removeAt(0);  // Remove first element directly
+	}
+}
+
+/**
+ * @brief Appends an element to the end of the array (STL compatibility).
+ *
+ * Implementation of STL-style push_back() method. Equivalent to append()
+ * but follows STL naming conventions.
+ */
+void QTomlArray::push_back(const QTomlValue& value)
+{
+	append(value);  // Delegate to existing implementation
+}
+
+/**
+ * @brief Prepends an element to the beginning of the array (STL compatibility).
+ *
+ * Implementation of STL-style push_front() method. Equivalent to prepend()
+ * but follows STL naming conventions.
+ */
+void QTomlArray::push_front(const QTomlValue& value)
+{
+	prepend(value);  // Delegate to existing implementation
+}
+
+/**
+ * @brief Removes the first element from the array.
+ *
+ * Implementation of Qt JSON compatible removeFirst() method. Safely removes
+ * the first element with no effect on empty arrays.
+ */
+void QTomlArray::removeFirst()
+{
+	if (!isEmpty()) {
+		removeAt(0);  // Remove first element using existing implementation
+	}
+}
+
+/**
+ * @brief Removes the last element from the array.
+ *
+ * Implementation of Qt JSON compatible removeLast() method. Safely removes
+ * the last element with no effect on empty arrays.
+ */
+void QTomlArray::removeLast()
+{
+	if (!isEmpty()) {
+		removeAt(size() - 1);  // Remove last element using existing implementation
+	}
+}
+
+/**
+ * @brief Returns explicit const iterator to the beginning.
+ *
+ * Implementation of STL-style cbegin() method. Always returns const iterator
+ * regardless of array const-ness.
+ */
+QTomlArray::const_iterator QTomlArray::cbegin() const noexcept
+{
+	return constBegin();  // Delegate to existing implementation
+}
+
+/**
+ * @brief Returns explicit const iterator to the end.
+ *
+ * Implementation of STL-style cend() method. Always returns const iterator
+ * regardless of array const-ness.
+ */
+QTomlArray::const_iterator QTomlArray::cend() const noexcept
+{
+	return constEnd();  // Delegate to existing implementation
+}
+
+/**
+ * @brief Erases element at iterator position.
+ *
+ * Implementation of STL-style erase() method. Removes the element pointed to
+ * by the iterator and returns iterator to the following element.
+ */
+QTomlArray::iterator QTomlArray::erase(iterator it)
+{
+	// Calculate index from iterator
+	qsizetype index = it - begin();
+	
+	// Validate iterator bounds
+	if (index < 0 || index >= size()) {
+		return end();  // Invalid iterator
+	}
+	
+	// Remove element at calculated index
+	removeAt(index);
+	
+	// Return iterator to element that followed the erased one
+	// After removal, the same index now points to the next element
+	if (index >= size()) {
+		return end();  // Removed last element
+	}
+	return begin() + index;
+}
+
+/**
+ * @brief Inserts element before iterator position.
+ *
+ * Implementation of STL-style insert() method. Inserts value before the
+ * specified position and returns iterator to newly inserted element.
+ */
+QTomlArray::iterator QTomlArray::insert(iterator before, const QTomlValue& value)
+{
+	// Calculate index from iterator
+	qsizetype index = before - begin();
+	
+	// Validate iterator bounds (allow end() for append)
+	if (index < 0 || index > size()) {
+		return end();  // Invalid iterator
+	}
+	
+	// Insert element at calculated index
+	insert(index, value);
+	
+	// Return iterator to newly inserted element
+	return begin() + index;
+}
+
+/**
+ * @brief Array concatenation operator.
+ *
+ * Implementation of Qt JSON compatible operator+. Creates new array containing
+ * all elements of this array followed by the specified value.
+ */
+QTomlArray QTomlArray::operator+(const QTomlValue& value) const
+{
+	QTomlArray result = *this;  // Copy this array
+	result.append(value);       // Append the value
+	return result;              // Return new array
+}
+
+/**
+ * @brief Array append assignment operator.
+ *
+ * Implementation of Qt JSON compatible operator+=. Appends value to this array
+ * and returns reference for chaining operations.
+ */
+QTomlArray& QTomlArray::operator+=(const QTomlValue& value)
+{
+	append(value);  // Delegate to existing implementation
+	return *this;   // Return reference for chaining
+}
+
+/**
+ * @brief Stream insertion operator for convenient appending.
+ *
+ * Implementation of Qt JSON compatible operator<<. Provides stream-like syntax
+ * for appending values with chaining support.
+ */
+QTomlArray& QTomlArray::operator<<(const QTomlValue& value)
+{
+	append(value);  // Delegate to existing implementation
+	return *this;   // Return reference for chaining
+}
+
+/**
+ * @brief Checks if the array represents valid data.
+ *
+ * Implementation of Qt class standard isValid() method. Arrays are always
+ * valid once constructed, providing API consistency.
+ */
+bool QTomlArray::isValid() const noexcept
+{
+	return true;  // Arrays are always valid once constructed
+}

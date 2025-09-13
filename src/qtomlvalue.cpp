@@ -96,6 +96,7 @@
 #include "qtomldatetime.h"
 
 #include <QMetaType>
+#include <limits>
 #include <utility>
 #include <variant>
 
@@ -994,7 +995,7 @@ QString QTomlValue::toString() const
  * @code
  * QTomlValue intValue(42);
  * QVariant var = intValue.toVariant();
- * Q_ASSERT(var.type() == QVariant::LongLong);
+ * Q_ASSERT(var.typeId() == QMetaType::LongLong);
  * Q_ASSERT(var.toLongLong() == 42);
  *
  * QTomlValue arrayValue(QTomlArray{QTomlValue(1)});
@@ -1082,3 +1083,280 @@ QTomlValue::Type QTomlValue::type() const noexcept { return d_ptr->type_; }
  * @endcode
  */
 void QTomlValue::swap(QTomlValue& other) noexcept { d_ptr.swap(other.d_ptr); }
+
+// ==================== Qt JSON API Compatibility Method Implementations ====================
+
+/**
+ * @brief Converts the value to QTomlArray with default fallback.
+ *
+ * Implementation of Qt JSON API compatible toArray method with default value support.
+ * If the current value is not an array, returns the provided default instead of empty array.
+ *
+ * @example
+ * @code
+ * QTomlValue value(QTomlValue::String);  // Non-array value
+ * QTomlArray defaultArray{"default", "values"};
+ * QTomlArray result = value.toArray(defaultArray);
+ * Q_ASSERT(result.size() == 2);  // Got default array
+ * @endcode
+ */
+QTomlArray QTomlValue::toArray(const QTomlArray& defaultValue) const
+{
+	if (isArray()) {
+		return toArray();  // Use existing implementation
+	}
+	return defaultValue;  // Return provided default
+}
+
+/**
+ * @brief Converts the value to QTomlObject with default fallback.
+ *
+ * Implementation of Qt JSON API compatible toObject method with default value support.
+ * If the current value is not an object, returns the provided default instead of empty object.
+ *
+ * @example
+ * @code
+ * QTomlValue value(42);  // Non-object value
+ * QTomlObject defaultObj{{"default", QTomlValue("value")}};
+ * QTomlObject result = value.toObject(defaultObj);
+ * Q_ASSERT(result.contains("default"));  // Got default object
+ * @endcode
+ */
+QTomlObject QTomlValue::toObject(const QTomlObject& defaultValue) const
+{
+	if (isObject()) {
+		return toObject();  // Use existing implementation
+	}
+	return defaultValue;  // Return provided default
+}
+
+/**
+ * @brief Converts the value to QString with default fallback.
+ *
+ * Implementation of Qt JSON API compatible toString method with default value support.
+ * If the current value is not a string, returns the provided default instead of empty string.
+ *
+ * @example
+ * @code
+ * QTomlValue value(42);  // Non-string value
+ * QString result = value.toString("default");
+ * Q_ASSERT(result == "default");  // Got default string
+ * @endcode
+ */
+QString QTomlValue::toString(const QString& defaultValue) const
+{
+	if (isString()) {
+		return toString();  // Use existing implementation
+	}
+	return defaultValue;  // Return provided default
+}
+
+/**
+ * @brief Converts the value to 32-bit integer with default fallback.
+ *
+ * Implementation of Qt JSON API compatible toInt method. Provides same conversion
+ * logic as toInteger but with 32-bit return type and custom default support.
+ *
+ * @example
+ * @code
+ * QTomlValue intValue(123);
+ * QTomlValue stringValue("not a number");
+ * 
+ * int result1 = intValue.toInt();        // 123
+ * int result2 = stringValue.toInt(999);  // 999 (default)
+ * @endcode
+ */
+int QTomlValue::toInt(int defaultValue) const noexcept
+{
+	qint64 longResult = toInteger(static_cast<qint64>(defaultValue));
+	
+	// Clamp to 32-bit range to prevent overflow
+	if (longResult > std::numeric_limits<int>::max()) {
+		return std::numeric_limits<int>::max();
+	} else if (longResult < std::numeric_limits<int>::min()) {
+		return std::numeric_limits<int>::min();
+	}
+	
+	return static_cast<int>(longResult);
+}
+
+/**
+ * @brief Checks if the value represents valid data.
+ *
+ * Implementation of Qt class standard isValid method. Returns false only for
+ * undefined values, all other states (including null) are considered valid.
+ *
+ * @example
+ * @code
+ * QTomlValue validValue(42);
+ * QTomlValue nullValue;
+ * QTomlValue undefinedValue(QTomlValue::Undefined);
+ * 
+ * Q_ASSERT(validValue.isValid());     // true - has data
+ * Q_ASSERT(nullValue.isValid());      // true - null is valid state
+ * Q_ASSERT(!undefinedValue.isValid()); // false - undefined is invalid
+ * @endcode
+ */
+bool QTomlValue::isValid() const noexcept
+{
+	return !isUndefined();  // Only undefined values are invalid
+}
+
+/**
+ * @brief Creates QTomlValue from QVariant object.
+ *
+ * Implementation of Qt JSON API compatible fromVariant static method.
+ * Performs comprehensive type mapping from QVariant to QTomlValue.
+ *
+ * @example
+ * @code
+ * QVariant stringVar("hello");
+ * QVariant intVar(42);
+ * QVariant boolVar(true);
+ * 
+ * QTomlValue val1 = QTomlValue::fromVariant(stringVar);
+ * QTomlValue val2 = QTomlValue::fromVariant(intVar);
+ * QTomlValue val3 = QTomlValue::fromVariant(boolVar);
+ * 
+ * Q_ASSERT(val1.toString() == "hello");
+ * Q_ASSERT(val2.toInteger() == 42);
+ * Q_ASSERT(val3.toBool() == true);
+ * @endcode
+ */
+QTomlValue QTomlValue::fromVariant(const QVariant& variant)
+{
+	// Handle null/invalid variants
+	if (!variant.isValid() || variant.isNull()) {
+		return QTomlValue();  // Return null QTomlValue
+	}
+
+	// Direct QTomlValue extraction
+	if (variant.canConvert<QTomlValue>()) {
+		return variant.value<QTomlValue>();
+	}
+
+	// Handle basic types using Qt 6 typeId() API with switch
+	switch (variant.typeId()) {
+		case QMetaType::Bool:
+			return QTomlValue(variant.toBool());
+			
+		// Signed integer types
+		case QMetaType::Int:
+			return QTomlValue(static_cast<qint64>(variant.toInt()));
+		case QMetaType::LongLong:
+			return QTomlValue(variant.toLongLong());
+		case QMetaType::Short:
+			return QTomlValue(static_cast<qint64>(variant.value<short>()));
+		case QMetaType::Char:
+			return QTomlValue(static_cast<qint64>(variant.toChar().toLatin1()));
+		case QMetaType::SChar:
+			return QTomlValue(static_cast<qint64>(variant.value<signed char>()));
+			
+		// Unsigned integer types (with overflow checking for large values)
+		case QMetaType::UInt:
+			return QTomlValue(static_cast<qint64>(variant.toUInt()));
+		case QMetaType::ULongLong: {
+			qulonglong val = variant.toULongLong();
+			// Check for overflow when converting to signed
+			if (val <= static_cast<qulonglong>(std::numeric_limits<qint64>::max())) {
+				return QTomlValue(static_cast<qint64>(val));
+			} else {
+				// Convert to double for very large unsigned values
+				return QTomlValue(static_cast<double>(val));
+			}
+		}
+		case QMetaType::UShort:
+			return QTomlValue(static_cast<qint64>(variant.value<unsigned short>()));
+		case QMetaType::UChar:
+			return QTomlValue(static_cast<qint64>(variant.value<unsigned char>()));
+			
+		// Floating point types
+		case QMetaType::Double:
+			return QTomlValue(variant.toDouble());
+		case QMetaType::Float:
+			return QTomlValue(static_cast<double>(variant.toFloat()));
+			
+		// String types
+		case QMetaType::QString:
+			return QTomlValue(variant.toString());
+		case QMetaType::QByteArray:
+			return QTomlValue(QString::fromUtf8(variant.toByteArray()));
+		case QMetaType::QChar:
+			return QTomlValue(QString(variant.toChar()));
+			
+		default:
+			break;
+	}
+
+	// Handle QToml types
+	if (variant.canConvert<QTomlArray>()) {
+		return QTomlValue(variant.value<QTomlArray>());
+	}
+	
+	if (variant.canConvert<QTomlObject>()) {
+		return QTomlValue(variant.value<QTomlObject>());
+	}
+	
+	if (variant.canConvert<QTomlDateTime>()) {
+		return QTomlValue(variant.value<QTomlDateTime>());
+	}
+
+	// Unsupported type - return null
+	return QTomlValue();
+}
+
+/**
+ * @brief Const subscript operator for object key access.
+ *
+ * Implementation of Qt JSON API compatible operator[] for key access.
+ * Safely handles non-object values by returning null instead of crashing.
+ *
+ * @example
+ * @code
+ * QTomlObject obj{{"key", QTomlValue("value")}};
+ * QTomlValue objectValue(obj);
+ * QTomlValue nonObjectValue(42);
+ * 
+ * QTomlValue result1 = objectValue["key"];        // "value"
+ * QTomlValue result2 = objectValue["missing"];    // null
+ * QTomlValue result3 = nonObjectValue["key"];     // null (safe)
+ * @endcode
+ */
+const QTomlValue QTomlValue::operator[](const QString& key) const
+{
+	if (isObject()) {
+		QTomlObject obj = toObject();
+		if (obj.contains(key)) {
+			return obj.value(key);
+		}
+	}
+	return QTomlValue();  // Return null for missing keys or non-objects
+}
+
+/**
+ * @brief Const subscript operator for array index access.
+ *
+ * Implementation of Qt JSON API compatible operator[] for index access.
+ * Safely handles non-array values and out-of-bounds access by returning null.
+ *
+ * @example
+ * @code
+ * QTomlArray arr{QTomlValue("first"), QTomlValue("second")};
+ * QTomlValue arrayValue(arr);
+ * QTomlValue nonArrayValue("not an array");
+ * 
+ * QTomlValue result1 = arrayValue[0];    // "first"
+ * QTomlValue result2 = arrayValue[10];   // null (out of bounds)
+ * QTomlValue result3 = nonArrayValue[0]; // null (not an array)
+ * @endcode
+ */
+const QTomlValue QTomlValue::operator[](qsizetype i) const
+{
+	if (isArray()) {
+		QTomlArray arr = toArray();
+		if (i >= 0 && i < arr.size()) {
+			return arr.at(i);
+		}
+	}
+	return QTomlValue();  // Return null for out-of-bounds or non-arrays
+}

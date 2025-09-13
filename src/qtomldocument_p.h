@@ -61,6 +61,7 @@
 #pragma execution_character_set("utf-8")
 
 #include "qtomlobject.h"
+#include "qtomlarray.h"
 
   /**
    * @class QTomlDocumentPrivate
@@ -316,4 +317,23 @@ public:
 	 * @see QTomlDocument::isNull() for public state query interface
 	 */
 	bool is_null_;
+
+	// ==================== Qt JSON API Compatibility Extensions ====================
+
+	/**
+	 * @brief Flag indicating whether the document is array-based.
+	 *
+	 * This boolean flag tracks whether the document contains an array as its root
+	 * element instead of the standard TOML table. This provides Qt JSON API
+	 * compatibility but may not produce valid TOML according to strict specification.
+	 */
+	bool is_array_based_ = false;
+
+	/**
+	 * @brief Root array for array-based documents.
+	 *
+	 * Storage for the root array when the document is in array-based mode.
+	 * This enables Qt JSON API compatibility by supporting array root elements.
+	 */
+	QTomlArray root_array_;
 };

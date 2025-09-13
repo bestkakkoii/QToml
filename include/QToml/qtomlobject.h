@@ -38,7 +38,10 @@
 #include <QtGlobal>
 #include <QStringList>
 #include <QVariantMap>
+#include <QVariantHash>
 #include <QHash>
+#include <QLatin1StringView>
+#include <QStringView>
 #include <memory>
 #include <initializer_list>
 
@@ -957,6 +960,53 @@ public:
 	 * @see fromVariantMap(), QTomlValue::toVariant()
 	 */
 	QVariantMap toVariantMap() const;
+
+	// ==================== Qt JSON API Compatibility Methods ====================
+
+	// String view overloads for contains()
+	bool contains(QLatin1StringView key) const;
+	bool contains(QStringView key) const;
+
+	// String view overloads for remove()
+	void remove(QLatin1StringView key);
+	void remove(QStringView key);
+
+	// String view overloads for take()
+	QTomlValue take(QLatin1StringView key);
+	QTomlValue take(QStringView key);
+
+	// String view overloads for value()
+	QTomlValue value(QLatin1StringView key) const;
+	QTomlValue value(QStringView key) const;
+	QTomlValue value(QLatin1StringView key, const QTomlValue& defaultValue) const;
+	QTomlValue value(QStringView key, const QTomlValue& defaultValue) const;
+
+	// String view overloads for find()
+	iterator find(QLatin1StringView key) noexcept;
+	iterator find(QStringView key) noexcept;
+	const_iterator find(QLatin1StringView key) const noexcept;
+	const_iterator find(QStringView key) const noexcept;
+
+	// Const find methods
+	const_iterator constFind(const QString& key) const noexcept;
+	const_iterator constFind(QLatin1StringView key) const noexcept;
+	const_iterator constFind(QStringView key) const noexcept;
+
+	// String view overloads for subscript operators
+	QTomlValue operator[](QLatin1StringView key) const;
+	QTomlValue operator[](QStringView key) const;
+	QTomlValue& operator[](QLatin1StringView key);
+	QTomlValue& operator[](QStringView key);
+
+	// Additional methods for Qt JSON compatibility
+	bool empty() const noexcept;
+	qsizetype length() const noexcept;
+	iterator erase(iterator it);
+	bool isValid() const noexcept;
+
+	// QVariantHash support
+	QVariantHash toVariantHash() const;
+	static QTomlObject fromVariantHash(const QVariantHash& hash);
 
 	/**
 	 * @brief Creates a QTomlObject from a QVariantMap.

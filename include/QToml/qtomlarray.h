@@ -1064,6 +1064,277 @@ public:
 
 	QStringList toStringList() const;
 
+	// ==================== Qt JSON API Compatibility Methods ====================
+
+	/**
+	 * @brief Checks if the array contains no elements (STL compatibility).
+	 *
+	 * Returns true if the array has zero elements, false otherwise.
+	 * This method provides STL-style naming compatibility alongside isEmpty().
+	 *
+	 * @return true if array contains no elements, false otherwise
+	 *
+	 * @complexity O(1) - Constant time check
+	 * @exception noexcept guarantee
+	 *
+	 * @note Compatible with STL containers' empty() method
+	 * @note Equivalent to isEmpty() but follows STL naming convention
+	 * @see isEmpty(), size()
+	 */
+	bool empty() const noexcept;
+
+	/**
+	 * @brief Removes the last element from the array.
+	 *
+	 * Removes the last element (if any) from the array, decreasing the size by one.
+	 * If the array is empty, this operation has no effect and is safe to call.
+	 *
+	 * @complexity O(1) - Constant time operation
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Compatible with STL containers' pop_back() method
+	 * @note Safe to call on empty arrays (no-op)
+	 * @note Element is destroyed automatically
+	 * @see removeLast(), takeAt()
+	 */
+	void pop_back();
+
+	/**
+	 * @brief Removes the first element from the array.
+	 *
+	 * Removes the first element (if any) from the array, shifting all other elements
+	 * one position to the left and decreasing the size by one. If the array is empty,
+	 * this operation has no effect and is safe to call.
+	 *
+	 * @complexity O(n) where n is the number of elements
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Compatible with STL containers' pop_front() method
+	 * @note Safe to call on empty arrays (no-op)
+	 * @note Less efficient than pop_back() due to element shifting
+	 * @see removeFirst(), takeAt()
+	 */
+	void pop_front();
+
+	/**
+	 * @brief Appends an element to the end of the array (STL compatibility).
+	 *
+	 * Adds the specified value to the end of the array by copying it.
+	 * This method provides STL-style naming compatibility alongside append().
+	 *
+	 * @param value The QTomlValue to append to the array
+	 *
+	 * @complexity O(1) amortized - may be O(n) during reallocation
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Compatible with STL containers' push_back() method
+	 * @note Equivalent to append() but follows STL naming convention
+	 * @see append(), operator<<()
+	 */
+	void push_back(const QTomlValue& value);
+
+	/**
+	 * @brief Prepends an element to the beginning of the array (STL compatibility).
+	 *
+	 * Adds the specified value to the beginning of the array by copying it.
+	 * All existing elements are shifted one position to the right.
+	 * This method provides STL-style naming compatibility alongside prepend().
+	 *
+	 * @param value The QTomlValue to prepend to the array
+	 *
+	 * @complexity O(n) where n is the number of existing elements
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Compatible with STL containers' push_front() method
+	 * @note Equivalent to prepend() but follows STL naming convention
+	 * @note Less efficient than push_back() due to element shifting
+	 * @see prepend(), insert()
+	 */
+	void push_front(const QTomlValue& value);
+
+	/**
+	 * @brief Removes the first element from the array.
+	 *
+	 * Removes the first element from the array, shifting all other elements
+	 * one position to the left. If the array is empty, this operation has no effect.
+	 *
+	 * @complexity O(n) where n is the number of elements
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Compatible with QJsonArray::removeFirst() method
+	 * @note Safe to call on empty arrays (no-op)
+	 * @note Less efficient than removeLast() due to element shifting
+	 * @see pop_front(), takeAt()
+	 */
+	void removeFirst();
+
+	/**
+	 * @brief Removes the last element from the array.
+	 *
+	 * Removes the last element from the array. If the array is empty,
+	 * this operation has no effect and is safe to call.
+	 *
+	 * @complexity O(1) - Constant time operation
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Compatible with QJsonArray::removeLast() method
+	 * @note Safe to call on empty arrays (no-op)
+	 * @note More efficient than removeFirst() as no shifting required
+	 * @see pop_back(), takeAt()
+	 */
+	void removeLast();
+
+	/**
+	 * @brief Returns explicit const iterator to the beginning.
+	 *
+	 * Returns a const iterator pointing to the first element of the array.
+	 * This method provides explicit const iteration support following STL conventions.
+	 *
+	 * @return Const iterator to the first element
+	 *
+	 * @complexity O(1) - Constant time iterator creation
+	 * @exception noexcept guarantee
+	 *
+	 * @note Compatible with STL containers' cbegin() method
+	 * @note Always returns const iterator regardless of array const-ness
+	 * @note For empty arrays, cbegin() == cend()
+	 * @see cend(), constBegin()
+	 */
+	const_iterator cbegin() const noexcept;
+
+	/**
+	 * @brief Returns explicit const iterator to the end.
+	 *
+	 * Returns a const iterator pointing to one position past the last element.
+	 * This method provides explicit const iteration support following STL conventions.
+	 *
+	 * @return Const iterator to one past the last element
+	 *
+	 * @complexity O(1) - Constant time iterator creation
+	 * @exception noexcept guarantee
+	 *
+	 * @note Compatible with STL containers' cend() method
+	 * @note Always returns const iterator regardless of array const-ness
+	 * @note Should not be dereferenced
+	 * @see cbegin(), constEnd()
+	 */
+	const_iterator cend() const noexcept;
+
+	/**
+	 * @brief Erases element at iterator position.
+	 *
+	 * Removes the element pointed to by the iterator, shifting all subsequent
+	 * elements one position to the left. Returns an iterator to the element
+	 * that followed the erased element.
+	 *
+	 * @param it Iterator pointing to the element to erase
+	 * @return Iterator to the element following the erased element
+	 *
+	 * @complexity O(n) where n is the number of elements after the erased position
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Compatible with STL containers' erase() method
+	 * @note Iterator must be valid and dereferenceable
+	 * @note Returned iterator may be end() if last element was erased
+	 * @see removeAt(), takeAt()
+	 */
+	iterator erase(iterator it);
+
+	/**
+	 * @brief Inserts element before iterator position.
+	 *
+	 * Inserts the specified value before the position pointed to by the iterator,
+	 * shifting existing elements to the right. Returns an iterator to the
+	 * newly inserted element.
+	 *
+	 * @param before Iterator pointing to the position before which to insert
+	 * @param value The QTomlValue to insert
+	 * @return Iterator pointing to the newly inserted element
+	 *
+	 * @complexity O(n) where n is the number of elements after the insertion point
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Compatible with STL containers' insert() method
+	 * @note Iterator must be valid (may be end() for append)
+	 * @note All iterators after insertion point are invalidated
+	 * @see insert(qsizetype, const QTomlValue&)
+	 */
+	iterator insert(iterator before, const QTomlValue& value);
+
+	/**
+	 * @brief Array concatenation operator.
+	 *
+	 * Creates a new array containing all elements of this array followed by
+	 * the specified value. The original array remains unchanged.
+	 *
+	 * @param value The QTomlValue to append to the new array
+	 * @return New QTomlArray containing this array's elements plus the value
+	 *
+	 * @complexity O(n) where n is the size of this array
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Compatible with QJsonArray::operator+() method
+	 * @note Creates a new array; original arrays are unchanged
+	 * @note Less efficient than append() for single additions
+	 * @see operator+=(), operator<<()
+	 */
+	QTomlArray operator+(const QTomlValue& value) const;
+
+	/**
+	 * @brief Array append assignment operator.
+	 *
+	 * Appends the specified value to this array and returns a reference to this array.
+	 * This enables chaining of append operations.
+	 *
+	 * @param value The QTomlValue to append to this array
+	 * @return Reference to this array for chaining operations
+	 *
+	 * @complexity O(1) amortized - may be O(n) during reallocation
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Compatible with QJsonArray::operator+=() method
+	 * @note Modifies this array in place
+	 * @note Supports operation chaining
+	 * @see append(), operator<<()
+	 */
+	QTomlArray& operator+=(const QTomlValue& value);
+
+	/**
+	 * @brief Stream insertion operator for convenient appending.
+	 *
+	 * Appends the specified value to this array using stream-like syntax.
+	 * Returns a reference to this array for chaining operations.
+	 *
+	 * @param value The QTomlValue to append to this array
+	 * @return Reference to this array for chaining operations
+	 *
+	 * @complexity O(1) amortized - may be O(n) during reallocation
+	 * @exception Strong exception safety guarantee
+	 *
+	 * @note Compatible with QJsonArray::operator<<() method
+	 * @note Provides convenient stream-like syntax
+	 * @note Supports operation chaining
+	 * @see append(), operator+=()
+	 */
+	QTomlArray& operator<<(const QTomlValue& value);
+
+	/**
+	 * @brief Checks if the array represents valid data.
+	 *
+	 * Returns true for all constructed arrays. This method provides
+	 * Qt class API consistency with other QToml classes.
+	 *
+	 * @return true (arrays are always valid once constructed)
+	 *
+	 * @complexity O(1) - Constant time check
+	 * @exception noexcept guarantee
+	 *
+	 * @note Qt class API consistency method
+	 * @note Arrays are always valid once constructed
+	 * @see isEmpty(), size()
+	 */
+	bool isValid() const noexcept;
+
 private:
 	/**
 	 * @brief Private implementation pointer (PIMPL pattern).

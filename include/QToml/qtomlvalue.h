@@ -598,6 +598,158 @@ public:
 	 */
 	Type type() const noexcept;
 
+	// ==================== Qt JSON API Compatibility Methods ====================
+
+	/**
+	 * @brief Converts the value to QTomlArray with default fallback.
+	 *
+	 * If the current value is of Array type, returns its array content;
+	 * otherwise returns the provided default array. This overload provides
+	 * Qt JSON API compatibility.
+	 *
+	 * @param defaultValue The default array to return if type mismatch occurs
+	 * @return QTomlArray object, defaultValue if type mismatch
+	 *
+	 * @note Compatible with QJsonValue::toArray(const QJsonArray&) const
+	 * @note Returns a copy, modifications will not affect the original object
+	 * @see isArray(), toArray()
+	 */
+	QTomlArray toArray(const QTomlArray& defaultValue) const;
+
+	/**
+	 * @brief Converts the value to QTomlObject with default fallback.
+	 *
+	 * If the current value is of Hash type, returns its object content;
+	 * otherwise returns the provided default object. This overload provides
+	 * Qt JSON API compatibility.
+	 *
+	 * @param defaultValue The default object to return if type mismatch occurs
+	 * @return QTomlObject object, defaultValue if type mismatch
+	 *
+	 * @note Compatible with QJsonValue::toObject(const QJsonObject&) const
+	 * @note Returns a copy, modifications will not affect the original object
+	 * @see isObject(), toObject()
+	 */
+	QTomlObject toObject(const QTomlObject& defaultValue) const;
+
+	/**
+	 * @brief Converts the value to QString with default fallback.
+	 *
+	 * If the current value is of String type, returns its string content;
+	 * otherwise returns the provided default string. This overload provides
+	 * Qt JSON API compatibility.
+	 *
+	 * @param defaultValue The default string to return if type mismatch occurs
+	 * @return QString object, defaultValue if type mismatch
+	 *
+	 * @note Compatible with QJsonValue::toString(const QString&) const
+	 * @note Will not convert numbers or other types to string representation
+	 * @see isString(), toString()
+	 */
+	QString toString(const QString& defaultValue) const;
+
+	/**
+	 * @brief Converts the value to 32-bit integer with default fallback.
+	 *
+	 * If the current value is of Integer type, returns its value cast to int;
+	 * if it's of Double type, performs truncation conversion;
+	 * otherwise returns the specified default value. This method provides
+	 * Qt JSON API compatibility.
+	 *
+	 * @param defaultValue Default return value when type mismatch occurs
+	 * @return 32-bit integer, supports conversion from double and default fallback
+	 *
+	 * @note Compatible with QJsonValue::toInt(int) const
+	 * @note Marked as noexcept, supports truncation conversion from Double to Integer
+	 * @note Large integers may be truncated to fit in 32-bit range
+	 * @see isInteger(), isDouble(), toInteger()
+	 */
+	int toInt(int defaultValue = 0) const noexcept;
+
+	/**
+	 * @brief Checks if the value represents valid data.
+	 *
+	 * Returns true if the value is not in an undefined state and contains
+	 * valid data according to TOML specification. This method provides
+	 * Qt class API consistency.
+	 *
+	 * @return true if value is valid, false if undefined or invalid
+	 *
+	 * @note Marked as noexcept, time complexity is O(1)
+	 * @note Undefined values are considered invalid
+	 * @note Null values are considered valid (empty state)
+	 * @see isNull(), isUndefined(), type()
+	 */
+	bool isValid() const noexcept;
+
+	// ==================== Static Factory Methods ====================
+
+	/**
+	 * @brief Creates QTomlValue from QVariant object.
+	 *
+	 * Attempts to convert a QVariant to QTomlValue using appropriate type mapping.
+	 * This method enables integration with Qt's variant system and provides
+	 * Qt JSON API compatibility.
+	 *
+	 * Supported conversions:
+	 * - Boolean types: Bool → QTomlValue(bool)
+	 * - Signed integer types: Int, LongLong, Short, Char, SChar → QTomlValue(qint64)
+	 * - Unsigned integer types: UInt, ULongLong, UShort, UChar → QTomlValue(qint64)
+	 * - Floating point types: Double, Float → QTomlValue(double)
+	 * - String types: QString, QByteArray, QChar → QTomlValue(QString)
+	 * - QVariant containing QTomlValue → Direct extraction
+	 * - QVariant containing QTomlArray → QTomlValue(QTomlArray)
+	 * - QVariant containing QTomlObject → QTomlValue(QTomlObject)
+	 * - QVariant containing QTomlDateTime → QTomlValue(QTomlDateTime)
+	 * - Other types → QTomlValue() (null)
+	 *
+	 * @param variant The QVariant object to convert
+	 * @return QTomlValue containing converted data, or null value if conversion fails
+	 *
+	 * @note Compatible with QJsonValue::fromVariant(const QVariant&)
+	 * @note This is a static method; conversion failure returns null value
+	 * @note Unsupported QVariant types result in null QTomlValue
+	 * @see toVariant()
+	 */
+	static QTomlValue fromVariant(const QVariant& variant);
+
+	// ==================== Subscript Access Operators ====================
+
+	/**
+	 * @brief Const subscript operator for object key access.
+	 *
+	 * If this value contains an object, returns the value associated with the key.
+	 * If the key doesn't exist or this value is not an object, returns a null QTomlValue.
+	 * This operator provides Qt JSON API compatibility.
+	 *
+	 * @param key The key to look up in the object
+	 * @return QTomlValue associated with the key, or null if key doesn't exist or not an object
+	 *
+	 * @note Compatible with QJsonValue::operator[](const QString&) const
+	 * @note Returns a copy, not a reference
+	 * @note Safe to use on non-object values (returns null)
+	 * @see isObject(), toObject()
+	 */
+	const QTomlValue operator[](const QString& key) const;
+
+	/**
+	 * @brief Const subscript operator for array index access.
+	 *
+	 * If this value contains an array, returns the value at the specified index.
+	 * If the index is out of bounds or this value is not an array, returns a null QTomlValue.
+	 * This operator provides Qt JSON API compatibility.
+	 *
+	 * @param i The index to access in the array
+	 * @return QTomlValue at the specified index, or null if index invalid or not an array
+	 *
+	 * @note Compatible with QJsonValue::operator[](qsizetype) const
+	 * @note Returns a copy, not a reference
+	 * @note Safe to use on non-array values (returns null)
+	 * @note No bounds checking - out of range access returns null
+	 * @see isArray(), toArray()
+	 */
+	const QTomlValue operator[](qsizetype i) const;
+
 	/**
 	 * @brief Swaps content with another QTomlValue object.
 	 *

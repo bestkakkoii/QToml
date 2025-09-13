@@ -492,6 +492,38 @@ public:
 	 */
 	QDateTime toQDateTime() const noexcept;
 
+	// ==================== Qt Class API Consistency Methods ====================
+
+	/**
+	 * @brief Checks if this temporal value represents valid data.
+	 *
+	 * Returns true if this object contains valid temporal data according to
+	 * TOML date/time specifications. This method provides Qt class API consistency.
+	 *
+	 * @return true if temporal value is valid, false if null or invalid
+	 */
+	bool isValid() const noexcept;
+
+	/**
+	 * @brief Checks if this temporal value is empty (alias for isNull).
+	 *
+	 * Returns true if this object contains no temporal data. This method
+	 * provides naming consistency with Qt container classes.
+	 *
+	 * @return true if temporal value is empty/null, false otherwise
+	 */
+	bool isEmpty() const noexcept;
+
+	/**
+	 * @brief Swaps content with another QTomlDateTime object.
+	 *
+	 * Efficiently swaps the content of two QTomlDateTime objects without copying.
+	 * Uses smart pointer swap for optimal performance.
+	 *
+	 * @param other The other QTomlDateTime to swap content with
+	 */
+	void swap(QTomlDateTime& other) noexcept;
+
 private:
 	/**
 	 * @brief Friend class for internal conversion operations.
