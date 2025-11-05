@@ -62,3 +62,8 @@ compile_commands.json
 /win/vc/deploy/bin
 /CLAUDE.md
 /INFO.MD
+/.bmad-core
+/.claude
+/.serena
+/.spec-workflow
+*.md
