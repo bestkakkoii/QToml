@@ -334,7 +334,7 @@ namespace
 	{
 		switch (value.type())
 		{
-		case QTomlValue::Hash:
+		case QTomlValue::Object:
 			table.insert_or_assign(key, convert_hash_to_table(value.toObject()));
 			break;
 
@@ -448,7 +448,7 @@ namespace
 	{
 		switch (value.type())
 		{
-		case QTomlValue::Hash:
+		case QTomlValue::Object:
 			array.push_back(convert_hash_to_table(value.toObject()));
 			break;
 
@@ -771,7 +771,7 @@ QTomlObject QTomlDocument::object() const
  * @note Document becomes non-null after setting
  * @note Hash content is copied for independence
  */
-void QTomlDocument::setHash(const QTomlObject& object)
+void QTomlDocument::setObject(const QTomlObject& object)
 {
 	d_ptr->is_null_ = false;
 	d_ptr->root_hash_ = object;

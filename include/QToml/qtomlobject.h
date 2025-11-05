@@ -355,6 +355,8 @@ public:
 	 * @endcode
 	 *
 	 * @note This function does not change the table size, only its capacity
+	 * @note **QToml Extension**: This method is not present in Qt JSON API (QJsonObject)
+	 * @note Provides performance optimization for scenarios with predictable data sizes
 	 * @see capacity(), size()
 	 */
 	void reserve(qsizetype size);
@@ -385,6 +387,8 @@ public:
 	 * @endcode
 	 *
 	 * @note Marked noexcept as it never throws exceptions
+	 * @note **QToml Extension**: This method is not present in Qt JSON API (QJsonObject)
+	 * @note Useful for performance profiling and memory usage analysis
 	 * @see reserve(), size()
 	 */
 	qsizetype capacity() const noexcept;

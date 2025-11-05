@@ -388,6 +388,9 @@ public:
 	 *     array.append(QTomlValue(i));
 	 * }
 	 * @endcode
+	 *
+	 * @note **QToml Extension**: This method is not present in Qt JSON API (QJsonArray)
+	 * @note Provides performance optimization for scenarios with predictable data sizes
 	 */
 	void reserve(qsizetype size);
 
@@ -416,6 +419,9 @@ public:
 	 * Q_ASSERT(array.capacity() >= 100); // At least 100
 	 * Q_ASSERT(array.size() == 0);       // Still empty
 	 * @endcode
+	 *
+	 * @note **QToml Extension**: This method is not present in Qt JSON API (QJsonArray)
+	 * @note Useful for performance profiling and memory usage analysis
 	 */
 	qsizetype capacity() const noexcept;
 

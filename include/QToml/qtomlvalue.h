@@ -63,7 +63,7 @@ class QTomlDateTime;
  * - String: UTF-8 strings
  * - DateTime: Date-time values (supports date-only, time-only, full date-time)
  * - Array: Arrays (can contain heterogeneous elements)
- * - Hash: Tables/objects (key-value pair collections)
+ * - Object: Tables/objects (key-value pair collections)
  * - Undefined: Undefined value (used for error handling)
  *
  * The interface design follows Qt style and maintains high consistency with QJsonValue,
@@ -82,7 +82,7 @@ class QTomlDateTime;
  * QTomlValue doubleVal(3.14);                  // Double
  * QTomlValue stringVal("Hello, TOML!");        // String
  * QTomlValue arrayVal(QTomlArray{...});        // Array
- * QTomlValue hashVal(QTomlObject{...});          // Hash
+ * QTomlValue hashVal(QTomlObject{...});          // Object
  *
  * // Type checking and safe conversion
  * if (intVal.isInteger()) {
@@ -120,7 +120,7 @@ public:
 		String,            ///< UTF-8 encoded string, supports multiline and literal strings
 		DateTime,          ///< Date-time value, supports multiple formats and time zones
 		Array,             ///< Heterogeneous array, can contain elements of any type
-		Hash,              ///< Key-value pair table, keys must be strings, values can be any type
+		Object,            ///< Key-value pair table, keys must be strings, values can be any type
 		Undefined = -1     ///< Undefined value, usually indicates error state or result of invalid operation
 	};
 	Q_ENUM(Type);
@@ -138,13 +138,13 @@ public:
 	 * - String: Empty string
 	 * - DateTime: Empty date-time
 	 * - Array: Empty array
-	 * - Hash: Empty table
+	 * - Object: Empty table
 	 * - Undefined: Undefined state
 	 *
 	 * @param type The value type to create, defaults to Null
 	 *
 	 * @note Marked as noexcept, time complexity is O(1)
-	 * @note For container types (Array, Hash), creates empty containers
+	 * @note For container types (Array, Object), creates empty containers
 	 */
 	QTomlValue(Type type = Null) noexcept;
 
@@ -263,7 +263,7 @@ public:
 	 * @brief QTomlObject constructor (copy version).
 	 *
 	 * Creates a QTomlValue from a QTomlObject object, performing a deep copy of the table content.
-	 * The created QTomlValue type is Hash.
+	 * The created QTomlValue type is Object.
 	 *
 	 * @param h The QTomlObject object to copy
 	 *
@@ -404,7 +404,7 @@ public:
 	/**
 	 * @brief Checks if the value is of object/table type.
 	 *
-	 * @return true if the value type is Hash, false otherwise
+	 * @return true if the value type is Object, false otherwise
 	 * @note Marked as noexcept, time complexity is O(1)
 	 * @see toObject()
 	 */
@@ -504,7 +504,7 @@ public:
 	/**
 	 * @brief Converts the value to QTomlObject.
 	 *
-	 * If the current value is of Hash type, returns its table content;
+	 * If the current value is of Object type, returns its table content;
 	 * otherwise returns an empty QTomlObject object.
 	 *
 	 * @return QTomlObject object, empty table if type mismatch
@@ -554,12 +554,12 @@ public:
 	 * - String → QVariant(QString)
 	 * - DateTime → QVariant::fromValue(QTomlDateTime)
 	 * - Array → QVariant::fromValue(QTomlArray)
-	 * - Hash → QVariant::fromValue(QTomlObject)
+	 * - Object → QVariant::fromValue(QTomlObject)
 	 *
 	 * @return Corresponding QVariant object
 	 *
 	 * @note Uses std::visit for efficient type dispatching
-	 * @note Complex types (DateTime, Array, Hash) are wrapped using QVariant::fromValue
+	 * @note Complex types (DateTime, Array, Object) are wrapped using QVariant::fromValue
 	 * @see QVariant::fromValue(), Q_DECLARE_METATYPE
 	 *
 	 * @example
@@ -619,7 +619,7 @@ public:
 	/**
 	 * @brief Converts the value to QTomlObject with default fallback.
 	 *
-	 * If the current value is of Hash type, returns its object content;
+	 * If the current value is of Object type, returns its object content;
 	 * otherwise returns the provided default object. This overload provides
 	 * Qt JSON API compatibility.
 	 *

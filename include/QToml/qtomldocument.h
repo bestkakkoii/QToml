@@ -165,7 +165,7 @@ class QTomlParseError;
  * // Modify and serialize
  * database.insert("timeout", QTomlValue(30));
  * root.insert("database", QTomlValue(database));
- * doc.setHash(root);
+ * doc.setObject(root);
  *
  * QByteArray output = doc.toToml();
  * qDebug() << "Generated TOML:" << output;
@@ -191,7 +191,7 @@ public:
 	 * @exception noexcept guarantee
 	 *
 	 * @note Marked noexcept for optimal performance
-	 * @note Empty documents can be populated via setHash() to become non-empty
+	 * @note Empty documents can be populated via setObject() to become non-empty
 	 * @note Default state allows immediate use without additional initialization
 	 *
 	 * @example
@@ -203,7 +203,7 @@ public:
 	 * // Document is ready for use
 	 * QTomlObject config;
 	 * config.insert("version", QTomlValue("1.0"));
-	 * doc.setHash(config);                // Now populated
+	 * doc.setObject(config);                // Now populated
 	 * Q_ASSERT(!doc.isNull());            // No longer null
 	 * @endcode
 	 */
@@ -268,7 +268,7 @@ public:
 	 * // Verify independence
 	 * QTomlObject copyRoot = copy.object();
 	 * copyRoot.insert("new_item", QTomlValue(42));
-	 * copy.setHash(copyRoot);
+	 * copy.setObject(copyRoot);
 	 *
 	 * Q_ASSERT(!original.object().contains("new_item"));  // Original unchanged
 	 * Q_ASSERT(copy.object().contains("new_item"));       // Copy modified
@@ -423,7 +423,7 @@ public:
 	 * Q_ASSERT(!doc.isObject());            // Default construction is null
 	 *
 	 * QTomlObject emptyHash;
-	 * doc.setHash(emptyHash);
+	 * doc.setObject(emptyHash);
 	 * Q_ASSERT(doc.isObject());             // Now contains valid (empty) table
 	 *
 	 * QTomlDocument parsed = QTomlDocument::fromToml("key = 'value'");
@@ -445,7 +445,7 @@ public:
 	 * @exception noexcept guarantee
 	 *
 	 * @note Empty document is different from document containing empty table
-	 * @note Null documents require setHash() call before serialization
+	 * @note Null documents require setObject() call before serialization
 	 * @see isEmpty(), isObject()
 	 *
 	 * @example
@@ -454,7 +454,7 @@ public:
 	 * Q_ASSERT(doc.isNull());             // Default construction is null
 	 *
 	 * QTomlObject emptyHash;
-	 * doc.setHash(emptyHash);
+	 * doc.setObject(emptyHash);
 	 * Q_ASSERT(!doc.isNull());            // No longer null (has empty table)
 	 * Q_ASSERT(doc.isEmpty());            // But is empty (table has no content)
 	 *
@@ -487,12 +487,12 @@ public:
 	 * Q_ASSERT(doc.isEmpty());            // Default construction is empty
 	 *
 	 * QTomlObject emptyHash;
-	 * doc.setHash(emptyHash);
+	 * doc.setObject(emptyHash);
 	 * Q_ASSERT(doc.isEmpty());            // Empty table is still empty
 	 *
 	 * QTomlObject filledHash;
 	 * filledHash.insert("key", QTomlValue("value"));
-	 * doc.setHash(filledHash);
+	 * doc.setObject(filledHash);
 	 * Q_ASSERT(!doc.isEmpty());           // Now contains data
 	 * @endcode
 	 */
@@ -513,8 +513,8 @@ public:
 	 * @exception Strong exception safety guarantee
 	 *
 	 * @note Returns a copy; modifications won't affect document's original content
-	 * @note To modify document, modify returned table then call setHash()
-	 * @see setHash()
+	 * @note To modify document, modify returned table then call setObject()
+	 * @see setObject()
 	 *
 	 * @example
 	 * @code
@@ -523,7 +523,7 @@ public:
 	 *
 	 * // Modify content
 	 * root.insert("new_key", QTomlValue("new_value"));
-	 * doc.setHash(root);  // Apply modifications
+	 * doc.setObject(root);  // Apply modifications
 	 *
 	 * // Verify changes
 	 * Q_ASSERT(doc.object().contains("new_key"));
@@ -556,7 +556,7 @@ public:
 	 * QTomlObject config;
 	 * config.insert("app_name", QTomlValue("MyApp"));
 	 *
-	 * doc.setHash(config);  // Set document content
+	 * doc.setObject(config);  // Set document content
 	 * Q_ASSERT(!doc.isNull());            // No longer null
 	 * Q_ASSERT(!doc.isEmpty());           // Contains data
 	 *
@@ -565,7 +565,7 @@ public:
 	 * Q_ASSERT(!doc.isEmpty());           // Document unchanged
 	 * @endcode
 	 */
-	void setHash(const QTomlObject& object);
+	void setObject(const QTomlObject& object);
 
 	// ==================== TOML Parsing and Serialization ====================
 
@@ -828,7 +828,7 @@ public:
 	 * @note Provides Qt JSON API compatibility
 	 * @note After setting, document becomes non-null
 	 * @note May not produce valid TOML according to strict specification
-	 * @see array(), setHash()
+	 * @see array(), setObject()
 	 */
 	void setArray(const QTomlArray& array);
 

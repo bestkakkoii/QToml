@@ -56,7 +56,7 @@
   * - **String**: QString for UTF-8 text with Unicode support
   * - **DateTime**: QTomlDateTime for RFC 3339 compliant timestamps
   * - **Array**: QTomlArray for ordered, heterogeneous collections
-  * - **Hash**: QTomlObject for unordered key-value mappings
+  * - **Object**: QTomlObject for unordered key-value mappings
   *
   * Performance characteristics:
   * - Storage size equals largest contained type plus discriminator
@@ -143,7 +143,7 @@ namespace
  * - **String**: Empty QString (no text content)
  * - **DateTime**: Empty QTomlDateTime (invalid date-time)
  * - **Array**: Empty QTomlArray (no elements)
- * - **Hash**: Empty QTomlObject (no key-value pairs)
+ * - **Object**: Empty QTomlObject (no key-value pairs)
  *
  * @param type The QTomlValue::Type to create, defaults to Null
  *
@@ -152,7 +152,7 @@ namespace
  *
  * @note Marked noexcept for optimal performance
  * @note All defaults are sensible and type-appropriate
- * @note Container types (Array, Hash) are immediately usable
+ * @note Container types (Array, Object) are immediately usable
  *
  * @example
  * @code
@@ -178,7 +178,7 @@ QTomlValue::QTomlValue(Type type) noexcept
 	case String:   d_ptr->value_.emplace<QString>();          break;
 	case DateTime: d_ptr->value_.emplace<QTomlDateTime>();    break;
 	case Array:    d_ptr->value_.emplace<QTomlArray>();       break;
-	case Hash:     d_ptr->value_.emplace<QTomlObject>();        break;
+	case Object:     d_ptr->value_.emplace<QTomlObject>();        break;
 	case Null:
 	case Undefined:
 	default:       d_ptr->value_.emplace<std::monostate>();   break;
@@ -474,7 +474,7 @@ QTomlValue::QTomlValue(QTomlArray&& a) noexcept
  * @complexity O(n) where n is the number of key-value pairs
  * @exception Strong exception safety guarantee
  *
- * @note Creates Hash type QTomlValue
+ * @note Creates Object type QTomlValue
  * @note Deep copy ensures independence
  * @note All nested values are recursively copied
  *
@@ -489,7 +489,7 @@ QTomlValue::QTomlValue(QTomlArray&& a) noexcept
 QTomlValue::QTomlValue(const QTomlObject& h)
 	: d_ptr(std::make_unique<QTomlValuePrivate>())
 {
-	d_ptr->type_ = Hash;
+	d_ptr->type_ = Object;
 	d_ptr->value_ = h;
 }
 
@@ -511,7 +511,7 @@ QTomlValue::QTomlValue(const QTomlObject& h)
  *
  * @example
  * @code
- * QTomlObject temp = generateLargeHash();
+ * QTomlObject temp = generateLargeObject();
  * QTomlValue value(std::move(temp));      // Efficient move
  * // temp is now empty but valid
  * Q_ASSERT(temp.isEmpty());
@@ -520,7 +520,7 @@ QTomlValue::QTomlValue(const QTomlObject& h)
 QTomlValue::QTomlValue(QTomlObject&& h) noexcept
 	: d_ptr(std::make_unique<QTomlValuePrivate>())
 {
-	d_ptr->type_ = Hash;
+	d_ptr->type_ = Object;
 	d_ptr->value_ = std::move(h);
 }
 
@@ -679,10 +679,10 @@ bool QTomlValue::isNull() const noexcept { return d_ptr->type_ == Null; }
 
 /**
  * @brief Checks if value is of object type.
- * @return true if type is Hash, false otherwise
+ * @return true if type is Object, false otherwise
  * @note Marked noexcept for performance
  */
-bool QTomlValue::isObject() const noexcept { return d_ptr->type_ == Hash; }
+bool QTomlValue::isObject() const noexcept { return d_ptr->type_ == Object; }
 
 /**
  * @brief Checks if value is of string type.
@@ -867,7 +867,7 @@ qint64 QTomlValue::toInteger(qint64 defaultValue) const noexcept
 /**
  * @brief Converts value to QTomlObject with type safety.
  *
- * Returns the contained QTomlObject if the value is of Hash type,
+ * Returns the contained QTomlObject if the value is of Object type,
  * otherwise returns an empty QTomlObject.
  *
  * @return QTomlObject content or empty object if wrong type
@@ -876,7 +876,7 @@ qint64 QTomlValue::toInteger(qint64 defaultValue) const noexcept
  * @exception Strong exception safety guarantee
  *
  * @note Returns copy for safety
- * @note Only returns content for Hash type values
+ * @note Only returns content for Object type values
  *
  * @example
  * @code

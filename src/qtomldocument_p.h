@@ -128,7 +128,7 @@ public:
 	 * - is_null_ is set to true indicating uninitialized state
 	 * - root_hash_ is default-constructed (empty but valid QTomlObject)
 	 * - Document cannot be serialized until is_null_ becomes false
-	 * - State can be changed through QTomlDocument::setHash() or parsing operations
+	 * - State can be changed through QTomlDocument::setObject() or parsing operations
 	 *
 	 * @complexity O(1) - Constant time construction
 	 * @exception Strong exception safety through QTomlObject default constructor
@@ -270,7 +270,7 @@ public:
 	 *
 	 * Usage patterns:
 	 * - Default construction sets this to true
-	 * - QTomlDocument::setHash() sets this to false
+	 * - QTomlDocument::setObject() sets this to false
 	 * - Successful parsing sets this to false
 	 * - Used by QTomlDocument::isNull() for public state queries
 	 * - Controls serialization behavior (null documents cannot be serialized)
